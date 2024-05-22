@@ -52,14 +52,8 @@
     },
     "cachem": {
       "Package": "cachem",
-      "Version": "1.0.8",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "fastmap",
-        "rlang"
-      ],
-      "Hash": "c35768291560ce302c0a6589f92e837d"
+      "Version": "1.1.0",
+      "Source": "Repository"
     },
     "cli": {
       "Package": "cli",
@@ -74,14 +68,8 @@
     },
     "digest": {
       "Package": "digest",
-      "Version": "0.6.33",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "utils"
-      ],
-      "Hash": "b18a9cf3c003977b0cc49d5e76ebe48d"
+      "Version": "0.6.35",
+      "Source": "Repository"
     },
     "ellipsis": {
       "Package": "ellipsis",
@@ -107,10 +95,8 @@
     },
     "fastmap": {
       "Package": "fastmap",
-      "Version": "1.1.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "f7736a18de97dea803bde0a2daaafb27"
+      "Version": "1.2.0",
+      "Source": "Repository"
     },
     "fontawesome": {
       "Package": "fontawesome",
@@ -126,25 +112,13 @@
     },
     "fs": {
       "Package": "fs",
-      "Version": "1.6.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "methods"
-      ],
-      "Hash": "47b5f30c720c23999b913a1a635cf0bb"
+      "Version": "1.6.4",
+      "Source": "Repository"
     },
     "glue": {
       "Package": "glue",
-      "Version": "1.6.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "methods"
-      ],
-      "Hash": "4f2596dfb05dac67b9dc558e5c6fba2e"
+      "Version": "1.7.0",
+      "Source": "Repository"
     },
     "highr": {
       "Package": "highr",
@@ -159,20 +133,8 @@
     },
     "htmltools": {
       "Package": "htmltools",
-      "Version": "0.5.7",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "base64enc",
-        "digest",
-        "ellipsis",
-        "fastmap",
-        "grDevices",
-        "rlang",
-        "utils"
-      ],
-      "Hash": "2d7b3857980e0e0d0a1fd6f11928ab0f"
+      "Version": "0.5.8.1",
+      "Source": "Repository"
     },
     "jquerylib": {
       "Package": "jquerylib",
@@ -276,14 +238,8 @@
     },
     "rlang": {
       "Package": "rlang",
-      "Version": "1.1.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "utils"
-      ],
-      "Hash": "50a6dbdc522936ca35afc5e2082ea91b"
+      "Version": "1.1.3",
+      "Source": "Repository"
     },
     "rmarkdown": {
       "Package": "rmarkdown",
@@ -311,30 +267,13 @@
     },
     "sass": {
       "Package": "sass",
-      "Version": "0.4.8",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R6",
-        "fs",
-        "htmltools",
-        "rappdirs",
-        "rlang"
-      ],
-      "Hash": "168f9353c76d4c4b0a0bbf72e2c2d035"
+      "Version": "0.4.9",
+      "Source": "Repository"
     },
     "stringi": {
       "Package": "stringi",
-      "Version": "1.8.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "stats",
-        "tools",
-        "utils"
-      ],
-      "Hash": "058aebddea264f4c99401515182e656a"
+      "Version": "1.8.4",
+      "Source": "Repository"
     },
     "stringr": {
       "Package": "stringr",
@@ -379,14 +318,8 @@
     },
     "xfun": {
       "Package": "xfun",
-      "Version": "0.41",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "stats",
-        "tools"
-      ],
-      "Hash": "460a5e0fe46a80ef87424ad216028014"
+      "Version": "0.44",
+      "Source": "Repository"
     },
     "yaml": {
       "Package": "yaml",
