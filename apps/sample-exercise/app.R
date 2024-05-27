@@ -23,26 +23,10 @@ library(dplyr)
 library(readr)
 
 
-## ---- SOURCES: ---------------------------------------------------------------
-
-# source("R/<File_name>.R", encoding = 'UTF-8')
-
-
-## ---- CONSTANTS: -------------------------------------------------------------
-
-# <level_1_section>:
-
-## <level_2_section>:
-
-
-## ---- FUNCTIONS: -------------------------------------------------------------
-
-
 ## ---- MAIN: ------------------------------------------------------------------
 
-## ----<chunk-name>----------------------------------------
+## ----create-user-interface----------------------------------------------------
 
-# Define UI for application that draws a histogram
 ui <- fluidPage(
 
   # Application title
@@ -68,7 +52,9 @@ ui <- fluidPage(
   )
 )
 
-# Define server logic required to draw a histogram
+
+## ----create-server-logic------------------------------------------------------
+
 server <- function(input, output) {
 
   user_email <- "email@domain.com"
@@ -132,6 +118,9 @@ server <- function(input, output) {
     else ""
   )
 }
+
+
+## ----run-shiny-app------------------------------------------------------------
 
 # Run the application
 shinyApp(ui, server)
