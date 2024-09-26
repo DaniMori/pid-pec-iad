@@ -15,6 +15,7 @@
 
 library(shiny)
 library(shinyjs)
+library(shinyvalidate)
 library(digest)
 library(stringr)
 library(tibble)
@@ -24,6 +25,7 @@ library(readr)
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
+source("../../R/ui_components.R", encoding = 'UTF-8')
 source("../../R/constants.R", encoding = 'UTF-8')
 
 
@@ -32,8 +34,6 @@ source("../../R/constants.R", encoding = 'UTF-8')
 ## ----create-server-logic------------------------------------------------------
 
 server <- function(input, output) {
-
-  disable(DOWNLOAD_BUTTON_ID)
 
   user_email <- "email@domain.com"
 
@@ -57,6 +57,14 @@ server <- function(input, output) {
     ) +
       runif(1, -10, 10) * predictor # Regression coefficient
   )
+  # Initial server configuration:
+
+  email_validator <- sv_email() # Validator function for the email value
+
+  disable(DOWNLOAD_BUTTON_ID) # Disable download button (until a valid email
+                              #   is input and confirmed)
+
+
 
   reg_fit <- user_data |> lm(formula = criterion ~ predictor)
 
