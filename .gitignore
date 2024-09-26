@@ -32,3 +32,6 @@
 .Rproj.user
 /dat/
 *.lnk
+
+# Shiny publication files
+*.dcf
