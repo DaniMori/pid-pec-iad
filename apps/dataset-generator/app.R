@@ -30,15 +30,17 @@ library(readr)
 ui <- fluidPage(
 
   # Application title
+  # TODO: Decide title & add logos (if necessary)
   titlePanel("Ejercicio: Regresión lineal en Jamovi"),
 
-  # Sidebar with a slider input for number of bins
   sidebarLayout(
+
+    # Sidebar with the email input:
     sidebarPanel(
       downloadButton("download", "Descargar archivo de datos")
     ),
 
-    # Show a plot of the generated distribution
+    # Main page with the download button:
     mainPanel(
       fluidRow(
         textInput("intercept", "Intersección (con 1 decimal):"),
