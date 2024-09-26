@@ -35,8 +35,6 @@ source("../../R/constants.R", encoding = 'UTF-8')
 
 server <- function(input, output) {
 
-  user_email <- "email@domain.com"
-
   # Create unique hash for each user email and use it to generate the unique
   #   dataset and results:
   hashed_email <- user_email |> digest()
@@ -63,6 +61,12 @@ server <- function(input, output) {
 
   disable(DOWNLOAD_BUTTON_ID) # Disable download button (until a valid email
                               #   is input and confirmed)
+
+
+  # UI reactive input values:
+
+  email_input <- reactiveVal()
+  email_check <- reactiveVal()
 
 
 
