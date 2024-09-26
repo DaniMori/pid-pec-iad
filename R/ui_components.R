@@ -17,9 +17,18 @@ library(shiny)
 library(bslib)
 
 
+## ---- CONSTANTS: -------------------------------------------------------------
+
+# Shiny component identifiers:
+EMAIL_INPUT_ID_SUFFIX <- "-input"
+
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
+email_input_id <- function(inputId) inputId |> paste0(EMAIL_INPUT_ID_SUFFIX)
+
 email_input <- function(inputId, domain, label = NULL) {
+
+  email_inputId <- email_input_id(inputId)
 
   layout_columns(
     textInput(inputId, label = label),
