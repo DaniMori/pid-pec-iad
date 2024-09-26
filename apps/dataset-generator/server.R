@@ -14,6 +14,7 @@
 ## ---- PACKAGES: --------------------------------------------------------------
 
 library(shiny)
+library(shinyjs)
 library(digest)
 library(stringr)
 library(tibble)
@@ -21,11 +22,18 @@ library(broom)
 library(dplyr)
 library(readr)
 
+## ---- SOURCES: ---------------------------------------------------------------
+
+source("../../R/constants.R", encoding = 'UTF-8')
+
+
 ## ---- MAIN: ------------------------------------------------------------------
 
 ## ----create-server-logic------------------------------------------------------
 
 server <- function(input, output) {
+
+  disable(DOWNLOAD_BUTTON_ID)
 
   user_email <- "email@domain.com"
 

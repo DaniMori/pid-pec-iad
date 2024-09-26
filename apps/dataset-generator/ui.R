@@ -14,6 +14,14 @@
 ## ---- PACKAGES: --------------------------------------------------------------
 
 library(shiny)
+library(shinyjs)
+library(bslib)
+
+## ---- SOURCES: ---------------------------------------------------------------
+
+source("../../R/ui_components.R", encoding = 'UTF-8')
+source("../../R/constants.R",     encoding = 'UTF-8')
+
 
 ## ---- MAIN: ------------------------------------------------------------------
 
@@ -21,27 +29,31 @@ library(shiny)
 
 ui <- fluidPage(
 
+  shinyjs::useShinyjs(), # Used to disable the download button
+
   # Application title
   # TODO: Decide title & add logos (if necessary)
-  titlePanel("Ejercicio: Regresión lineal en Jamovi"),
+  titlePanel(APP_TITLE),
 
   sidebarLayout(
 
     # Sidebar with the email input:
     sidebarPanel(
-      downloadButton("download", "Descargar archivo de datos")
+      email_input(
+        EMAIL_INPUT_ID,
+        domain = UNED_STUDENT_EMAIL_DOMAIN,
+        label  = EMAIL_INPUT_LABEL
+      ),
+      email_input(
+        EMAIL_CHECK_ID,
+        domain = UNED_STUDENT_EMAIL_DOMAIN,
+        label  = EMAIL_CHECK_LABEL
+      )
     ),
 
     # Main page with the download button:
     mainPanel(
-      fluidRow(
-        textInput("intercept", "Intersección (con 1 decimal):"),
-        textOutput("intercept_result")
-      ),
-      fluidRow(
-        textInput("slope", "Pendiente (con 1 decimal):"),
-        textOutput("slope_result")
-      ),
+      downloadButton(DOWNLOAD_BUTTON_ID, DOWNLOAD_BUTTON_LABEL)
     )
   )
 )
