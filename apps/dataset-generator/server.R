@@ -35,26 +35,6 @@ source("../../R/constants.R", encoding = 'UTF-8')
 
 server <- function(input, output) {
 
-  # Create unique hash for each user email and use it to generate the unique
-  #   dataset and results:
-  hashed_email <- user_email |> digest()
-
-  # Generate user data:
-  user_email |> digest2int() |> set.seed()
-
-  user_data <- tibble(
-    predictor = rnorm(
-      n    = sample(50:200, size = 1), # 50 to 200 cases (uniform sample)
-      mean = runif(1, -10,  10),       # mean uniform from -10 to 10
-      sd   = runif(1,    .5, 4)        # sd uniform from .5 to 4
-    ),
-    criterion = rnorm(
-      n    = length(predictor),
-      mean = runif(1, 10,  20), # mean uniform from 10 to 20
-      sd   = runif(1,   .1, 2)  # sd uniform from .1 to 2
-    ) +
-      runif(1, -10, 10) * predictor # Regression coefficient
-  )
   # Initial server configuration:
 
   email_validator <- sv_email() # Validator function for the email value
@@ -69,19 +49,48 @@ server <- function(input, output) {
   email_check <- reactiveVal()
 
 
+  # Server logic:
 
-  reg_fit <- user_data |> lm(formula = criterion ~ predictor)
+  reactive({
 
-  reg_fit_coefs <- reg_fit |> tidy()
+    email_input(input[[email_input_id(EMAIL_INPUT_ID)]])
+    email_check(input[[email_input_id(EMAIL_CHECK_ID)]])
 
-  intercept <- reg_fit_coefs |>
-    filter(term == "(Intercept)") |>
-    pull(estimate) |>
-    round(1)
-  slope     <- reg_fit_coefs |>
-    filter(term == "predictor") |>
-    pull(estimate) |>
-    round(1)
+    # Create unique hash for each user email and use it to generate the unique
+    #   dataset and results:
+    hashed_email <- email_input() |> digest()
+
+    # Generate user data:
+    user_email() |> digest2int() |> set.seed()
+
+    user_data <- tibble(
+      predictor = rnorm(
+        n    = sample(50:200, size = 1), # 50 to 200 cases (uniform sample)
+        mean = runif(1, -10,  10),       # mean uniform from -10 to 10
+        sd   = runif(1,    .5, 4)        # sd uniform from .5 to 4
+      ),
+      criterion = rnorm(
+        n    = length(predictor),
+        mean = runif(1, 10,  20), # mean uniform from 10 to 20
+        sd   = runif(1,   .1, 2)  # sd uniform from .1 to 2
+      ) +
+        runif(1, -10, 10) * predictor # Regression coefficient
+    )
+
+    reg_fit <- user_data |> lm(formula = criterion ~ predictor)
+
+    reg_fit_coefs <- reg_fit |> tidy()
+
+    intercept <- reg_fit_coefs |>
+      filter(term == "(Intercept)") |>
+      pull(estimate) |>
+      round(1)
+    slope     <- reg_fit_coefs |>
+      filter(term == "predictor") |>
+      pull(estimate) |>
+      round(1)
+  })
+
 
 
   # UI logic:
