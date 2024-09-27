@@ -47,9 +47,27 @@ server <- function(input, output) {
 
   email_input <- reactiveVal()
   email_check <- reactiveVal()
-
+  email_state <- reactiveVal("blank") # Email validation state
 
   # Server logic:
+
+  # Render the verification mark
+  output[[email_check_id(EMAIL_INPUT_ID)]] <- renderUI({
+
+    switch(
+      email_state(),
+      "blank" = fontawesome::fa(
+      "check",
+      fill = "#49e11e",
+      width = '25px',
+      vertical_align = '10px'
+      ),
+      "processing" = tags$img(src = "www/round-segments-blue-loop.gif"),
+      "valid" = tags$img(src = "https://example.com/valid.png", class = "verification-mark"),
+      "invalid" = tags$img(src = "https://example.com/invalid.png", class = "verification-mark")
+    )
+  })
+
 
   reactive({
 

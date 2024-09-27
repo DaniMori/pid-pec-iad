@@ -1,0 +1,14 @@
+---
+title: "Component attributions & licenses"
+output:
+  html_document:
+    df_print: paged
+---
+
+# "Processing" animated icon
+
+file: [Loop](../www/round-segments-blue-loop.gif)
+
+souce: <https://www.jimphicdesigns.com/downloads/download-page.php?id=18>
+
+license: <https://www.jimphicdesigns.com/apages/fontlicense.php>
