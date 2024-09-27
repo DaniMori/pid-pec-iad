@@ -48,12 +48,14 @@ ui <- fluidPage(
         EMAIL_CHECK_ID,
         domain = UNED_STUDENT_EMAIL_DOMAIN,
         label  = EMAIL_CHECK_LABEL
-      )
+      ),
+      width = 6
     ),
 
     # Main page with the download button:
     mainPanel(
-      downloadButton(DOWNLOAD_BUTTON_ID, DOWNLOAD_BUTTON_LABEL)
+      downloadButton(DOWNLOAD_BUTTON_ID, DOWNLOAD_BUTTON_LABEL),
+      width = 6
     )
   )
 )
