@@ -65,10 +65,7 @@ email_input <- function(inputId,
         placeholder = placeholder
       ),
       htmltools::tags$p(domain, style = "padding-top:6px; margin-left:-8px;"),
-      shiny::uiOutput(
-        email_check_id(inputId),
-        style = "width:20px; height:20px;"
-      )
+      shiny::imageOutput(email_check_id(inputId), height = '40px', width = '40px')
     )
   )
 }

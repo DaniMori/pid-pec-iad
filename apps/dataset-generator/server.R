@@ -52,21 +52,32 @@ server <- function(input, output) {
   # Server logic:
 
   # Render the verification mark
-  output[[email_check_id(EMAIL_INPUT_ID)]] <- renderUI({
-
-    switch(
-      email_state(),
-      "blank" = fontawesome::fa(
-      "check",
-      fill = "#49e11e",
-      width = '25px',
-      vertical_align = '10px'
-      ),
-      "processing" = tags$img(src = "www/round-segments-blue-loop.gif"),
-      "valid" = tags$img(src = "https://example.com/valid.png", class = "verification-mark"),
-      "invalid" = tags$img(src = "https://example.com/invalid.png", class = "verification-mark")
-    )
-  })
+  output[[email_check_id(EMAIL_INPUT_ID)]] <- renderImage(
+    {
+      list(
+        src = switch(
+          email_state(),
+          "blank" = '',
+          "processing" = "../../www/round-segments-blue-loop.gif",
+          "valid" = fontawesome::fa_png( # TODO: Create PNG files beforehand, use them after in app
+            "check",
+            fill = "#49e11e",
+            width = 40L
+            # vertical_align = '10px'
+          ),
+          "invalid" = fontawesome::fa(
+            "cross",
+            fill = "red",
+            width = 40L
+            # vertical_align = '10px'
+          )
+        ),
+        width = '40px',
+        height = '40px'
+      )
+    },
+    deleteFile = FALSE
+  )
 
 
   reactive({
