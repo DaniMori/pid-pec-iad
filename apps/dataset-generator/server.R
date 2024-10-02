@@ -41,45 +41,6 @@ server <- function(input, output) {
 
   disable(DOWNLOAD_BUTTON_ID) # Disable download button (until a valid email
                               #   is input and confirmed)
-
-
-  # UI reactive input values:
-
-  email_input <- reactiveVal()
-  email_check <- reactiveVal()
-  email_state <- reactiveVal("blank") # Email validation state
-
-  # Server logic:
-
-  # Render the verification mark
-  output[[email_check_id(EMAIL_INPUT_ID)]] <- renderImage(
-    {
-      list(
-        src = switch(
-          email_state(),
-          "blank" = '',
-          "processing" = "../../www/round-segments-blue-loop.gif",
-          "valid" = fontawesome::fa_png( # TODO: Create PNG files beforehand, use them after in app
-            "check",
-            fill = "#49e11e",
-            width = 40L
-            # vertical_align = '10px'
-          ),
-          "invalid" = fontawesome::fa(
-            "cross",
-            fill = "red",
-            width = 40L
-            # vertical_align = '10px'
-          )
-        ),
-        width = '40px',
-        height = '40px'
-      )
-    },
-    deleteFile = FALSE
-  )
-
-
   reactive({
 
     email_input(input[[email_input_id(EMAIL_INPUT_ID)]])

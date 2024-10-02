@@ -45,10 +45,10 @@ email_label <- function(inputId, label = NULL) {
   )
 }
 
-email_input <- function(inputId,
-                        domain,
-                        label       = NULL,
-                        placeholder = EMAIL_PLACEHOLDER) {
+emailInput <- function(inputId,
+                       domain,
+                       label       = NULL,
+                       placeholder = EMAIL_PLACEHOLDER) {
 
   value <- shiny::restoreInput(id = inputId, default = "")
 
@@ -64,8 +64,70 @@ email_input <- function(inputId,
         value       = value,
         placeholder = placeholder
       ),
-      htmltools::tags$p(domain, style = "padding-top:6px; margin-left:-8px;"),
-      shiny::imageOutput(email_check_id(inputId), height = '40px', width = '40px')
+      htmltools::tags$p(domain, style = "padding-top:6px; margin-left:-8px; padding-right:100px;"),
+      shiny::imageOutput(email_check_id(inputId), height = '40px', width = '40px', inline = TRUE, fill = TRUE)
     )
+  )
+}
+
+validateEmail <- function(input,
+                          output,
+                          # session,
+                          inputId,
+                          domain,
+                          validate_func) {
+
+  # UI reactive input values:
+  email_value <- reactiveVal()
+  email_state <- reactiveVal("blank") # Email validation state
+
+  # Server logic:
+
+  ## Compute reactive value with complete email address
+  observeEvent(
+    input[[email_input_id(inputId)]], # React to changes in email input
+
+    # Email validation logic:
+    if (input$username == "") {
+
+      email_state("blank")
+
+    } else {
+
+      email_state("processing")
+
+      # Create complete email address:
+      email_value(input[[email_input_id(inputId)]] |> paste0(domain))
+
+      valid_email <- validate_func(email_value())
+
+      if (valid_email) email_state("valid") else email_state("invalid")
+    }
+  )
+
+  # Render verification mark
+  output[[email_check_id(EMAIL_INPUT_ID)]] <- renderImage(
+    {
+      list(
+        src = switch(
+          email_state(),
+          blank      = "../../www/blank.png",
+          processing = "../../www/processing.gif",
+          valid      = "../../www/valid.png",
+          invalid    = "../../www/invalid.png"
+        ),
+        width  = '40px',
+        height = '40px'
+      )
+    },
+    deleteFile = FALSE
+  )
+
+  output[[text_id(inputId)]] <- shiny::renderText(
+    paste0(select_path(), collapse = PATHS_COLLAPSE)
+  )
+
+  shiny::reactive(
+    list(email = email_value(), valid = email_state() == "valid")
   )
 }
