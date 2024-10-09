@@ -15,6 +15,7 @@
 
 library(shiny)
 library(bslib)
+library(here)
 
 
 ## ---- CONSTANTS: -------------------------------------------------------------
@@ -26,6 +27,18 @@ EMAIL_CHECK_ID_SUFFIX <- "-checkmark"
 
 # Shiny component verbatim:
 EMAIL_PLACEHOLDER <- "Nombre de usuario"
+
+# Email validation values:
+INPUT_EMPTY   <- ""
+EMAIL_BLANK   <- "blank"
+EMAIL_VALID   <- "valid"
+EMAIL_INVALID <- "invalid"
+
+# File system values:
+ASSETS_DIR        <- here("www")
+BLANK_ICON_PATH   <- here(ASSETS_DIR, "blank.png")
+VALID_ICON_PATH   <- here(ASSETS_DIR, "valid.png")
+INVALID_ICON_PATH <- here(ASSETS_DIR, "invalid.png")
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
@@ -50,7 +63,7 @@ emailInput <- function(inputId,
                        label       = NULL,
                        placeholder = EMAIL_PLACEHOLDER) {
 
-  value <- shiny::restoreInput(id = inputId, default = "")
+  value <- shiny::restoreInput(id = inputId, default = INPUT_EMPTY)
 
   htmltools::tags$div(
     class = "form-group shiny-input-container",
@@ -76,12 +89,9 @@ validateEmail <- function(input,
                           inputId,
                           domain,
                           validate_func) {
-
-  # UI reactive input values:
-  email_value <- reactiveVal()
-  email_state <- reactiveVal("blank") # Email validation state
-
-  # Server logic:
+  # Reactive input values:
+  email_value <- reactiveVal(INPUT_EMPTY)
+  email_state <- reactiveVal(EMAIL_BLANK) # Email validation state
 
   ## Compute reactive value with complete email address
   observeEvent(
@@ -111,10 +121,9 @@ validateEmail <- function(input,
       list(
         src = switch(
           email_state(),
-          blank      = "../../www/blank.png",
-          processing = "../../www/processing.gif",
-          valid      = "../../www/valid.png",
-          invalid    = "../../www/invalid.png"
+          blank      = BLANK_ICON_PATH,
+          valid      = VALID_ICON_PATH,
+          invalid    = INVALID_ICON_PATH
         ),
         width  = '40px',
         height = '40px'
@@ -128,6 +137,6 @@ validateEmail <- function(input,
   )
 
   shiny::reactive(
-    list(email = email_value(), valid = email_state() == "valid")
+    list(email = email_value(), valid = email_state() == EMAIL_VALID)
   )
 }
