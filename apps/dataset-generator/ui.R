@@ -44,7 +44,7 @@ ui <- fluidPage(
         domain = UNED_STUDENT_EMAIL_DOMAIN,
         label  = EMAIL_INPUT_LABEL
       ),
-      email_input(
+      emailInput(
         EMAIL_CHECK_ID,
         domain = UNED_STUDENT_EMAIL_DOMAIN,
         label  = EMAIL_CHECK_LABEL

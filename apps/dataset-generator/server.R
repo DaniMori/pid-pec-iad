@@ -41,16 +41,6 @@ server <- function(input, output) {
 
   disable(DOWNLOAD_BUTTON_ID) # Disable download button (until a valid email
                               #   is input and confirmed)
-
-
-  # UI reactive input values:
-
-  email_input <- reactiveVal()
-  email_check <- reactiveVal()
-
-
-  # Server logic:
-
   reactive({
 
     email_input(input[[email_input_id(EMAIL_INPUT_ID)]])
