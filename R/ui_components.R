@@ -85,7 +85,6 @@ emailInput <- function(inputId,
 
 validateEmail <- function(input,
                           output,
-                          # session,
                           inputId,
                           domain,
                           validate_function,
@@ -117,7 +116,7 @@ validateEmail <- function(input,
   )
 
   # Render verification mark
-  output[[email_check_id(EMAIL_INPUT_ID)]] <- renderImage(
+  output[[email_check_id(inputId)]] <- renderImage(
     {
       list(
         src = switch(
@@ -131,10 +130,6 @@ validateEmail <- function(input,
       )
     },
     deleteFile = FALSE
-  )
-
-  output[[text_id(inputId)]] <- shiny::renderText(
-    paste0(select_path(), collapse = PATHS_COLLAPSE)
   )
 
   shiny::reactive(
