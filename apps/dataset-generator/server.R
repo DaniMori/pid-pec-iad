@@ -20,7 +20,6 @@ setwd(here::here())
 
 library(shiny)
 library(shinyjs)
-library(shinyvalidate)
 library(digest)
 library(stringr)
 library(tibble)

@@ -13,8 +13,6 @@
 
 ## ---- PACKAGES: --------------------------------------------------------------
 
-library(shiny)
-library(bslib)
 library(here)
 
 
@@ -146,7 +144,7 @@ validateEmail <- function(input,
 # Simple validation function for correct email values
 is_valid_email <- function(email) {
 
-  is.null(sv_email()(email))
+  is.null(shinyvalidate::sv_email()(email))
 }
 
 # Validate function for double checking email values
