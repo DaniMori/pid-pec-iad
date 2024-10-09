@@ -88,30 +88,31 @@ validateEmail <- function(input,
                           # session,
                           inputId,
                           domain,
-                          validate_func) {
+                          validate_function,
+                          ...) { # Additional arguments to `validate_function()`
   # Reactive input values:
   email_value <- reactiveVal(INPUT_EMPTY)
   email_state <- reactiveVal(EMAIL_BLANK) # Email validation state
 
-  ## Compute reactive value with complete email address
+  # Compute reactive value with complete email address & validate it
   observeEvent(
     input[[email_input_id(inputId)]], # React to changes in email input
+    {
+      username <- input[[email_input_id(inputId)]]
 
-    # Email validation logic:
-    if (input$username == "") {
+      # Email validation logic:
+      if (username == INPUT_EMPTY) {
 
-      email_state("blank")
+        email_state(EMAIL_BLANK)
 
-    } else {
+      } else {
 
-      email_state("processing")
+        # Create complete email address:
+        email_value(username |> paste0(domain))
 
-      # Create complete email address:
-      email_value(input[[email_input_id(inputId)]] |> paste0(domain))
-
-      valid_email <- validate_func(email_value())
-
-      if (valid_email) email_state("valid") else email_state("invalid")
+        if (validate_function(email_value(), ...)) email_state(EMAIL_VALID)
+        else                                       email_state(EMAIL_INVALID)
+      }
     }
   )
 
