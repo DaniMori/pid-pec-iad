@@ -77,8 +77,14 @@ emailInput <- function(inputId,
         value       = value,
         placeholder = placeholder
       ),
-      htmltools::tags$p(domain, style = "padding-top:6px; margin-left:-8px; padding-right:100px;"),
-      shiny::imageOutput(email_check_id(inputId), height = '40px', width = '40px', inline = TRUE, fill = TRUE)
+      htmltools::tags$p(domain, style = "padding-top:6px; margin-left:-8px;"),
+      shiny::imageOutput(
+        email_check_id(inputId),
+        height = '30px',
+        width  = '30px',
+        inline = TRUE,
+        fill   = TRUE
+      )
     )
   )
 }
@@ -125,8 +131,8 @@ validateEmail <- function(input,
           valid      = VALID_ICON_PATH,
           invalid    = INVALID_ICON_PATH
         ),
-        width  = '40px',
-        height = '40px'
+        width  = '30px',
+        height = '30px'
       )
     },
     deleteFile = FALSE
