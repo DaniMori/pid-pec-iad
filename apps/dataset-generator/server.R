@@ -52,12 +52,9 @@ server <- function(input, output) {
     contentType = "text/csv"
   )
 
-  # Enable/disable the download button when the email is valid/invalid
-  observeEvent(
-    email_valid(),
-    toggleState(DOWNLOAD_BUTTON_ID, condition = email_valid())
-  )
+  # Server logic:
 
+  ## Email validation logic
   email_input <- validateEmail(
     input, output,
     inputId       = EMAIL_INPUT_ID,
@@ -65,6 +62,7 @@ server <- function(input, output) {
     validate_func = is_valid_email
   )
 
+  ## Email "double checking" logic
   email_check <- validateEmail(
     input, output,
     inputId       = EMAIL_CHECK_ID,
@@ -73,12 +71,19 @@ server <- function(input, output) {
     check_value   = reactive(email_input()$email)
   )
 
-  # Validate email when both the input and the "double check" are valid
+  ## Validate email when both the input and the "double check" are valid
   observeEvent(
     email_input()$valid & email_check()$valid,
     email_valid(email_input()$valid & email_check()$valid)
   )
 
+  ## Enable/disable the download button when the email is valid/invalid
+  observeEvent(
+    email_valid(),
+    toggleState(DOWNLOAD_BUTTON_ID, condition = email_valid())
+  )
+
+  ## Generate the personal student dataset
   observeEvent(
     email_valid(),
     {
