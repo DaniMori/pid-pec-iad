@@ -53,7 +53,7 @@ server <- function(input, output) {
   )
 
   # Enable/disable the download button when the email is valid/invalid
-  observeEvent( ## FIXME: Make button "unclickable"!
+  observeEvent(
     email_valid(),
     toggleState(DOWNLOAD_BUTTON_ID, condition = email_valid())
   )
@@ -82,6 +82,9 @@ server <- function(input, output) {
   observeEvent(
     email_valid(),
     {
+      # Will only generate data if the email is valid:
+      shiny::validate(need(email_valid(), message = "invalid email"))
+
       # Create unique hash for the student email:
       hashed_email <- email_input()$email |> hash_emails()
 
