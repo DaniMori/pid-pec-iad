@@ -63,6 +63,13 @@ server <- function(input, output) {
     email_valid(email_input()$valid & email_check()$valid)
   )
 
+  # Enable the download button when the email is valid
+  observeEvent(
+    email_valid(),
+    if (email_valid()) enable(DOWNLOAD_BUTTON_ID)
+    else               disable(DOWNLOAD_BUTTON_ID)
+  )
+
   reactive({
 
     email_input(input[[email_input_id(EMAIL_INPUT_ID)]])
