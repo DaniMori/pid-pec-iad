@@ -39,7 +39,7 @@ ui <- fluidPage(
 
     # Sidebar with the email input:
     sidebarPanel(
-      email_input(
+      emailInput(
         EMAIL_INPUT_ID,
         domain = UNED_STUDENT_EMAIL_DOMAIN,
         label  = EMAIL_INPUT_LABEL
