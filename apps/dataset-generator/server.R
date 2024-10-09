@@ -37,10 +37,32 @@ server <- function(input, output) {
 
   # Initial server configuration:
 
-  email_validator <- sv_email() # Validator function for the email value
+  email_valid <- reactiveVal(FALSE) # Whether the email has been validated
 
   disable(DOWNLOAD_BUTTON_ID) # Disable download button (until a valid email
                               #   is input and confirmed)
+
+  email_input <- validateEmail(
+    input, output,
+    inputId       = EMAIL_INPUT_ID,
+    domain        = UNED_STUDENT_EMAIL_DOMAIN,
+    validate_func = is_valid_email
+  )
+
+  email_check <- validateEmail(
+    input, output,
+    inputId       = EMAIL_CHECK_ID,
+    domain        = UNED_STUDENT_EMAIL_DOMAIN,
+    validate_func = double_check_email,
+    check_value   = reactive(email_input()$email)
+  )
+
+  # Validate email when both the input and the "double check" are valid
+  observeEvent(
+    email_input()$valid & email_check()$valid,
+    email_valid(email_input()$valid & email_check()$valid)
+  )
+
   reactive({
 
     email_input(input[[email_input_id(EMAIL_INPUT_ID)]])
