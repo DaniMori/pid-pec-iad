@@ -45,8 +45,18 @@ server <- function(input, output) {
   email_valid    <- reactiveVal(FALSE) # Whether the email has been validated
   simulated_data <- reactiveVal()      # Simulated dataset
 
-  disable(DOWNLOAD_BUTTON_ID) # Disable download button (until a valid email
-                              #   is input and confirmed)
+  ## File download handler (activated when the email is valid)
+  output[[DOWNLOAD_BUTTON_ID]] <- downloadHandler(
+    filename = "regresion_lineal.csv",
+    content  = function(file) simulated_data() |> write_csv(file),
+    contentType = "text/csv"
+  )
+
+  # Enable/disable the download button when the email is valid/invalid
+  observeEvent( ## FIXME: Make button "unclickable"!
+    email_valid(),
+    toggleState(DOWNLOAD_BUTTON_ID, condition = email_valid())
+  )
 
   email_input <- validateEmail(
     input, output,
@@ -69,12 +79,8 @@ server <- function(input, output) {
     email_valid(email_input()$valid & email_check()$valid)
   )
 
-  # Enable the download button when the email is valid
   observeEvent(
     email_valid(),
-    if (email_valid()) enable(DOWNLOAD_BUTTON_ID)
-    else               disable(DOWNLOAD_BUTTON_ID)
-  )
     {
       # Create unique hash for the student email:
       hashed_email <- email_input()$email |> hash_emails()
