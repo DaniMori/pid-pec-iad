@@ -41,6 +41,8 @@ ui <- fluidPage(
   fillPage(
 
     # Download link:
-    downloadLink(DOWNLOAD_LINK_ID, DOWNLOAD_LINK_LABEL)
+    downloadLink(DOWNLOAD_LINK_ID, DOWNLOAD_LINK_LABEL),
+
+    tags$div(tags$p(CLOSE_WINDOW_MSG), style="margin-top:2em;")
   )
 )
