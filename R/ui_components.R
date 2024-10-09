@@ -141,3 +141,12 @@ validateEmail <- function(input,
     list(email = email_value(), valid = email_state() == EMAIL_VALID)
   )
 }
+
+# Simple validation function for correct email values
+is_valid_email <- function(email) {
+
+  is.null(sv_email()(email))
+}
+
+# Validate function for double checking email values
+double_check_email <- function(email, check_value) email == check_value()
