@@ -103,8 +103,6 @@ server <- function(input, output) {
       round(1)
   })
 
-
-
   # UI logic:
 
   ## File download handler:
@@ -115,17 +113,5 @@ server <- function(input, output) {
       user_data |> write_csv(file)
     },
     contentType = "text/csv"
-  )
-
-  ## Result checkers:
-  output$intercept_result <- renderText(
-    if (input$intercept != "")
-      if (input$intercept == intercept) "Correcto!" else "Incorrecto"
-    else ""
-  )
-  output$slope_result <- renderText(
-    if (input$slope != "")
-      if (input$slope == slope) "Correcto!" else "Incorrecto"
-    else ""
   )
 }
