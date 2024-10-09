@@ -20,7 +20,6 @@ setwd(here::here())
 
 library(shiny)
 library(shinyjs)
-library(digest)
 library(stringr)
 library(tibble)
 library(broom)
@@ -31,6 +30,8 @@ library(readr)
 
 source("R/email_input_component.R", encoding = 'UTF-8')
 source("R/constants.R",             encoding = 'UTF-8')
+source("R/simulate_data.R",         encoding = 'UTF-8')
+source("R/hash_emails.R",           encoding = 'UTF-8')
 
 
 ## ---- MAIN: ------------------------------------------------------------------
@@ -41,7 +42,8 @@ server <- function(input, output) {
 
   # Initial server configuration:
 
-  email_valid <- reactiveVal(FALSE) # Whether the email has been validated
+  email_valid    <- reactiveVal(FALSE) # Whether the email has been validated
+  simulated_data <- reactiveVal()      # Simulated dataset
 
   disable(DOWNLOAD_BUTTON_ID) # Disable download button (until a valid email
                               #   is input and confirmed)
@@ -73,56 +75,12 @@ server <- function(input, output) {
     if (email_valid()) enable(DOWNLOAD_BUTTON_ID)
     else               disable(DOWNLOAD_BUTTON_ID)
   )
+    {
+      # Create unique hash for the student email:
+      hashed_email <- email_input()$email |> hash_emails()
 
-  reactive({
-
-    email_input(input[[email_input_id(EMAIL_INPUT_ID)]])
-    email_check(input[[email_input_id(EMAIL_CHECK_ID)]])
-
-    # Create unique hash for each user email and use it to generate the unique
-    #   dataset and results:
-    hashed_email <- email_input() |> digest()
-
-    # Generate user data:
-    user_email() |> digest2int() |> set.seed()
-
-    user_data <- tibble(
-      predictor = rnorm(
-        n    = sample(50:200, size = 1), # 50 to 200 cases (uniform sample)
-        mean = runif(1, -10,  10),       # mean uniform from -10 to 10
-        sd   = runif(1,    .5, 4)        # sd uniform from .5 to 4
-      ),
-      criterion = rnorm(
-        n    = length(predictor),
-        mean = runif(1, 10,  20), # mean uniform from 10 to 20
-        sd   = runif(1,   .1, 2)  # sd uniform from .1 to 2
-      ) +
-        runif(1, -10, 10) * predictor # Regression coefficient
-    )
-
-    reg_fit <- user_data |> lm(formula = criterion ~ predictor)
-
-    reg_fit_coefs <- reg_fit |> tidy()
-
-    intercept <- reg_fit_coefs |>
-      filter(term == "(Intercept)") |>
-      pull(estimate) |>
-      round(1)
-    slope     <- reg_fit_coefs |>
-      filter(term == "predictor") |>
-      pull(estimate) |>
-      round(1)
-  })
-
-  # UI logic:
-
-  ## File download handler:
-  output$download <- downloadHandler(
-    filename = "regresion_lineal.csv",
-    content  = function(file) {
-
-      user_data |> write_csv(file)
-    },
-    contentType = "text/csv"
+      # Generate simulated data with the hashed email as seed:
+      simulated_data(simulate_data(hashed_email))
+    }
   )
 }
