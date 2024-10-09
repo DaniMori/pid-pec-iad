@@ -38,33 +38,33 @@ When using this template, please don’t forget to:
 Start by installing the following software components:
 
 - [R version
-  4.4.0](https://cran.rstudio.com/bin/windows/base/old/4.4.0/): In
+  4.4.1](https://cran.rstudio.com/bin/windows/base/old/4.4.1/): In
   Windows, using the [binary
-  installer](https://cran.rstudio.com/bin/windows/base/old/4.4.0/R-4.4.0-win.exe)
+  installer](https://cran.rstudio.com/bin/windows/base/old/4.4.1/R-4.4.1-win.exe)
   is recommended.
 
 <!-- -->
 
 - [Rstudio Desktop](https://posit.co/download/rstudio-desktop/):
   Although not strictly necessary, it is recommended to install the
-  Rstudio IDE; for strict reproducibility, use build [2024.04.1+748 for
+  Rstudio IDE; for strict reproducibility, use build [2024.09.0+375 for
   Windows
-  10/11](https://download1.rstudio.org/electron/windows/RStudio-2024.04.1-748.exe).
+  10/11](https://download1.rstudio.org/electron/windows/RStudio-2024.09.0-375.exe).
 
 <!-- -->
 
 - [Quarto publishing system](https://quarto.org/): An additional
   component used by Rstudio to generate and publish literate computing
-  outputs. For strict reproducibility please use build 1.4.553; On
+  outputs. For strict reproducibility please use build 1.5.57; On
   Windows, use [the 64-bit
-  installer](https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.553/quarto-1.4.553-win.msi).
+  installer](https://github.com/quarto-dev/quarto-cli/releases/download/v1.5.57/quarto-1.5.57-win.msi).
 
 <!-- -->
 
 - [Git client](https://git-scm.com/download): Install the Git client in
   order to be able to clone locally the project repository. On Windows,
   use [the 64-bit Windows
-  installer](https://github.com/git-for-windows/git/releases/download/v2.45.1.windows.1/Git-2.45.1-64-bit.exe).
+  installer](https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe).
 
 ## Installing the project locally
 
@@ -124,26 +124,19 @@ The file structure of this repository is as follows:
 
     PID-sandbox
     |
-    |--- apps         (To store apps, e.g. in Shiny)
+    |- server.R (Shiny app server logic)
     |
-    |--- dat          (To store input datasets; must NEVER be checked-in to Github)
+    |- ui.R     (Shiny app user interface)
     |
-    |--- doc          (To store important documentation of the project)
-    |    |
-    |    |--- minutes (To store meeting minutes)
+    |--- dat    (To store input datasets; must NEVER be checked-in to Github)
     |
-    |--- notebooks    (Notebooks to explore data and test processes live here)
+    |--- R      (R functions created for this project live here)
     |
-    |--- output       (Processing outputs; files must be individually "checked-in"
-    |                 when necessary)
+    |--- renv   (System library necesssary for `renv` to work. DON'T TOUCH)
     |
-    |--- R            (R functions created for this project live here)
+    |--- src    (Source scripts that implement the main processes)
     |
-    |--- renv         (System library necesssary for `renv` to work. DON'T TOUCH)
-    |
-    |--- src          (Source scripts that implement the main processes)
-    |
-    |--- www          (Project assets, e.g., images, bibliography files, etc.)
+    |--- www    (Project assets, e.g., images, bibliography files, etc.)
 
 Use the folders as indicated to store the different files and generate
 the outputs of the processes.
