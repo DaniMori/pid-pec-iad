@@ -16,3 +16,11 @@ hash_emails <- function(emails) {
 
   emails |> digest::digest() |> digest::digest2int()
 }
+
+validate_email <- function(email) {
+
+  validate <- shinyvalidate::sv_email()
+  result <- validate(email)
+  if (!is.null(result)) print(result)
+  shiny::validate(result)
+}

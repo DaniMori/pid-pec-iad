@@ -43,13 +43,17 @@ server <- function(input, output, session) {
       # Get email from query:
       email(parseQueryString(session$clientData$url_search)$email)
 
+      validate_email(email()) # Check that email is valid in the first place
+
       # Generate the personal student dataset:
 
       ## Create unique hash for the student email:
       hashed_email <- email() |> hash_emails()
+      print("Email hash created")
 
       ## Generate simulated data with the hashed email as seed:
       simulated_data(simulate_data(hashed_email))
+      print("Dataset generated")
 
       # Run download automatically on loading app:
       shinyjs::runjs(
@@ -63,13 +67,21 @@ server <- function(input, output, session) {
           .open = '[', .close = ']'
         )
       )
+      print("Automatic download on loading run")
     }
   )
 
   ## File download handler (activated when the email is valid)
   output[[DOWNLOAD_BUTTON_ID]] <- downloadHandler(
     filename = "regresion_lineal.csv",
-    content  = function(file) simulated_data() |> write_csv(file),
+    content  = function(file) {
+
+      validate_email(email())
+
+      print("Download granted")
+
+      simulated_data() |> write_csv(file)
+    },
     contentType = "text/csv"
   )
 }
