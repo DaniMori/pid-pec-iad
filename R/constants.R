@@ -26,7 +26,7 @@ APP_TITLE <- "Ejercicio: Regresión lineal en Jamovi"
 EMAIL_INPUT_LABEL <- "Introduce tu email UNED:"
 EMAIL_CHECK_LABEL  <- "Verifica tu email UNED:"
 
-UNED_STUDENT_EMAIL_DOMAIN <- "@estudiante.uam.es"
+UNED_STUDENT_EMAIL_DOMAIN <- "@estudiante.uned.es"
 
 ## Download dataset:
 DOWNLOAD_BUTTON_LABEL <- "Descargar archivo de datos"
