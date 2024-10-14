@@ -20,8 +20,34 @@ fields <- c("name", "used_shiny", "r_num_years")
 # trigger auth on purpose --> store a token in the specified cache
 # gs4_auth()
 
-## Step 2: Announce cache location and pre-authorize token use
-## (do once per script/service; maybe in ".Rprofile"?)
+# ## Step 2: Announce cache location and pre-authorize token use
+# ## (DO NOT perform this step. See "Encrypt token" below instead)
+# options(
+#   gargle_oauth_cache = here::here(".secrets"),
+#   gargle_oauth_email = "danielmorillo.ac@gmail.com"
+# )
+
+# Encrypt token: https://gargle.r-lib.org/articles/managing-tokens-securely.html
+KEY_NAME   <- "PID_PEC_IAD_KEY"
+
+# Do this once:
+# secret_key <- gargle::secret_make_key()
+#
+# Then write password to ".Renviron" as PID_PEC_IAD_KEY = <password>
+#
+# Restart R (so that the environment variable is loaded)
+#
+# Encrypt OAuth token:
+# gargle::secret_write_rds(
+#   gs4_token(),
+#   ".secrets/gs4-oauth-token.rds",
+#   key = KEY_NAME
+# )
+oauth_token <- gargle::secret_read_rds(
+  path = ".secrets/gs4-oauth-token.rds",
+  key  = KEY_NAME
+)
+gs4_auth(token = oauth_token)
 
 # Service account token setup:
 # https://gargle.r-lib.org/articles/non-interactive-auth.html#provide-a-service-account-token-directly
@@ -36,20 +62,18 @@ fields <- c("name", "used_shiny", "r_num_years")
 ## Use token:
 gs4_auth(path = ".secrets/<token_filename>.json")
 
-options(
-  gargle_oauth_cache = here::here(".secrets"),
-  gargle_oauth_email = "danielmorillo.ac@gmail.com"
+KEY_NAME   <- "PID_PEC_IAD_KEY"
+secret_key <- gargle::secret_make_key()
+
+gargle::secret_encrypt_json(
+  json = ".secrets/named-icon-438614-f5-1d0fa6767c8b.json",
+  path = ".secrets/gsheets-encrypted-token.json",
+  key  = "PID_PEC_IAD_KEY"
 )
 
 # now "do anything" that triggers authentication
 doc_url <- "https://docs.google.com/spreadsheets/d/1jzpIEa_h9AOyNSkJU80x4IFbAKj9AOkREwHmpbcPVyM"
 file_link <- gs4_get(doc_url)
-
-
-# TODO: Encrypting token: https://gargle.r-lib.org/articles/managing-tokens-securely.html
-KEY_NAME   <- "PID-PEC-IAD_KEY"
-secret_key <- gargle::secret_make_key()
-
 
 saveData <- function(data) {
   # The data must be a dataframe rather than a named vector
