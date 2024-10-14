@@ -29,9 +29,9 @@ fields <- c("name", "used_shiny", "r_num_years")
 ## First create "Service Account Token" (SAT) in Google Cloud Platform:
 ## https://gargle.r-lib.org/articles/get-api-credentials.html#service-account-token
 ##
-## When trying to access Google Sheets (i.e. calling `gs4_get()`), prompted with
-## "enabling the Google Sheets API"; just using the link provided and enabling
-## the API works.
+## Enable the "Google Sheets API" in the Google Cloud Platform
+##
+## Then add the service account as an "editor" to the Google Spreadsheet file
 ##
 ## Use token:
 gs4_auth(path = ".secrets/<token_filename>.json")
