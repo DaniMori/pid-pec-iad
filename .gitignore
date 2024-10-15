@@ -35,3 +35,4 @@
 
 # Shiny publication files
 *.dcf
+/.secrets/

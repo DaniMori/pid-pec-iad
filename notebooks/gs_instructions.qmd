@@ -1,0 +1,271 @@
+---
+title: "Google Spreadsheets connection instructions"
+format: html
+editor: source
+---
+
+# Introduction
+
+This document explains how to authorize and configure a connection to Google
+Spreadsheets, so it can be used as a back-end to store the application data.
+
+The procedure consists of setting up and encrypted [OAuth
+token](https://oauth.net/) for granting the Shiny app access to Google
+Spreadsheets. After setting it up, the token can be read and used in the app for
+gaining access to the Spreadsheets API through [the {googlesheets4} R
+package](https://googlesheets4.tidyverse.org/).
+
+## Attributions
+
+This procedure uses [the {gargle} package](https://gargle.r-lib.org/) (an R
+interface for the Google APIs) to authenticate. Its description is based on the
+following sources, both of them articles in the package website:
+
+-   [Non-interactive
+    auth](https://gargle.r-lib.org/articles/non-interactive-auth.html#project-level-oauth-cache),
+    specially [section "Project-level OAuth
+    cache"](https://gargle.r-lib.org/articles/non-interactive-auth.html#project-level-oauth-cache)
+
+-   [Managing tokens
+    securely](https://gargle.r-lib.org/articles/managing-tokens-securely.html),
+    specially [section "Encrypt an R
+    object"](https://gargle.r-lib.org/articles/managing-tokens-securely.html#encrypt-an-r-object)
+
+## Setup summary
+
+The setup process consists of the following steps:
+
+1.  Create a Google Spreadsheet file
+
+2.  Set up an OAuth token
+
+3.  Create an encryption key
+
+4.  Set the encryption key as an environment variable
+
+5.  Encrypt the OAuth token
+
+# Detailed procedure
+
+## Create a Google Spreadsheet file
+
+The file must be created under the Google account that will be used to generate
+the OAuth token. Bear in mind that this account is the "identity" that the Shiny
+app will use to interact with the spreadsheet (and the Google API in general,
+for that matter).
+
+It is also recommended that, starting from cell A1, the spreadsheet file has the
+structure of the dataset we want to save in it. This can be done simply by
+typing in the variable names in the first row of the dataset.
+
+For this minimal example, we will create a spreadsheet with the following two
+variables:
+
+```{r dataset-vars}
+VAR_NAMES <- c("full_name", "valid")
+```
+
+### Procedure
+
+1.  Go to [Google Spreadsheets](https://docs.google.com/spreadsheets). If
+    necessary, log in with a valid Google account.
+
+2.  Under "Create spreadsheet" click on "Blank spreadsheet".
+
+3.  In the field "Untitled spreadsheet" type in a name, e.g., "Shiny_app_data"
+    (without the double quotes).
+
+4.  In cells A1 and A2, respectively, type in the variable names, i.e.,
+    `full_name` and `valid`. (For better readability, this row can be formatted
+    as **boldface**.)
+
+5.  In the browser, press `CTRL + L` (in Windows) to go to the address bar and
+    then `CTRL + C` to copy the spreadsheet file URL, which should include
+    everything up until the last "slash" ("/") character. In this example:
+
+```{r gs-url}
+GS_URL <-
+  "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
+```
+
+(Change line 86 to use a different file created following these instructions, if
+necessary.)
+
+6.  (OPTIONALLY) In [the Google Drive
+    view](https://drive.google.com/drive/u/0/my-drive), find the spreadsheet
+    file and [share it](https://support.google.com/drive/answer/2494822) with
+    other Google account(s) (e.g. collaborators), **granting them "Edit"
+    permission**.
+
+## Set up an OAuth token
+
+This step will create an OAuth token for the Shiny app to use non-interactively,
+which is necessary to deploy it on [shinyapps.io](https://www.shinyapps.io/)
+without human intervention.
+
+We will make use of the interactive capabilities of {gargle} to generate a token
+through a browser and cache it in a secret directory (i.e. folder) local to this
+project.
+
+### Procedure
+
+1.  Designate a project-specific cache directory to be used by {gargle}
+
+```{r setup-cache-dir}
+CACHE_PATH <- ".secrets"
+options(gargle_oauth_cache = here::here(CACHE_PATH))
+```
+
+2.  Purposely trigger interactive authorization by {googlesheets4}
+
+```{r interactive-auth}
+googlesheets4::gs4_auth()
+```
+
+3.  In the browser tab opened by the call to `googlesheets4::gs4_auth()`, click
+    on your account of choice to "authorize *Tidyverse API Packages*".
+
+4.  In the next page, click on the button "Continue"
+
+5.  Check the box "View, edit, create and delete all you spreadsheets in Google
+    Spreadsheets
+
+6.  Click on the button "Continue"
+
+7.  If the authorization has been sucessfull, a page will show the following
+    message:
+
+```         
+Authentication complete. Please close this page and return to R.
+```
+
+Close this window/tab and return to Rstudio. Now {googlesheets4} can read the
+token from the designated cache:
+
+```{r read-token}
+gs_token <- googlesheets4::gs4_token()
+```
+
+{googlesheets4} will use this token as long as it finds it in the cache folder,
+without the need for interactively authenticating again.
+
+## Create an encryption key
+
+After completing the previous step, you will notice that a ".secrets" folder has
+been created in the project root folder, which contains a file with a name
+similar to "<token_id>\_<user_name>@gmail.com", where `<token_id>` is a
+hexadecimal number with several digits, and `<user_name>` is the user name of
+the Google account used to "authorize *Tidyverse API Packages*".
+
+This file is the token that will be used to grant the Shiny app access to the
+spreadsheet file. However, as this file needs to be deployed to
+[shinyapps.io](https://www.shinyapps.io/) along with the app code and associated
+files, it needs to be encrypted to prevent it from the risk of being exposed
+publicly. This could allow malicious agents accessing not only the spreadsheet
+for this project, but all other spreadsheets this account has access to.
+
+Instead, the token is encrypted with a symmetric key (i.e. a "password") that
+will be used in the app to decrypt it.
+
+### Procedure
+
+1.  Generate a secret key using {gargle}
+
+```{r gen-key}
+secret_key <- gargle::secret_make_key()
+```
+
+## Set the encryption key as an environment variable
+
+Using the encryption key requires that it is set as an environment variable.
+This prevents the key from being used by calling its value directly, which could
+result in logging its value in log files that could eventually go public (e.g.,
+it would end up in the ".Rhistory" file). Instead of this, {gargle}'s encryption
+function call an environment variable by its variable name and uses it to
+encrypt the token.
+
+To set the encryption key as an environment variable, it is required that it is
+loaded to the R session on startup. This is usually done by setting it in a
+".Renviron" file in the root folder of the project[^1].
+
+[^1]: The ".Renviron" file, containing the environment variable with the secret
+    key value needs, obviously, to be deployed along with the rest of the app
+    code and ancillary files. Why this file is considered to be secure is
+    something that I ignore.
+
+### Procedure
+
+1.  Create a ".Renviron" file in the root folder of the project
+
+```{r create-renviron}
+usethis::edit_r_environ(scope = "project")
+```
+
+2.  Write the encryption key to the ".Renviron" file with an object name that
+    clearly identifies it, as `<KEY_VAR_NAME> = <secret_key>`, where
+    `<KEY_VAR_NAME>` is the name of the object and `<secret_key>` is the secret
+    key value (an alphanumeric string)
+
+```{r write-envvar-key}
+KEY_VAR_NAME <- "PID_PEC_IAD_KEY"
+writeLines(paste(KEY_VAR_NAME, secret_key, sep = ' = '), con = ".Renviron")
+```
+
+3.  Restart the R session (from within Rstudio it can be done by calling)
+
+```{r restart-R}
+rstudioapi::restartSession(clean = FALSE)
+```
+
+4.  Verify that the key is created as an environment variable
+
+```{r}
+# NOTE: If the R session fails to restore, the following lines will restore the
+#       missing objects and set up the options manually:
+VAR_NAMES    <- c("full_name", "valid")
+GS_URL       <-
+  "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
+CACHE_PATH   <- ".secrets"
+options(gargle_oauth_cache = here::here(CACHE_PATH))
+gs_token     <- googlesheets4::gs4_token() # Select existing token if necessary
+KEY_VAR_NAME <- "PID_PEC_IAD_KEY"
+
+# Verify that the environment variable has the encryption key value
+Sys.getenv(KEY_VAR_NAME)
+```
+
+## Encrypt the OAuth token
+
+As explained before, we use this key to encrypt the OAuth token.
+
+To do this, we will write the token as an encrypted R object, calling {gargle}'s
+[`secret_write_rds()`](https://gargle.r-lib.org/reference/gargle_secret.html).
+As explained before, this is done calling the encryption key by its environment
+variable name, instead of its value. The function call will internally resolve
+its value and use it to encrypt the token as an R object, and then save it as a
+".rds" object.
+
+Also, as the "unencrypted" token will no longer be necessary, we will then
+delete it to avoid it from being accidentally exposed.
+
+### Procedure
+
+1.  Encrypt the token
+
+```{r encrypt-token}
+ENCRYPTED_TOKEN_FILENAME <- "encrypted-oauth-token.rds"
+
+gargle::secret_write_rds(
+  gs_token,
+  here::here(CACHE_PATH, ENCRYPTED_TOKEN_FILENAME),
+  key = KEY_VAR_NAME
+)
+```
+
+2.  Delete the unencrypted token file
+
+```{r delete-unencrypted-token}
+# TODO: Find the file by browsing to the ".secrets" folder, then substitute
+#       "<token_filename>" with its name.
+file.remove(here::here(CACHE_PATH, "<token_filename>"))
+```
