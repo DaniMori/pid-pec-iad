@@ -269,3 +269,5 @@ gargle::secret_write_rds(
 #       "<token_filename>" with its name.
 file.remove(here::here(CACHE_PATH, "<token_filename>"))
 ```
+
+# Test non-interactive authorization
