@@ -6,7 +6,7 @@ editor_options:
     canonical: false
 ---
 
-# Repository `PID-sandbox`
+# Repository `pid-pec-iad`
 
 Posit Cloud Shiny Application sandbox for testing a "Teaching innovation
 project" concept
@@ -98,7 +98,7 @@ Rstudio project in the folder specified.
 The URL that must be entered into the `Repository URL` text box is:
 
 ```
-https://github.com/DaniMori/PID-sandbox.git
+https://github.com/DaniMori/pid-pec-iad.git
 ```
 
 [CR]: https://book.cds101.com/using-rstudio-server-to-clone-a-github-repo-as-a-new-project.html#step---2
@@ -148,7 +148,7 @@ renv::restore()
 The file structure of this repository is as follows:
 
 ```         
-PID-sandbox
+pid-pec-iad
 |
 |- server.R (Shiny app server logic)
 |

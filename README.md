@@ -1,5 +1,5 @@
 
-# Repository `PID-sandbox`
+# Repository `pid-pec-iad`
 
 Posit Cloud Shiny Application sandbox for testing a “Teaching innovation
 project” concept
@@ -64,7 +64,7 @@ Start by installing the following software components:
 - [Git client](https://git-scm.com/download): Install the Git client in
   order to be able to clone locally the project repository. On Windows,
   use [the 64-bit Windows
-  installer](https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe).
+  installer](https://github.com/git-for-windows/git/releases/download/v2.47.0.windows.1/Git-2.47.0-64-bit.exe).
 
 ## Installing the project locally
 
@@ -76,7 +76,7 @@ instructions](https://book.cds101.com/using-rstudio-server-to-clone-a-github-rep
 specified. The URL that must be entered into the `Repository URL` text
 box is:
 
-    https://github.com/DaniMori/PID-sandbox.git
+    https://github.com/DaniMori/pid-pec-iad.git
 
 **IMPORTANT:** It is totally unrecommended to clone a git repository
 inside a cloud storage folder (e.g., Dropbox, OneDrive). Please note
@@ -122,21 +122,28 @@ renv::restore()
 
 The file structure of this repository is as follows:
 
-    PID-sandbox
+    pid-pec-iad
     |
-    |- server.R (Shiny app server logic)
+    |--- apps         (To store apps, e.g. in Shiny)
     |
-    |- ui.R     (Shiny app user interface)
+    |--- dat          (To store input datasets; must NEVER be checked-in to Github)
     |
-    |--- dat    (To store input datasets; must NEVER be checked-in to Github)
+    |--- doc          (To store important documentation of the project)
+    |    |
+    |    |--- minutes (To store meeting minutes)
     |
-    |--- R      (R functions created for this project live here)
+    |--- notebooks    (Notebooks to explore data and test processes live here)
     |
-    |--- renv   (System library necesssary for `renv` to work. DON'T TOUCH)
+    |--- output       (Processing outputs; files must be individually "checked-in"
+    |                 when necessary)
     |
-    |--- src    (Source scripts that implement the main processes)
+    |--- R            (R functions created for this project live here)
     |
-    |--- www    (Project assets, e.g., images, bibliography files, etc.)
+    |--- renv         (System library necesssary for `renv` to work. DON'T TOUCH)
+    |
+    |--- src          (Source scripts that implement the main processes)
+    |
+    |--- www          (Project assets, e.g., images, bibliography files, etc.)
 
 Use the folders as indicated to store the different files and generate
 the outputs of the processes.
