@@ -16,8 +16,12 @@
 DOWNLOAD_LINK_ID <- "download"
 
 # Interface verbatim:
-APP_TITLE           <- "Ejercicio: Regresión lineal en Jamovi"
+APP_TITLE           <- "Descarga de datos para actividad optativa con Jamovi"
 DOWNLOAD_LINK_LABEL <-
   "Haz click aquí si la descarga no se inicia automáticamente"
-CLOSE_WINDOW_MSG    <-
-  "(Cierra esta ventana cuando acabe la descarga para volver al curso virtual)"
+CLOSE_WINDOW_MSG    <- paste(
+  "(Cierra esta ventana cuando acabe la descarga",
+  "para volver al curso virtual y continuar con la actividad)"
+)
+DATASET_FILENAME    <- "regresion_lineal.csv" # Name of downloaded dataset
+

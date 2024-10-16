@@ -73,7 +73,7 @@ server <- function(input, output, session) {
 
   ## File download handler (activated when the email is valid)
   output[[DOWNLOAD_LINK_ID]] <- downloadHandler(
-    filename = "regresion_lineal.csv",
+    filename = DATASET_FILENAME,
     content  = function(file) {
 
       validate_email(email())
