@@ -20,81 +20,68 @@ setwd(here::here())
 
 library(shiny)
 library(shinyjs)
-library(stringr)
-library(tibble)
-library(broom)
-library(dplyr)
 library(readr)
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
-source("R/email_input_component.R", encoding = 'UTF-8')
-source("R/constants.R",             encoding = 'UTF-8')
-source("R/simulate_data.R",         encoding = 'UTF-8')
-source("R/hash_emails.R",           encoding = 'UTF-8')
+source("R/constants.R",     encoding = 'UTF-8')
+source("R/simulate_data.R", encoding = 'UTF-8')
+source("R/hash_emails.R",   encoding = 'UTF-8')
 
 
 ## ---- MAIN: ------------------------------------------------------------------
 
 ## ----create-server-logic------------------------------------------------------
 
-server <- function(input, output) {
+server <- function(input, output, session) {
 
-  # Initial server configuration:
+  email <- reactiveVal()          # Email read from the session query
+  simulated_data <- reactiveVal() # Simulated dataset
 
-  email_valid    <- reactiveVal(FALSE) # Whether the email has been validated
-  simulated_data <- reactiveVal()      # Simulated dataset
+  observe(
+    {
+      # Get email from query:
+      email(parseQueryString(session$clientData$url_search)$email)
+
+      validate_email(email()) # Check that email is valid in the first place
+
+      # Generate the personal student dataset:
+
+      ## Create unique hash for the student email:
+      hashed_email <- email() |> hash_emails()
+      print("Email hash created")
+
+      ## Generate simulated data with the hashed email as seed:
+      simulated_data(simulate_data(hashed_email))
+      print("Dataset generated")
+
+      # Run download automatically on loading app:
+      shinyjs::runjs(
+        glue::glue(
+          "setTimeout(
+            function(){
+              document.getElementById('[DOWNLOAD_LINK_ID]').click();
+            },
+            200
+          );",
+          .open = '[', .close = ']'
+        )
+      )
+      print("Automatic download on loading run")
+    }
+  )
 
   ## File download handler (activated when the email is valid)
-  output[[DOWNLOAD_BUTTON_ID]] <- downloadHandler(
+  output[[DOWNLOAD_LINK_ID]] <- downloadHandler(
     filename = "regresion_lineal.csv",
-    content  = function(file) simulated_data() |> write_csv(file),
+    content  = function(file) {
+
+      validate_email(email())
+
+      print("Download granted")
+
+      simulated_data() |> write_csv(file)
+    },
     contentType = "text/csv"
-  )
-
-  # Server logic:
-
-  ## Email validation logic
-  email_input <- validateEmail(
-    input, output,
-    inputId       = EMAIL_INPUT_ID,
-    domain        = UNED_STUDENT_EMAIL_DOMAIN,
-    validate_func = is_valid_email
-  )
-
-  ## Email "double checking" logic
-  email_check <- validateEmail(
-    input, output,
-    inputId       = EMAIL_CHECK_ID,
-    domain        = UNED_STUDENT_EMAIL_DOMAIN,
-    validate_func = double_check_email,
-    check_value   = reactive(email_input()$email)
-  )
-
-  ## Validate email when both the input and the "double check" are valid
-  observeEvent(
-    email_input()$valid & email_check()$valid,
-    email_valid(email_input()$valid & email_check()$valid)
-  )
-
-  ## Enable/disable the download button when the email is valid/invalid
-  observeEvent(
-    email_valid(),
-    toggleState(DOWNLOAD_BUTTON_ID, condition = email_valid())
-  )
-
-  ## Generate the personal student dataset
-  observeEvent(
-    email_valid(),
-    {
-      # Will only generate data if the email is valid:
-      shiny::validate(need(email_valid(), message = "invalid email"))
-
-      # Create unique hash for the student email:
-      hashed_email <- email_input()$email |> hash_emails()
-
-      # Generate simulated data with the hashed email as seed:
-      simulated_data(simulate_data(hashed_email))
-    }
   )
 }

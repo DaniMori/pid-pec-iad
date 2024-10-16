@@ -20,12 +20,10 @@ setwd(here::here())
 
 library(shiny)
 library(shinyjs)
-library(bslib)
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
-source("R/email_input_component.R", encoding = 'UTF-8')
-source("R/constants.R",             encoding = 'UTF-8')
+source("R/constants.R", encoding = 'UTF-8')
 
 
 ## ---- MAIN: ------------------------------------------------------------------
@@ -40,27 +38,11 @@ ui <- fluidPage(
   # TODO: Decide title & add logos (if necessary)
   titlePanel(APP_TITLE),
 
-  sidebarLayout(
+  fillPage(
 
-    # Sidebar with the email input:
-    sidebarPanel(
-      emailInput(
-        EMAIL_INPUT_ID,
-        domain = UNED_STUDENT_EMAIL_DOMAIN,
-        label  = EMAIL_INPUT_LABEL
-      ),
-      emailInput(
-        EMAIL_CHECK_ID,
-        domain = UNED_STUDENT_EMAIL_DOMAIN,
-        label  = EMAIL_CHECK_LABEL
-      ),
-      width = 6
-    ),
+    # Download link:
+    downloadLink(DOWNLOAD_LINK_ID, DOWNLOAD_LINK_LABEL),
 
-    # Main page with the download button:
-    mainPanel(
-      downloadButton(DOWNLOAD_BUTTON_ID, DOWNLOAD_BUTTON_LABEL),
-      width = 6
-    )
+    tags$div(tags$p(CLOSE_WINDOW_MSG), style="margin-top:2em;")
   )
 )
