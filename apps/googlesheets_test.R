@@ -44,35 +44,13 @@ KEY_NAME   <- "PID_PEC_IAD_KEY"
 #   key = KEY_NAME
 # )
 oauth_token <- gargle::secret_read_rds(
-  path = ".secrets/gs4-oauth-token.rds",
+  path = here::here(".secrets/encrypted-oauth-token.rds"),
   key  = KEY_NAME
 )
 gs4_auth(token = oauth_token)
 
-# Service account token setup:
-# https://gargle.r-lib.org/articles/non-interactive-auth.html#provide-a-service-account-token-directly
-
-## First create "Service Account Token" (SAT) in Google Cloud Platform:
-## https://gargle.r-lib.org/articles/get-api-credentials.html#service-account-token
-##
-## Enable the "Google Sheets API" in the Google Cloud Platform
-##
-## Then add the service account as an "editor" to the Google Spreadsheet file
-##
-## Use token:
-gs4_auth(path = ".secrets/<token_filename>.json")
-
-KEY_NAME   <- "PID_PEC_IAD_KEY"
-secret_key <- gargle::secret_make_key()
-
-gargle::secret_encrypt_json(
-  json = ".secrets/named-icon-438614-f5-1d0fa6767c8b.json",
-  path = ".secrets/gsheets-encrypted-token.json",
-  key  = "PID_PEC_IAD_KEY"
-)
-
 # now "do anything" that triggers authentication
-doc_url <- "https://docs.google.com/spreadsheets/d/1jzpIEa_h9AOyNSkJU80x4IFbAKj9AOkREwHmpbcPVyM"
+doc_url <- "https://docs.google.com/spreadsheets/d/1oiOcp9sOD5_FTTgsnlZCmZNI0s5MM7tYiCvo7GER8Ww"
 file_link <- gs4_get(doc_url)
 
 saveData <- function(data) {
