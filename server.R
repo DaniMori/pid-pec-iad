@@ -19,8 +19,6 @@ setwd(here::here())
 ## ---- PACKAGES: --------------------------------------------------------------
 
 library(shiny)
-library(shinyjs, warn.conflicts = FALSE)
-library(readr)
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
@@ -91,7 +89,7 @@ server <- function(input, output, session) {
 
       print("Download granted")
 
-      simulated_data() |> write_csv(file)
+      simulated_data() |> readr::write_csv(file)
     },
     contentType = "text/csv"
   )
