@@ -20,7 +20,7 @@ source("R/constants.R", encoding = 'UTF-8')
 # Event related constants:
 
 ## Variable names:
-VAR_NAMES <- c("email_hash", "timestamp", "event")
+LOG_VAR_NAMES <- c("email_hash", "timestamp", "event")
 
 ## Variable values:
 EVENT_TYPES <- c("Access", "Download") |> setNames(nm = _)
@@ -66,7 +66,7 @@ write_event <- function(hash,
     timestamp()
 
   event_data <- tibble::tibble(hash, timestamp, event) |>
-    setNames(VAR_NAMES)
+    setNames(LOG_VAR_NAMES)
 
   suppressMessages( # Prevent logging
     googlesheets4::sheet_append(gs_file_link, event_data)

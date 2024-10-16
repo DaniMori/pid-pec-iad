@@ -40,3 +40,9 @@ KEY_VAR_NAME     <- "PID_PEC_IAD_KEY"
 GS_BASE_URL <- "https://docs.google.com/spreadsheets/d"
 FILE_ID_URL <- "1S-yq7bgqncOL83IHFVII5ufgygYSpU8-Kv-2BWk-pCc"
 FILE_URL    <- paste(GS_BASE_URL, FILE_ID_URL, sep = '/')
+
+
+# Simulated data objects:
+
+## Variable names:
+SIM_VAR_NAMES <- c("autonomia_laboral", "satisfaccion_laboral")

@@ -10,12 +10,9 @@
 # ==============================================================================
 
 
-## ---- CONSTANTS: -------------------------------------------------------------
+## ---- SOURCES: ---------------------------------------------------------------
 
-# <level_1_section>:
-
-## <level_2_section>:
-
+source("R/constants.R", encoding = 'UTF-8')
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
@@ -24,10 +21,10 @@ simulate_data <- function(seed) {
   set.seed(seed)
 
   tibble::tibble(
-    predictor = rnorm(
-      n    = sample(50:200, size = 1), # 50 to 200 cases (uniform sample)
-      mean = runif(1, -10,  10),       # mean uniform from -10 to 10
-      sd   = runif(1,    .5, 4)        # sd uniform from .5 to 4
+    predictor = sample(
+      0:10,                               # Integer score uniform from 0 to 10
+      size    = sample(50:200, size = 1), # 50 to 200 cases (uniform sample)
+      replace = TRUE
     ),
     criterion = rnorm(
       n    = length(predictor),
@@ -35,5 +32,6 @@ simulate_data <- function(seed) {
       sd   = runif(1,   .1, 2)  # sd uniform from .1 to 2
     ) +
       runif(1, -10, 10) * predictor # Regression coefficient
-  )
+  ) |>
+    setNames(SIM_VAR_NAMES)
 }
