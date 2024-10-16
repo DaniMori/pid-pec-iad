@@ -30,3 +30,13 @@ DATASET_FILENAME    <- "regresion_lineal.csv" # Name of downloaded dataset
 ## Auto download configuration:
 AUTO_DOWNLOAD_TIMEOUT <- 200L # Timeout (to start download) in milliseconds
 
+## Google Spreadsheets authentication:
+OAUTH_CACHE_PATH <- here::here(".secrets")
+TOKEN_FILENAME   <- "encrypted-oauth-token.rds"
+TOKEN_FILEPATH   <- here::here(OAUTH_CACHE_PATH, TOKEN_FILENAME)
+KEY_VAR_NAME     <- "PID_PEC_IAD_KEY"
+
+## Google Spreadsheets storage:
+GS_BASE_URL <- "https://docs.google.com/spreadsheets/d"
+FILE_ID_URL <- "1S-yq7bgqncOL83IHFVII5ufgygYSpU8-Kv-2BWk-pCc"
+FILE_URL    <- paste(GS_BASE_URL, FILE_ID_URL, sep = '/')

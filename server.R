@@ -27,6 +27,7 @@ library(readr)
 source("R/constants.R",     encoding = 'UTF-8')
 source("R/simulate_data.R", encoding = 'UTF-8')
 source("R/hash_emails.R",   encoding = 'UTF-8')
+source("R/data_storage.R",  encoding = 'UTF-8')
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
@@ -52,7 +53,8 @@ auto_download_code <- glue::glue(
 
 server <- function(input, output, session) {
 
-  email <- reactiveVal()          # Email read from the session query
+  # Reactive values:
+  email          <- reactiveVal() # Email read from the session query
   simulated_data <- reactiveVal() # Simulated dataset
 
   observe(
@@ -61,14 +63,16 @@ server <- function(input, output, session) {
       email(parseQueryString(session$clientData$url_search)$email)
 
       validate_email(email()) # Check that email is valid in the first place
+      print("Email valid")
 
-      # Generate the personal student dataset:
-
-      ## Create unique hash for the student email:
+      ## Create unique hash for the user email:
       hashed_email <- email() |> hash_emails()
       print("Email hash created")
 
-      ## Generate simulated data with the hashed email as seed:
+      # Log access to the app:
+      write_event(hash = hashed_email, event = "Access")
+
+      # Generate simulated data with the hashed email as seed:
       simulated_data(simulate_data(hashed_email))
       print("Dataset generated")
 
