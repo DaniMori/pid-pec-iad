@@ -1,7 +1,9 @@
 ---
 title: "Google Spreadsheets connection instructions"
-format: html
+format: gfm
 editor: source
+execute: 
+  eval: false
 ---
 
 # Introduction
@@ -167,7 +169,9 @@ rstudioapi::restartSession(clean = FALSE)
 
 4.  Verify that the key is created as an environment variable
 
-```{r}
+```{r check-evvar-key}
+#| eval: true
+
 # NOTE: If the R session fails to restore, the following lines will restore the
 #       missing objects and set up the options manually:
 GS_URL       <-
@@ -336,8 +340,8 @@ throughout the documentation so I assume it must be better for some reason
 
 To make sure the operation was successful, we use the current time in the
 variable `timestamp`. Then, we can open the spreadsheet file and check that its
-value in the last line of the file coincides with the time when the line was
-written (i.e., when `googlesheets4::sheet_append()` was called).
+value in the last line of the file coincides with the time when the new data was
+created (i.e., when `data.frame()` was called).
 
 ### Procedure
 
@@ -350,8 +354,8 @@ gs_link <- googlesheets4::gs4_get(GS_URL)
 2.  Attempt writing a line to the file
 
 ```{r gs-write-line}
-test_data <- data.frame(
-  lubridate::now("CET") |>
+test_data <- data.frame(   # The timestamp value will indicate when this code
+  lubridate::now("CET") |> #   block is run
     lubridate::stamp("2024-12-01 06:00", orders = "%Y%Om%d%H%M")(),
   "John Doe",
   FALSE
