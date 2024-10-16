@@ -25,3 +25,8 @@ CLOSE_WINDOW_MSG    <- paste(
 )
 DATASET_FILENAME    <- "regresion_lineal.csv" # Name of downloaded dataset
 
+# Server logic objects:
+
+## Auto download configuration:
+AUTO_DOWNLOAD_TIMEOUT <- 200L # Timeout (to start download) in milliseconds
+

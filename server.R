@@ -19,7 +19,7 @@ setwd(here::here())
 ## ---- PACKAGES: --------------------------------------------------------------
 
 library(shiny)
-library(shinyjs)
+library(shinyjs, warn.conflicts = FALSE)
 library(readr)
 
 ## ---- SOURCES: ---------------------------------------------------------------
@@ -27,6 +27,23 @@ library(readr)
 source("R/constants.R",     encoding = 'UTF-8')
 source("R/simulate_data.R", encoding = 'UTF-8')
 source("R/hash_emails.R",   encoding = 'UTF-8')
+
+## ---- CONSTANTS: -------------------------------------------------------------
+
+# Server configuration objects:
+
+## Auto-download javascript code:
+AUTO_DOWNLOAD_JS_FUN  <- "setTimeout(
+  function(){
+    document.getElementById('[DOWNLOAD_LINK_ID]').click();
+  },
+  [AUTO_DOWNLOAD_TIMEOUT]
+);"
+
+auto_download_code <- glue::glue(
+  AUTO_DOWNLOAD_JS_FUN,
+  .open = '[', .close = ']'
+)
 
 
 ## ---- MAIN: ------------------------------------------------------------------
@@ -56,17 +73,7 @@ server <- function(input, output, session) {
       print("Dataset generated")
 
       # Run download automatically on loading app:
-      shinyjs::runjs(
-        glue::glue(
-          "setTimeout(
-            function(){
-              document.getElementById('[DOWNLOAD_LINK_ID]').click();
-            },
-            200
-          );",
-          .open = '[', .close = ']'
-        )
-      )
+      shinyjs::runjs(auto_download_code)
       print("Automatic download on loading run")
     }
   )
