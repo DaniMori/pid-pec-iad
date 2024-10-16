@@ -35,67 +35,15 @@ following sources, both of them articles in the package website:
 
 The setup process consists of the following steps:
 
-1.  Create a Google Spreadsheet file
+1.  Set up an OAuth token
 
-2.  Set up an OAuth token
+2.  Create an encryption key
 
-3.  Create an encryption key
+3.  Set the encryption key as an environment variable
 
-4.  Set the encryption key as an environment variable
-
-5.  Encrypt the OAuth token
+4.  Encrypt the OAuth token
 
 # Detailed procedure
-
-## Create a Google Spreadsheet file
-
-The file must be created under the Google account that will be used to generate
-the OAuth token. Bear in mind that this account is the "identity" that the Shiny
-app will use to interact with the spreadsheet (and the Google API in general,
-for that matter).
-
-It is also recommended that, starting from cell A1, the spreadsheet file has the
-structure of the dataset we want to save in it. This can be done simply by
-typing in the variable names in the first row of the dataset.
-
-For this minimal example, we will create a spreadsheet with the following two
-variables:
-
-```{r dataset-vars}
-VAR_NAMES <- c("full_name", "valid")
-```
-
-### Procedure
-
-1.  Go to [Google Spreadsheets](https://docs.google.com/spreadsheets). If
-    necessary, log in with a valid Google account.
-
-2.  Under "Create spreadsheet" click on "Blank spreadsheet".
-
-3.  In the field "Untitled spreadsheet" type in a name, e.g., "Shiny_app_data"
-    (without the double quotes).
-
-4.  In cells A1 and A2, respectively, type in the variable names, i.e.,
-    `full_name` and `valid`. (For better readability, this row can be formatted
-    as **boldface**.)
-
-5.  In the browser, press `CTRL + L` (in Windows) to go to the address bar and
-    then `CTRL + C` to copy the spreadsheet file URL, which should include
-    everything up until the last "slash" ("/") character. In this example:
-
-```{r gs-url}
-GS_URL <-
-  "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
-```
-
-(Change line 86 to use a different file created following these instructions, if
-necessary.)
-
-6.  (OPTIONALLY) In [the Google Drive
-    view](https://drive.google.com/drive/u/0/my-drive), find the spreadsheet
-    file and [share it](https://support.google.com/drive/answer/2494822) with
-    other Google account(s) (e.g. collaborators), **granting them "Edit"
-    permission**.
 
 ## Set up an OAuth token
 
@@ -222,7 +170,6 @@ rstudioapi::restartSession(clean = FALSE)
 ```{r}
 # NOTE: If the R session fails to restore, the following lines will restore the
 #       missing objects and set up the options manually:
-VAR_NAMES    <- c("full_name", "valid")
 GS_URL       <-
   "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
 CACHE_PATH   <- ".secrets"
@@ -245,8 +192,8 @@ variable name, instead of its value. The function call will internally resolve
 its value and use it to encrypt the token as an R object, and then save it as a
 ".rds" object.
 
-Also, as the "unencrypted" token will no longer be necessary, we will then
-delete it to avoid it from being accidentally exposed.
+Also, as the "decrypted" token will no longer be necessary, we will then delete
+it to avoid its accidental exposure.
 
 ### Procedure
 
@@ -262,12 +209,63 @@ gargle::secret_write_rds(
 )
 ```
 
-2.  Delete the unencrypted token file
+2.  Delete the decrypted token file
 
-```{r delete-unencrypted-token}
+```{r delete-decrypted-token}
 # TODO: Find the file by browsing to the ".secrets" folder, then substitute
 #       "<token_filename>" with its name.
 file.remove(here::here(CACHE_PATH, "<token_filename>"))
 ```
 
 # Test non-interactive authorization
+1.  Create a Google Spreadsheet file
+
+```{r dataset-vars}
+VAR_NAMES <- c("full_name", "valid")
+```
+
+## Create a Google Spreadsheet file
+
+The file must be created under the Google account that will be used to generate
+the OAuth token. Bear in mind that this account is the "identity" that the Shiny
+app will use to interact with the spreadsheet (and the Google API in general,
+for that matter).
+
+It is also recommended that, starting from cell A1, the spreadsheet file has the
+structure of the dataset we want to save in it. This can be done simply by
+typing in the variable names in the first row of the dataset.
+
+For this minimal example, we will create a spreadsheet with the following two
+variables:
+
+### Procedure
+
+1.  Go to [Google Spreadsheets](https://docs.google.com/spreadsheets). If
+    necessary, log in with a valid Google account.
+
+2.  Under "Create spreadsheet" click on "Blank spreadsheet".
+
+3.  In the field "Untitled spreadsheet" type in a name, e.g., "Shiny_app_data"
+    (without the double quotes).
+
+4.  In cells A1 and A2, respectively, type in the variable names, i.e.,
+    `full_name` and `valid`. (For better readability, this row can be formatted
+    as **boldface**.)
+
+5.  In the browser, press `CTRL + L` (in Windows) to go to the address bar and
+    then `CTRL + C` to copy the spreadsheet file URL, which should include
+    everything up until the last "slash" ("/") character. In this example:
+
+```{r gs-url}
+GS_URL <-
+  "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
+```
+
+(Change line 86 to use a different file created following these instructions, if
+necessary.)
+
+6.  (OPTIONALLY) In [the Google Drive
+    view](https://drive.google.com/drive/u/0/my-drive), find the spreadsheet
+    file and [share it](https://support.google.com/drive/answer/2494822) with
+    other Google account(s) (e.g. collaborators), **granting them "Edit"
+    permission**.
