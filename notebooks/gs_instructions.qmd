@@ -352,7 +352,7 @@ gs_link <- googlesheets4::gs4_get(GS_URL)
 ```{r gs-write-line}
 test_data <- data.frame(
   lubridate::now("CET") |>
-    lubridate::stamp("2024-12-01 06:00", orders = "%Y%m%d%H%M")(),
+    lubridate::stamp("2024-12-01 06:00", orders = "%Y%Om%d%H%M")(),
   "John Doe",
   FALSE
 ) |>
