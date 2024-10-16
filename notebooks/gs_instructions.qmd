@@ -52,8 +52,8 @@ which is necessary to deploy it on [shinyapps.io](https://www.shinyapps.io/)
 without human intervention.
 
 We will make use of the interactive capabilities of {gargle} to generate a token
-through a browser and cache it in a secret directory (i.e. folder) local to this
-project.
+through a browser and cache it in a secret directory (i.e. folder), local to
+this project.
 
 ### Procedure
 
@@ -201,11 +201,11 @@ it to avoid its accidental exposure.
 
 ```{r encrypt-token}
 ENCRYPTED_TOKEN_FILENAME <- "encrypted-oauth-token.rds"
-
+encrypted_token_filepath <- here::here(CACHE_PATH, ENCRYPTED_TOKEN_FILENAME)
 gargle::secret_write_rds(
   gs_token,
-  here::here(CACHE_PATH, ENCRYPTED_TOKEN_FILENAME),
-  key = KEY_VAR_NAME
+  path = encrypted_token_filepath,
+  key  = KEY_VAR_NAME
 )
 ```
 
@@ -217,19 +217,31 @@ gargle::secret_write_rds(
 file.remove(here::here(CACHE_PATH, "<token_filename>"))
 ```
 
-# Test non-interactive authorization
-1.  Create a Google Spreadsheet file
+# Test non-interactive authorization {#test}
 
-```{r dataset-vars}
-VAR_NAMES <- c("full_name", "valid")
-```
+Using the encrypted token requires reading the encrypted file and decrypting it
+to obtain the actual OAuth token object. This token is then used to grant
+{googlesheets4} access to the Spreadsheets API.
 
-## Create a Google Spreadsheet file
+To test that everything works, it is recommended to test writing to a Google
+Spreadsheets file. In order to do that, we will follow these steps:
 
-The file must be created under the Google account that will be used to generate
-the OAuth token. Bear in mind that this account is the "identity" that the Shiny
-app will use to interact with the spreadsheet (and the Google API in general,
-for that matter).
+1.  Create a Google Spreadsheets file
+
+2.  Read and decrypt the OAuth token from the encrypted file
+
+3.  Grant access to {googlesheets4} using the decrypted token
+
+4.  Attempt writing to the spreadsheet file
+
+## Create a Google Spreadsheets file
+
+The file must be created under **the Google account that was be used to generate
+the OAuth token**. Alternatively, the file can be created with a different
+account, but "edit access" must be granted to the account used to generate the
+token. Bear in mind that this account is the "identity" that the Shiny app will
+use to interact with the spreadsheet (and the Google API in general, for that
+matter).
 
 It is also recommended that, starting from cell A1, the spreadsheet file has the
 structure of the dataset we want to save in it. This can be done simply by
@@ -237,6 +249,10 @@ typing in the variable names in the first row of the dataset.
 
 For this minimal example, we will create a spreadsheet with the following two
 variables:
+
+```{r dataset-vars}
+VAR_NAMES <- c("timestamp", "full_name", "valid")
+```
 
 ### Procedure
 
@@ -257,6 +273,8 @@ variables:
     everything up until the last "slash" ("/") character. In this example:
 
 ```{r gs-url}
+# TODO: Change line 276 to use a different Google Spreadsheets file created
+#       following these instructions, if necessary.
 GS_URL <-
   "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
 ```
@@ -269,3 +287,102 @@ necessary.)
     file and [share it](https://support.google.com/drive/answer/2494822) with
     other Google account(s) (e.g. collaborators), **granting them "Edit"
     permission**.
+
+## Read and decrypt the OAuth token from the encrypted file
+
+This consists only of reading the OAuth token with the decryption function
+`secret_read_rds()` from the {gargle} package, which is the "symmetric" to
+`gargle::secret_write_rds()` we used earlier to encrypt the token. It takes in
+similar arguments (except for the original token object, obviously) and returns
+the decrypted token as an R object.
+
+### Procedure
+
+1.  Read and decrypt OAuth token
+
+```{r read-encrypted-token}
+gs_token <- gargle::secret_read_rds(
+  path = encrypted_token_filepath,
+  key  = KEY_VAR_NAME
+)
+```
+
+## Grant access to {googlesheets4} using the decrypted token
+
+This step consists only of granting access to the Google Spreadsheets API to
+{googlesheets4}. We do this by calling authorization function
+`googlesheets4::gs4_auth()` with the decrypted OAuth token as an argument.
+
+### Procedure
+
+1.  Authorize {googlesheets4} with the decrypted token
+
+```{r auth-gs4}
+googlesheets4::gs4_auth(token = gs_token)
+```
+
+## Attempt writing to the spreadsheet file
+
+Assuming the authorization was successful, {googlesheets4} now has write access
+to the Google Spreadsheets API. We will test this by trying to write lines to
+the spreadsheet test file we created earlier.
+
+To do that, we will first create a "link" object to the file (an object of the
+class `googlesheets4_spreadheet`), and then use it to write to that file.
+Although this step is not strictly necessary (we could access the file directly
+through its URL anytime we want to write to it), this procedure appears
+throughout the documentation so I assume it must be better for some reason
+(probably faster).
+
+To make sure the operation was successful, we use the current time in the
+variable `timestamp`. Then, we can open the spreadsheet file and check that its
+value in the last line of the file coincides with the time when the line was
+written (i.e., when `googlesheets4::sheet_append()` was called).
+
+### Procedure
+
+1.  Get the link object to the file
+
+```{r get-file-link}
+gs_link <- googlesheets4::gs4_get(GS_URL)
+```
+
+2.  Attempt writing a line to the file
+
+```{r gs-write-line}
+test_data <- data.frame(
+  lubridate::now("CET") |>
+    lubridate::stamp("2024-12-01 06:00", orders = "%Y%m%d%H%M")(),
+  "John Doe",
+  FALSE
+) |>
+  setNames(VAR_NAMES)
+
+googlesheets4::sheet_append(gs_link, test_data)
+```
+
+3.  Verify that the line has been written, navigating to `{r} GS_URL` and
+    checking the last value of `timestamp`.
+
+# Complete code for setting up a connection to a Google Spreadsheets file
+
+Here I present a summed up version of the code needed to set up a connection to
+a spreadsheet file. Note the file must have been already created, and populated
+with the variable names in the first row, as per [the previous section](#test).
+
+Then, in the app code it is just a matter of interacting with the spreadsheet
+file with object `gs_link`.
+
+```{r connect-gs-file}
+# Read & decrypt OAuth token
+gs_token <- gargle::secret_read_rds(
+  path = encrypted_token_filepath,
+  key  = KEY_VAR_NAME
+)
+
+# Grant access with OAuth token
+googlesheets4::gs4_auth(token = gs_token)
+
+# Get file link
+gs_link <- googlesheets4::gs4_get(GS_URL)
+```
