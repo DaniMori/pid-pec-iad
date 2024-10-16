@@ -63,7 +63,7 @@ this project.
 
 ```{r setup-cache-dir}
 CACHE_PATH <- ".secrets"
-options(gargle_oauth_cache = here::here(CACHE_PATH))
+options(gargle_oauth_cache = CACHE_PATH)
 ```
 
 2.  Purposely trigger interactive authorization by {googlesheets4}
@@ -174,10 +174,8 @@ rstudioapi::restartSession(clean = FALSE)
 
 # NOTE: If the R session fails to restore, the following lines will restore the
 #       missing objects and set up the options manually:
-GS_URL       <-
-  "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
 CACHE_PATH   <- ".secrets"
-options(gargle_oauth_cache = here::here(CACHE_PATH))
+options(gargle_oauth_cache = CACHE_PATH)
 gs_token     <- googlesheets4::gs4_token() # Select existing token if necessary
 KEY_VAR_NAME <- "PID_PEC_IAD_KEY"
 
