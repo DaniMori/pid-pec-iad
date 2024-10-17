@@ -53,4 +53,14 @@ CONFIG_FILEPATH <- here::here(ASSETS_DIR, CONFIG_FILENAME)
 # Simulated data objects:
 
 ## Variable names:
-SIM_VAR_NAMES <- c("autonomia_laboral", "satisfaccion_laboral")
+SIM_VARIABLES <- c("predictor",         "criterion")
+SIM_VAR_NAMES <- c("autonomia_laboral", "satisfaccion_laboral") |>
+  setNames(SIM_VARIABLES)
+
+## Variable data:
+SAMPLE_SIZE       <- 50:200 # Uniformly random sample size of 50-200 cases
+PREDICTOR_SCORES  <-  0: 10 # Possible scores in the predictor variable
+CRITERION_SCORES  <-  1:  5 # Possible scores in the criterion variable
+
+## Response configuration data:
+N_DECIMALS     <- 2L # Decimal places to use for rounding numeric results
