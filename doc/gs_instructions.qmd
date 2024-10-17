@@ -6,6 +6,11 @@ execute:
   eval: false
 ---
 
+```{r setup}
+# Set working directory
+setwd(here::here())
+```
+
 # Introduction
 
 This document explains how to authorize and configure a connection to Google
@@ -267,8 +272,8 @@ VAR_NAMES <- c("timestamp", "full_name", "valid")
     (without the double quotes).
 
 4.  In cells A1 and A2, respectively, type in the variable names, i.e.,
-    `full_name` and `valid`. (For better readability, this row can be formatted
-    as **boldface**.)
+    `timestamp`, `full_name` and `valid`. (For better readability, this row can
+    be formatted as **boldface**.)
 
 5.  In the browser, press `CTRL + L` (in Windows) to go to the address bar and
     then `CTRL + C` to copy the spreadsheet file URL, which should include
