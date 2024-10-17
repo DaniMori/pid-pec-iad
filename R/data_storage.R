@@ -19,47 +19,68 @@ source("R/constants.R", encoding = 'UTF-8')
 
 # Event related constants:
 
-## Variable names:
-LOG_VAR_NAMES <- c("email_hash", "timestamp", "event")
-
 ## Variable values:
 EVENT_TYPES <- c("Access", "Download") |> setNames(nm = _)
 
 ## Time and date configuration:
-SERVER_TIMEZONE  <- "Europe/Madrid"
 TIMESTAMP_FORMAT <- "%Y-%Om-%d %H:%M %Z" # With time zone at the end
+
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
 # Function to create an event timestamp
 timestamp <- lubridate::stamp(
   orders = TIMESTAMP_FORMAT,
-  exact = TRUE,
-  quiet = TRUE
+  exact  = TRUE,
+  quiet  = TRUE
 )
 
+get_storage_url <- function(config_filepath, field = "file_id") {
+
+  # Constant objects: ----
+  GS_BASE_URL <- "https://docs.google.com/spreadsheets/d"
+  URL_SEP     <- '/'
+
+  # Main: ----
+  file_id <- yaml::read_yaml(config_filepath)[[field]]
+  paste(GS_BASE_URL, file_id, sep = URL_SEP)
+}
+
 connect_gs <- function(file_url, token_path, key_varname) {
+
   ## TODO: Parse arguments
 
-  # Read & decrypt OAuth token
+  # Main: ----
+
+  ## Read & decrypt OAuth token
   gs_token <- gargle::secret_read_rds(
     path = token_path,
     key  = key_varname
   )
 
-  # Grant access with OAuth token
+  ## Grant access with OAuth token
   googlesheets4::gs4_auth(token = gs_token)
 
-  # Get file link
+  ## Get file link
   googlesheets4::gs4_get(file_url)
 }
 
-write_event <- function(hash,
-                        event = EVENT_TYPES) {
+write_event <- function(hash, event = EVENT_TYPES) {
+
+  # Constant objects: ----
+
+  ## Time and date configuration:
+  SERVER_TIMEZONE  <- "Europe/Madrid"
+
+  ## Variable names:
+  LOG_VAR_NAMES <- c("email_hash", "timestamp", "event")
+
+
+  # Argument parsing and formatting: ----
   ## TODO: Parse arguments
   event <- match.arg(event)
 
-  ## Main: ----
+  # Main: ----
 
   timestamp <- lubridate::now()         |>
     lubridate::with_tz(SERVER_TIMEZONE) |>
@@ -73,11 +94,12 @@ write_event <- function(hash,
   )
 }
 
-## ---- CONFIGURATION: ---------------------------------------------------------
+
+## ---- MAIN: ---------------------------------------------------------
 
 # Data storage configuration:
-gs_file_link <- connect_gs( # Google Spreadsheets file connection
-  FILE_URL,
-  token_path  = TOKEN_FILEPATH,
-  key_varname = KEY_VAR_NAME
-)
+gs_file_link <- get_storage_url(CONFIG_FILEPATH) |> # Storage file URL
+  connect_gs(                                       # Storage file connection
+    token_path  = TOKEN_FILEPATH,
+    key_varname = KEY_VAR_NAME
+  )

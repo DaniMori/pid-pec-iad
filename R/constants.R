@@ -12,10 +12,16 @@
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
-# Shiny component identifiers:
+# File system objects:
+ASSETS_DIR <- here::here("www")
+
+
+# User interface objects:
+
+## Shiny component identifiers:
 DOWNLOAD_LINK_ID <- "download"
 
-# Interface verbatim:
+## Interface verbatim:
 APP_TITLE           <- "Descarga de datos para actividad optativa con Jamovi"
 DOWNLOAD_LINK_LABEL <-
   "Haz click aquí si la descarga no se inicia automáticamente"
@@ -25,21 +31,23 @@ CLOSE_WINDOW_MSG    <- paste(
 )
 DATASET_FILENAME    <- "regresion_lineal.csv" # Name of downloaded dataset
 
+
 # Server logic objects:
 
 ## Auto download configuration:
 AUTO_DOWNLOAD_TIMEOUT <- 200L # Timeout (to start download) in milliseconds
 
-## Google Spreadsheets authentication:
+## Google Spreadsheets configuration:
+
+### Authentication:
 OAUTH_CACHE_PATH <- here::here(".secrets")
 TOKEN_FILENAME   <- "encrypted-oauth-token.rds"
 TOKEN_FILEPATH   <- here::here(OAUTH_CACHE_PATH, TOKEN_FILENAME)
 KEY_VAR_NAME     <- "PID_PEC_IAD_KEY"
 
-## Google Spreadsheets storage:
-GS_BASE_URL <- "https://docs.google.com/spreadsheets/d"
-FILE_ID_URL <- "1S-yq7bgqncOL83IHFVII5ufgygYSpU8-Kv-2BWk-pCc"
-FILE_URL    <- paste(GS_BASE_URL, FILE_ID_URL, sep = '/')
+### Storage file:
+CONFIG_FILENAME <- "gsheets_config.yaml"
+CONFIG_FILEPATH <- here::here(ASSETS_DIR, CONFIG_FILENAME)
 
 
 # Simulated data objects:
