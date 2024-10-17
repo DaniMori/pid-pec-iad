@@ -31,8 +31,11 @@
 # Directories and links
 .Rproj.user
 /dat/
-/.secrets/
 *.lnk
 
 # Shiny publication files
 *.dcf
+
+# App configuration
+/.secrets/
+www/gsheets_config.yml

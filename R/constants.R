@@ -46,7 +46,7 @@ TOKEN_FILEPATH   <- here::here(OAUTH_CACHE_PATH, TOKEN_FILENAME)
 KEY_VAR_NAME     <- "PID_PEC_IAD_KEY"
 
 ### Storage file:
-CONFIG_FILENAME <- "gsheets_config.yaml"
+CONFIG_FILENAME <- "gsheets_config.yml"
 CONFIG_FILEPATH <- here::here(ASSETS_DIR, CONFIG_FILENAME)
 
 
