@@ -53,6 +53,7 @@ server <- function(input, output, session) {
 
   # Reactive values:
   email          <- reactiveVal() # Email read from the session query
+  hashed_email   <- reactiveVal() # Hashed email for logging and random seed
   simulated_data <- reactiveVal() # Simulated dataset
 
   observe(
@@ -64,14 +65,14 @@ server <- function(input, output, session) {
       print("Email valid")
 
       ## Create unique hash for the user email:
-      hashed_email <- email() |> hash_emails()
+      hashed_email(email() |> hash_emails())
       print("Email hash created")
 
       # Log access to the app:
-      write_event(hash = hashed_email, event = "Access")
+      write_event(hash = hashed_email(), event = "Access")
 
       # Generate simulated data with the hashed email as seed:
-      simulated_data(simulate_data(hashed_email))
+      simulated_data(simulate_data(hashed_email()))
       print("Dataset generated")
 
       # Run download automatically on loading app:
@@ -88,6 +89,9 @@ server <- function(input, output, session) {
       validate_email(email())
 
       print("Download granted")
+
+      # Log download attempt:
+      write_event(hash = hashed_email(), event = "Download")
 
       simulated_data() |> readr::write_csv(file)
     },
