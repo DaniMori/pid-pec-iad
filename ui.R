@@ -19,7 +19,8 @@ setwd(here::here())
 ## ---- PACKAGES: --------------------------------------------------------------
 
 library(shiny)
-library(shinyjs)
+library(shinyjs, warn.conflicts = FALSE)
+
 
 ## ---- SOURCES: ---------------------------------------------------------------
 

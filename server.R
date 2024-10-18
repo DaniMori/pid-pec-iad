@@ -89,9 +89,9 @@ server <- function(input, output, session) {
 
       validate_email(email())
 
-      record_log("Download granted")
+      record_log("Download started")
 
-      # Log download attempt:
+      # Record download attempt to users data file:
       write_event(hash = hashed_email(), event = "Download")
 
       simulated_data() |> readr::write_csv(file)
