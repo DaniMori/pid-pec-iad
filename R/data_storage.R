@@ -23,7 +23,7 @@ source("R/constants.R", encoding = 'UTF-8')
 EVENT_TYPES <- c("Access", "Download") |> setNames(nm = _)
 
 ## Time and date configuration:
-TIMESTAMP_FORMAT <- "%Y-%Om-%d %H:%M %Z" # With time zone at the end
+TIMESTAMP_FORMAT <- "%Y-%Om-%d %H:%M:%OS3 %Z" # With time zone at the end
 
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
