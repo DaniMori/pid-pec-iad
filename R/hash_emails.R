@@ -22,5 +22,7 @@ validate_email <- function(email) {
   validate <- shinyvalidate::sv_email()
   result <- validate(email)
   if (!is.null(result)) print(result)
+  if (is.null(email)) shiny::validate("Email must not be empty.")
+
   shiny::validate(result)
 }
