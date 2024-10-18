@@ -26,6 +26,7 @@ source("R/constants.R",      encoding = 'UTF-8')
 source("R/simulated_data.R", encoding = 'UTF-8')
 source("R/hash_emails.R",    encoding = 'UTF-8')
 source("R/data_storage.R",   encoding = 'UTF-8')
+source("R/log.R",            encoding = 'UTF-8')
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
@@ -62,22 +63,22 @@ server <- function(input, output, session) {
       email(parseQueryString(session$clientData$url_search)$email)
 
       validate_email(email()) # Check that email is valid in the first place
-      print("Email valid")
+      record_log("Email valid")
 
       ## Create unique hash for the user email:
       hashed_email(email() |> hash_emails())
-      print("Email hash created")
+      record_log("Email hash created")
 
       # Log access to the app:
       write_event(hash = hashed_email(), event = "Access")
 
       # Generate simulated data with the hashed email as seed:
       simulated_data(simulate_data(hashed_email()))
-      print("Dataset generated")
+      record_log("Dataset generated")
 
       # Run download automatically on loading app:
       shinyjs::runjs(auto_download_code)
-      print("Automatic download on loading run")
+      record_log("Automatic download on loading run")
     }
   )
 
@@ -88,7 +89,7 @@ server <- function(input, output, session) {
 
       validate_email(email())
 
-      print("Download granted")
+      record_log("Download granted")
 
       # Log download attempt:
       write_event(hash = hashed_email(), event = "Download")
