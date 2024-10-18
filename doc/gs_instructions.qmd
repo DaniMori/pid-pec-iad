@@ -8,7 +8,7 @@ execute:
 
 ```{r setup}
 # Set working directory
-setwd(here::here())
+knitr::opts_knit(root.dir = here::here())
 ```
 
 # Introduction
