@@ -124,26 +124,21 @@ The file structure of this repository is as follows:
 
     pid-pec-iad
     |
-    |--- apps         (To store apps, e.g. in Shiny)
+    |- server.R (Shiny app server logic)
     |
-    |--- dat          (To store input datasets; must NEVER be checked-in to Github)
+    |- ui.R     (Shiny app user interface)
     |
-    |--- doc          (To store important documentation of the project)
-    |    |
-    |    |--- minutes (To store meeting minutes)
+    |--- dat    (To store input datasets; must NEVER be checked-in to Github)
     |
-    |--- notebooks    (Notebooks to explore data and test processes live here)
+    |--- doc    (To store important documentation of the project)
     |
-    |--- output       (Processing outputs; files must be individually "checked-in"
-    |                 when necessary)
+    |--- R      (R functions created for this project live here)
     |
-    |--- R            (R functions created for this project live here)
+    |--- renv   (System library necesssary for `renv` to work. DON'T TOUCH)
     |
-    |--- renv         (System library necesssary for `renv` to work. DON'T TOUCH)
+    |--- src    (Source scripts that implement the main processes)
     |
-    |--- src          (Source scripts that implement the main processes)
-    |
-    |--- www          (Project assets, e.g., images, bibliography files, etc.)
+    |--- www    (Project assets, e.g., images, bibliography files, etc.)
 
 Use the folders as indicated to store the different files and generate
 the outputs of the processes.

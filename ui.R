@@ -11,16 +11,20 @@
 # ==============================================================================
 
 
+## ---- GLOBAL OPTIONS: --------------------------------------------------------
+
+setwd(here::here())
+
+
 ## ---- PACKAGES: --------------------------------------------------------------
 
 library(shiny)
-library(shinyjs)
-library(bslib)
+library(shinyjs, warn.conflicts = FALSE)
+
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
-source("../../R/ui_components.R", encoding = 'UTF-8')
-source("../../R/constants.R",     encoding = 'UTF-8')
+source("R/constants.R", encoding = 'UTF-8')
 
 
 ## ---- MAIN: ------------------------------------------------------------------
@@ -35,25 +39,11 @@ ui <- fluidPage(
   # TODO: Decide title & add logos (if necessary)
   titlePanel(APP_TITLE),
 
-  sidebarLayout(
+  fillPage(
 
-    # Sidebar with the email input:
-    sidebarPanel(
-      email_input(
-        EMAIL_INPUT_ID,
-        domain = UNED_STUDENT_EMAIL_DOMAIN,
-        label  = EMAIL_INPUT_LABEL
-      ),
-      email_input(
-        EMAIL_CHECK_ID,
-        domain = UNED_STUDENT_EMAIL_DOMAIN,
-        label  = EMAIL_CHECK_LABEL
-      )
-    ),
+    # Download link:
+    downloadLink(DOWNLOAD_LINK_ID, DOWNLOAD_LINK_LABEL),
 
-    # Main page with the download button:
-    mainPanel(
-      downloadButton(DOWNLOAD_BUTTON_ID, DOWNLOAD_BUTTON_LABEL)
-    )
+    tags$div(tags$p(CLOSE_WINDOW_MSG), style="margin-top:2em;")
   )
 )
