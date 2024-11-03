@@ -35,3 +35,7 @@
 
 # Shiny publication files
 *.dcf
+
+# App configuration
+/.secrets/
+www/gsheets_config.yml

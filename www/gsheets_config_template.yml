@@ -1,0 +1,3 @@
+## TODO: Substitute <FILE_ID> by URL "file component", then save this file as
+##       "www/gsheets_config.yml"
+file_id: "<FILE_ID>"
