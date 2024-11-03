@@ -949,6 +949,18 @@
       ],
       "Hash": "062470668513dcda416927085ee9bdc7"
     },
+    "roperators": {
+      "Package": "roperators",
+      "Version": "1.3.14",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "stats",
+        "tools"
+      ],
+      "Hash": "f15eaa3e6b35a9ea5024b4206b552d9f"
+    },
     "rprojroot": {
       "Package": "rprojroot",
       "Version": "2.0.4",
