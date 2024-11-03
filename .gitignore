@@ -30,7 +30,7 @@
 
 # Directories and links
 .Rproj.user
-#/dat/
+/dat/
 *.lnk
 
 # Shiny publication files
