@@ -30,7 +30,7 @@
 
 # Directories and links
 .Rproj.user
-/dat/
+#/dat/
 *.lnk
 
 # Shiny publication files
@@ -39,3 +39,6 @@
 # App configuration
 /.secrets/
 www/gsheets_config.yml
+
+# Explicit exclusions for dataset and processing notebooks
+!dat/student_response_variables.csv # Student responses variables
