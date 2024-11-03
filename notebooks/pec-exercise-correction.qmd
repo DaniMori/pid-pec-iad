@@ -1,0 +1,229 @@
+---
+title: "PEC Exercise Correction"
+author: "Daniel Morillo"
+format: html
+editor: source
+---
+
+```{r setup}
+# Set working directory
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+```{r libraries}
+#| include: false
+library(googlesheets4)
+library(dplyr)
+library(lubridate)
+library(stringr)
+library(tidyr)
+library(purrr)
+library(here)
+library(tibble)
+library(readr)
+library(roperators)
+```
+
+```{r sources}
+source("R/data_storage.R",   encoding = 'UTF-8')
+source("R/simulated_data.R", encoding = 'UTF-8')
+source("R/hash_emails.R",    encoding = 'UTF-8')
+```
+
+# Introduction
+
+This document retrieves the information for correcting the exercise of the
+educational innovation project for the IAD course.
+
+Using two source datasets, it computes:
+
+-   The correct answers to the exercise for each student
+
+-   Whether they have answered correctly to the exercise
+
+-   Whether each student fulfills the assessment criteria
+
+-   Which students must receive the course compensation for their participation
+
+The source datasets are:
+
+-   The log of users that have downloaded their personalized, random dataset,
+    from the dataset generation Shiny app.
+
+-   The OpenLMS output dataset with the exercise survey responses.
+
+# Data loading & preprocessing
+
+## Dataset of personalized data downloads
+
+The downloads are first read from the Google Spreadsheets file connection. Prior
+to reading the dataset, one must make sure that [the Gsheets API connection has
+been successfully authorized](doc/gs_instructions.qmd).
+
+```{r load-download-data}
+data_downloads <- gs_file_link |>
+  read_sheet(col_types = 'icc') |> # Read email hashes as integers
+  mutate(across(timestamp, parse_timestamp)) # `timestamp` as POSIXct time
+```
+
+Then, the data is processed to extract, for each user:
+
+-   The number of access and download attempts.
+
+-   The timestamp (in the local time of `{r} LOCAL_TIMEZONE`) of the first and
+    last access and download attempts.
+
+```{r process-download-data}
+data_downloads_out <- data_downloads |>
+  arrange(timestamp) |>
+  summarise(
+    attempts = n(),
+    first    = first(timestamp),
+    last     = last(timestamp),
+    .by      = c(email_hash, event) # Compute for each event type and email hash
+  ) |>
+  mutate(across(event, str_to_lower)) |> # Lowercase events for column names
+  pivot_wider(names_from = event, values_from = attempts:last)
+```
+
+## Dataset of activity responses
+
+```{r config-responses-data}
+# File system objects:
+DATA_FOLDER             <- "dat"
+DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI.csv"
+RESPONSE_VARS_FILENAME  <- "student_response_variables.csv"
+
+data_responses_filepath <- here(DATA_FOLDER, DATA_RESPONSES_FILENAME)
+response_vars_filepath  <- here(DATA_FOLDER, RESPONSE_VARS_FILENAME)
+
+# Variable name objects:
+response_vars <- response_vars_filepath |> read_csv(col_types = "c")
+response_var_labels <- response_vars |> deframe()
+
+# Variable values:
+RELATIONSHIP_VALUES <- c("Inversa", "No tienen relación", "Directa")
+HELP_VALUES         <- c("1 - Nada", "2 - Un poco", "3 - Algo", "4 - Mucho")
+USEFULNESS_VALUES   <- c(
+  "1 - Nada útiles",
+  "2 - Poco útiles",
+  "3 - Algo útiles",
+  "4 - Muy útiles"
+)
+CLARITY_VALUES      <- c(
+  "1 - Nada claras",
+  "2 - Poco claras",
+  "3 - Algo claras",
+  "4 - Muy claras"
+)
+```
+
+The dataset is first downloaded from [the OpenLMS
+course](https://agora.uned.es/course/view.php?id=7595). To download them, we
+need to access the page of responses ("Respuestas") in the activity survey, and
+download them by clicking the button "Descargar". The format used will be "csv"
+(the default one). The data are saved to [the data folder](dat/), with its
+default name, "`{r} DATA_RESPONSES_FILENAME`".
+
+This dataset is then read and preprocessed
+
+```{r load-responses-data}
+data_student_responses <- data_responses_filepath |>
+  read_csv() |>
+  rename(!!!response_var_labels) |>
+  select(email_address:extra_comments) |>
+  mutate(
+    email_hash = email_address |> map_int(hash_emails),
+    date = date |>
+      parse_date_time(orders = "%d%B%Y %H%M") |>
+      force_tz(tzone = LOCAL_TIMEZONE),
+    relationship = relationship |> factor(
+      levels = RELATIONSHIP_VALUES, labels = -1:1
+    ),
+    across(starts_with("help"), ordered, levels = HELP_VALUES),
+    across(usefulness_videos,   ordered, levels = USEFULNESS_VALUES),
+    across(instructions,        ordered, levels = CLARITY_VALUES),
+    nps = nps |> str_extract("^\\d*") |> as.integer()
+  )
+```
+
+# Output computation
+
+## Correct responses for each student
+
+For each student, the correct answers of the exercise are obtained.
+
+```{r get-correct-responses}
+data_correct_responses <- data_downloads_out |>
+  pull(email_hash) |>
+  set_names() |>
+  map(get_user_responses) |>
+  list_rbind(names_to = "email_hash") |>
+  mutate(across(email_hash, as.integer)) # Turn names to integers for matching
+```
+
+## Student responses correction
+
+For each student, it is computed whether they have answered correctly to each of
+the items in the exercise.
+
+```{r correct-student-responses}
+data_response_corrections <- data_student_responses |>
+  select(email_hash, intercept:relationship) |>
+  left_join(
+    data_correct_responses,
+    by     = "email_hash",
+    suffix = c("_student", "_correct")
+  ) |>
+  mutate(
+    intercept    = map2_lgl(intercept_student, intercept_correct, `%~=%`),
+    slope        = map2_lgl(slope_student,     slope_correct,     `%~=%`),
+    relationship = relationship_student %==% relationship_correct,
+  )
+```
+
+## Assessment criteria fulfillment
+
+To receive the course compensation, each student must have
+
+-   downloaded their personalized dataset, and
+
+-   completed the response survey of the activity.
+
+We merge both datasets to detect the students that have done both steps.
+Additionally, we check whether they have responded after downloading the dataset
+(at least for the first time).
+
+```{r compute-assessment-criteria}
+data_criteria <- data_student_responses |>
+  select(email_address, email_hash, date) |>
+  full_join(
+    data_downloads_out |> select(email_hash, first_download),
+    by = "email_hash"
+  ) |>
+  mutate(
+    download_correct = !is.na(first_download),
+    response_correct = !is.na(date),
+    date_correct     = first_download < date,
+    criteria_all     = download_correct & response_correct & date_correct
+  )
+
+data_criteria |> count(criteria_all)
+```
+
+## Students to receive compensation for participation
+
+The dataset of the students that qualify for the compensation is created and
+exported.
+
+```{r create-compensation-dataset}
+DATA_COMPENSATION_FILENAME <- "compensation_data.csv"
+
+data_compensation_filepath <- here(DATA_FOLDER, DATA_COMPENSATION_FILENAME)
+
+data_compensations <- data_criteria |>
+  filter(criteria_all) |>
+  select(email_address)
+
+data_compensations |> write_csv(file = data_compensation_filepath)
+```
