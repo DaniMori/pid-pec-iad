@@ -69,7 +69,8 @@ get_model_params <- function(data) {
     dplyr::select(term, estimate)           |>
     tidyr::pivot_wider(names_from = term, values_from = estimate)
 
-  responses |> dplyr::mutate(relationship = sign(slope))
+  responses |>
+    dplyr::mutate(relationship = slope |> sign() |> factor(levels = -1:1))
 }
 
 get_user_responses <- function(hash) {
