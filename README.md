@@ -64,7 +64,7 @@ Start by installing the following software components:
 - [Git client](https://git-scm.com/download): Install the Git client in
   order to be able to clone locally the project repository. On Windows,
   use [the 64-bit Windows
-  installer](https://github.com/git-for-windows/git/releases/download/v2.47.0.windows.1/Git-2.47.0-64-bit.exe).
+  installer](https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe).
 
 ## Installing the project locally
 
@@ -118,27 +118,56 @@ Alternatively, you can type in the console:
 renv::restore()
 ```
 
+# Usage
+
+The main files of this repository are the two files that make up the
+Shiny app, [“ui.R”](ui.R) for the interface, and [“server.R”](server.R)
+for the server logic.
+
+## Configuration
+
+Before trying to run it, the Google Spreadsheets connection must be set
+up. Follow the instructions in document [“Google Spreadsheets connection
+instructions”](doc/gs.instructions.qmd) to do this.
+
+## Running the app
+
+The Shiny app can be run locally in Rstudio from any of these two files;
+when they are open in the text editor, the “Source” button that appears
+in the upper toolbar for scripts and computable documents turns into a
+“Run App” button. Clicking on this button starts the app and opens it in
+the viewer pane or a new window. To make sure the complete functionality
+of the app is working, it is better to run it in a new window (click on
+the right-side down arrow and select “Run in Window”, then click on “Run
+App”).
+
+## Deploying the app to [shinyapps.io](https://www.shinyapps.io/)
+
+<!-- # TODO: Complete -->
+
 # Repository structure
 
 The file structure of this repository is as follows:
 
     pid-pec-iad
     |
-    |- server.R (Shiny app server logic)
+    |- server.R    (Shiny app server logic)
     |
-    |- ui.R     (Shiny app user interface)
+    |- ui.R        (Shiny app user interface)
     |
-    |--- dat    (To store input datasets; must NEVER be checked-in to Github)
+    |--- dat       (To store input datasets; must NEVER be checked-in to Github)
     |
-    |--- doc    (To store important documentation of the project)
+    |--- doc       (To store important documentation of the project)
     |
-    |--- R      (R functions created for this project live here)
+    |--- notebooks (Notebooks to explore data and test processes live here)
     |
-    |--- renv   (System library necesssary for `renv` to work. DON'T TOUCH)
+    |--- R         (R functions created for this project live here)
     |
-    |--- src    (Source scripts that implement the main processes)
+    |--- renv      (System library necesssary for `renv` to work. DON'T TOUCH)
     |
-    |--- www    (Project assets, e.g., images, bibliography files, etc.)
+    |--- src       (Source scripts that implement the main processes)
+    |
+    |--- www       (Project assets, e.g., images, bibliography files, etc.)
 
 Use the folders as indicated to store the different files and generate
 the outputs of the processes.
