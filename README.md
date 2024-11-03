@@ -38,9 +38,9 @@ When using this template, please don’t forget to:
 Start by installing the following software components:
 
 - [R version
-  4.4.1](https://cran.rstudio.com/bin/windows/base/old/4.4.1/): In
+  4.4.2](https://cran.rstudio.com/bin/windows/base/old/4.4.2/): In
   Windows, using the [binary
-  installer](https://cran.rstudio.com/bin/windows/base/old/4.4.1/R-4.4.1-win.exe)
+  installer](https://cran.rstudio.com/bin/windows/base/old/4.4.2/R-4.4.2-win.exe)
   is recommended.
 
 <!-- -->
