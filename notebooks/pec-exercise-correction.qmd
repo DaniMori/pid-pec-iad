@@ -203,9 +203,9 @@ data_student_responses <- data_responses_filepath |>
     relationship = relationship |> factor(
       levels = RELATIONSHIP_VALUES, labels = -1:1
     ),
-    across(starts_with("help"), ordered, levels = HELP_VALUES),
-    across(usefulness_videos,   ordered, levels = USEFULNESS_VALUES),
-    across(instructions,        ordered, levels = CLARITY_VALUES),
+    across(starts_with("help"), ~ordered(., levels = HELP_VALUES)),
+    across(usefulness_videos,   ~ordered(., levels = USEFULNESS_VALUES)),
+    across(instructions,        ~ordered(., levels = CLARITY_VALUES)),
     nps = nps |> str_extract("^\\d*") |> as.integer()
   )
 
