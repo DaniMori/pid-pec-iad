@@ -1,14 +1,15 @@
 ---
-title: "PEC Exercise Correction"
-author: "Daniel Morillo"
-format: html
-editor: source
+title:        "PEC Exercise Correction"
+author:       "Daniel Morillo"
 format:
   html:
     df-print: paged
+editor:       source
 execute: 
   output:     false
   warning:    false
+params:
+  test_mode:  false
 ---
 
 ```{r setup}
@@ -16,6 +17,9 @@ execute:
 
 # Set working directory
 knitr::opts_knit$set(root.dir = here::here())
+
+# Read in parameters
+test_mode <- params$test_mode
 ```
 
 ```{r libraries}
@@ -95,9 +99,31 @@ The source datasets are:
 
 -   The OpenLMS output dataset with the exercise survey responses.
 
+## Testing mode
+
+Test mode allows to render the notebook **with all the responses**. Test mode
+can be turned on/off by editing the value of the parameter `test_mode` to
+`true`/`false` in the document "yaml" front matter (line 12). When test mode is
+on, the responses from the teaching team are filtered out applying the following
+criteria:
+
+-   From the student responses dataset, responses that match the "teacher email
+    domain" are directly filtered out.
+
+-   From the downloads dataset, a set of teacher emails is loaded, their
+    corresponding hashes are computed, and the matching ones are filtered out.
+
 # Data loading & preprocessing
 
 ## Dataset of personalized data downloads
+
+```{r config-downlads-data}
+## File system objects:
+teaching_team_emails_filepath <- here(
+  DATA_FOLDER,
+  TEACHING_TEAM_EMAILS_FILENAME
+)
+```
 
 The downloads are first read from the Google Spreadsheets file connection. Prior
 to reading the dataset, one must make sure that [the Gsheets API connection has
@@ -107,6 +133,20 @@ been successfully authorized](doc/gs_instructions.qmd).
 data_downloads <- gs_file_link |>
   read_sheet(col_types = 'icc') |> # Read email hashes as integers
   mutate(across(timestamp, parse_timestamp)) # `timestamp` as POSIXct time
+
+if (!test_mode) {
+
+  teaching_team_emails <- teaching_team_emails_filepath |> read_csv()
+
+  # Hash emails for filtering out the matching hashes: 
+  teaching_team_hashes <- teaching_team_emails |>
+    transmute(email_hash = email_address |> map_int(hash_emails))
+
+  # Filter out the teaching team emails (i.e. the ones included in the dataset
+  #   with the "teaching team emails":
+  data_downloads <- data_downloads |>
+    anti_join(teaching_team_hashes, by = "email_hash")
+}
 ```
 
 Then, the data is processed to extract, for each user:
@@ -168,6 +208,14 @@ data_student_responses <- data_responses_filepath |>
     across(instructions,        ordered, levels = CLARITY_VALUES),
     nps = nps |> str_extract("^\\d*") |> as.integer()
   )
+
+if (!test_mode) {
+  
+  # Filter out the teaching team emails (i.e. the ones that match the "professor
+  #   domain").
+  data_student_responses <- data_student_responses |>
+    filter(email_address |> str_detect(PROFESSOR_EMAIL_DOMAIN, negate = TRUE))
+}
 ```
 
 # Output computation
