@@ -3,9 +3,17 @@ title: "PEC Exercise Correction"
 author: "Daniel Morillo"
 format: html
 editor: source
+format:
+  html:
+    df-print: paged
+execute: 
+  output:     false
+  warning:    false
 ---
 
 ```{r setup}
+#| include: false
+
 # Set working directory
 knitr::opts_knit$set(root.dir = here::here())
 ```
@@ -25,6 +33,7 @@ library(roperators)
 ```
 
 ```{r sources}
+#| include: false
 source("R/data_storage.R",   encoding = 'UTF-8')
 source("R/simulated_data.R", encoding = 'UTF-8')
 source("R/hash_emails.R",    encoding = 'UTF-8')
@@ -195,6 +204,7 @@ Additionally, we check whether they have responded after downloading the dataset
 (at least for the first time).
 
 ```{r compute-assessment-criteria}
+#| output: true
 data_criteria <- data_student_responses |>
   select(email_address, email_hash, date) |>
   full_join(
