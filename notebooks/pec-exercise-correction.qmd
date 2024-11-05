@@ -1,15 +1,17 @@
 ---
-title:        "PEC Exercise Correction"
-author:       "Daniel Morillo"
+title:               "PEC Exercise Correction"
+author:              "Daniel Morillo"
 format:
   html:
-    df-print: paged
-editor:       source
+    df-print:        paged
+    toc:             true
+    embed-resources: true
+editor:              source
 execute: 
-  output:     false
-  warning:    false
+  output:            false
+  warning:           false
 params:
-  test_mode:  false
+  test_mode:         false
 ---
 
 ```{r setup}
