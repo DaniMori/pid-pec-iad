@@ -155,6 +155,8 @@ The file structure of this repository is as follows:
     |
     |- ui.R     (Shiny app user interface)
     |
+    |--- apps   (To store apps, e.g. in Shiny)
+    |
     |--- dat    (To store input datasets; must NEVER be checked-in to Github)
     |
     |--- doc    (To store important documentation of the project)
