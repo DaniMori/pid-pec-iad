@@ -32,6 +32,40 @@ library(readr)
 library(roperators)
 ```
 
+```{r constants}
+#| include: false
+
+# Shared file system objects:
+DATA_FOLDER <- "dat"
+
+
+# Constant objects for processing the downloads dataset:
+TEACHING_TEAM_EMAILS_FILENAME <- "teaching_team_emails.csv"
+
+# Constant objects for processing the student responses dataset:
+
+## File system objects:
+DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI.csv"
+RESPONSE_VARS_FILENAME  <- "student_response_variables.csv"
+
+## Variable values:
+RELATIONSHIP_VALUES <- c("Inversa", "No tienen relación", "Directa")
+HELP_VALUES         <- c("1 - Nada", "2 - Un poco", "3 - Algo", "4 - Mucho")
+USEFULNESS_VALUES   <- c(
+  "1 - Nada útiles",
+  "2 - Poco útiles",
+  "3 - Algo útiles",
+  "4 - Muy útiles"
+)
+CLARITY_VALUES      <- c(
+  "1 - Nada claras",
+  "2 - Poco claras",
+  "3 - Algo claras",
+  "4 - Muy claras"
+)
+PROFESSOR_EMAIL_DOMAIN <- "@psi.uned.es"
+```
+
 ```{r sources}
 #| include: false
 source("R/data_storage.R",   encoding = 'UTF-8')
@@ -98,33 +132,13 @@ data_downloads_out <- data_downloads |>
 ## Dataset of activity responses
 
 ```{r config-responses-data}
-# File system objects:
-DATA_FOLDER             <- "dat"
-DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI.csv"
-RESPONSE_VARS_FILENAME  <- "student_response_variables.csv"
-
+## File system objects:
 data_responses_filepath <- here(DATA_FOLDER, DATA_RESPONSES_FILENAME)
 response_vars_filepath  <- here(DATA_FOLDER, RESPONSE_VARS_FILENAME)
 
 # Variable name objects:
 response_vars <- response_vars_filepath |> read_csv(col_types = "c")
 response_var_labels <- response_vars |> deframe()
-
-# Variable values:
-RELATIONSHIP_VALUES <- c("Inversa", "No tienen relación", "Directa")
-HELP_VALUES         <- c("1 - Nada", "2 - Un poco", "3 - Algo", "4 - Mucho")
-USEFULNESS_VALUES   <- c(
-  "1 - Nada útiles",
-  "2 - Poco útiles",
-  "3 - Algo útiles",
-  "4 - Muy útiles"
-)
-CLARITY_VALUES      <- c(
-  "1 - Nada claras",
-  "2 - Poco claras",
-  "3 - Algo claras",
-  "4 - Muy claras"
-)
 ```
 
 The dataset is first downloaded from [the OpenLMS
