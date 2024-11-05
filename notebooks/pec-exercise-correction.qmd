@@ -283,6 +283,9 @@ data_criteria <- data_student_responses |>
 data_criteria |> count(criteria_all)
 ```
 
+The number of "TRUE" cases are the number of students that fulfill the
+compensation criteria; the "FALSE" cases are the ones who do not.
+
 ## Students to receive compensation for participation
 
 The dataset of the students that qualify for the compensation is created and
