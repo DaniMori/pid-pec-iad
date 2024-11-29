@@ -39,7 +39,6 @@ server <- function(input, output, session) {
   # Reactive values:
   email        <- reactiveVal() # Email read from the session query
   hashed_email <- reactiveVal() # Hashed email for logging and random seed
-  responses    <- reactiveVal() # Data frame of correct responses
 
   observe(
     {
@@ -52,15 +51,17 @@ server <- function(input, output, session) {
       ## Create unique hash for the user email:
       hashed_email(email() |> hash_emails())
       record_log("Email hash created")
-
-      # Generate correct responses with the hashed email as seed:
-      simulated_data(hashed_email() |> simulate_data())
-      record_log("Dataset generated")
     }
   )
 
   ## File download handler (activated when the email is valid)
   output[[RESPONSE_TABLE_ID]] <- renderTable(
-    # TODO: Add table rendering logic
+
+    if (!is.null(hashed_email())) {
+
+      hashed_email() |>
+        get_user_responses() |>
+        format_responses()
+    }
   )
 }
