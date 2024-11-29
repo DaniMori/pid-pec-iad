@@ -1,8 +1,8 @@
 # ==============================================================================
 #
-# FILE NAME:   server.R
-# DESCRIPTION: Server logic of the "Feedback" app for teaching innovation project
-#              in "Introduction to Data Analysis".
+# FILE NAME:   pid-iad-feedback.R
+# DESCRIPTION: "Feedback" app for teaching innovation project in the
+#              "Introduction to Data Analysis" course.
 #
 # AUTHOR:      Daniel Morillo
 #
@@ -19,6 +19,8 @@ setwd(here::here())
 ## ---- PACKAGES: --------------------------------------------------------------
 
 library(shiny)
+library(shinyjs, warn.conflicts = FALSE)
+
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
@@ -29,7 +31,23 @@ source("R/log.R",            encoding = 'UTF-8')
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
-## ---- MAIN: ------------------------------------------------------------------
+## ---- FUNCTIONS: -------------------------------------------------------------
+
+## ----create-user-interface----------------------------------------------------
+
+ui <- fluidPage(
+
+  shinyjs::useShinyjs(), # Used to disable the download button
+
+  # Application title
+  titlePanel(FEEDBACK_APP_TITLE),
+
+  fillPage(
+
+    # Output table with the correct responses:
+    tableOutput(RESPONSE_TABLE_ID)
+  )
+)
 
 ## ----create-server-logic------------------------------------------------------
 
@@ -64,3 +82,9 @@ server <- function(input, output, session) {
     }
   )
 }
+
+
+## ---- MAIN: ------------------------------------------------------------------
+
+# Run the application
+shinyApp(ui = ui, server = server)
