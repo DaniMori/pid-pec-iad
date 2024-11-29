@@ -30,22 +30,6 @@ source("R/log.R",            encoding = 'UTF-8')
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
-# Server configuration objects:
-
-## Auto-download javascript code:
-AUTO_DOWNLOAD_JS_FUN  <- "setTimeout(
-  function(){
-    document.getElementById('[DOWNLOAD_LINK_ID]').click();
-  },
-  [AUTO_DOWNLOAD_TIMEOUT]
-);"
-
-auto_download_code <- glue::glue(
-  AUTO_DOWNLOAD_JS_FUN,
-  .open = '[', .close = ']'
-)
-
-
 ## ---- MAIN: ------------------------------------------------------------------
 
 ## ----create-server-logic------------------------------------------------------
@@ -53,9 +37,9 @@ auto_download_code <- glue::glue(
 server <- function(input, output, session) {
 
   # Reactive values:
-  email          <- reactiveVal() # Email read from the session query
-  hashed_email   <- reactiveVal() # Hashed email for logging and random seed
-  simulated_data <- reactiveVal() # Simulated dataset
+  email        <- reactiveVal() # Email read from the session query
+  hashed_email <- reactiveVal() # Hashed email for logging and random seed
+  responses    <- reactiveVal() # Data frame of correct responses
 
   observe(
     {
@@ -69,33 +53,14 @@ server <- function(input, output, session) {
       hashed_email(email() |> hash_emails())
       record_log("Email hash created")
 
-      # Log access to the app:
-      write_event(hash = hashed_email(), event = "Access")
-
-      # Generate simulated data with the hashed email as seed:
-      simulated_data(simulate_data(hashed_email()))
+      # Generate correct responses with the hashed email as seed:
+      simulated_data(hashed_email() |> simulate_data())
       record_log("Dataset generated")
-
-      # Run download automatically on loading app:
-      shinyjs::runjs(auto_download_code)
-      record_log("Automatic download on loading run")
     }
   )
 
   ## File download handler (activated when the email is valid)
-  output[[DOWNLOAD_LINK_ID]] <- downloadHandler(
-    filename = DATASET_FILENAME,
-    content  = function(file) {
-
-      validate_email(email())
-
-      record_log("Download started")
-
-      # Record download attempt to users data file:
-      write_event(hash = hashed_email(), event = "Download")
-
-      simulated_data() |> readr::write_csv(file)
-    },
-    contentType = "text/csv"
+  output[[RESPONSE_TABLE_ID]] <- renderTable(
+    # TODO: Add table rendering logic
   )
 }

@@ -41,9 +41,7 @@ ui <- fluidPage(
 
   fillPage(
 
-    # Download link:
-    downloadLink(DOWNLOAD_LINK_ID, DOWNLOAD_LINK_LABEL),
-
-    tags$div(tags$p(CLOSE_WINDOW_MSG), style="margin-top:2em;")
+    # Output table with the correct responses:
+    tableOutput(RESPONSE_TABLE_ID)
   )
 )

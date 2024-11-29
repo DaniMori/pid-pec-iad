@@ -16,12 +16,14 @@
 ASSETS_DIR <- here::here("www")
 
 
-# User interface objects:
+# Dataset generation app:
 
-## Shiny component identifiers:
+## User interface objects:
+
+### Shiny component identifiers:
 DOWNLOAD_LINK_ID <- "download"
 
-## Interface verbatim:
+### Interface verbatim:
 APP_TITLE           <- "Descarga de datos para actividad optativa con Jamovi"
 DOWNLOAD_LINK_LABEL <-
   "Haz click aquí si la descarga no se inicia automáticamente"
@@ -31,23 +33,32 @@ CLOSE_WINDOW_MSG    <- paste(
 )
 DATASET_FILENAME    <- "regresion_lineal.csv" # Name of downloaded dataset
 
+## Server logic objects:
 
-# Server logic objects:
-
-## Auto download configuration:
+### Auto download configuration:
 AUTO_DOWNLOAD_TIMEOUT <- 200L # Timeout (to start download) in milliseconds
 
-## Google Spreadsheets configuration:
+### Google Spreadsheets configuration:
 
-### Authentication:
+#### Authentication:
 OAUTH_CACHE_PATH <- here::here(".secrets")
 TOKEN_FILENAME   <- "encrypted-oauth-token.rds"
 TOKEN_FILEPATH   <- here::here(OAUTH_CACHE_PATH, TOKEN_FILENAME)
 KEY_VAR_NAME     <- "PID_PEC_IAD_KEY"
 
-### Storage file:
+#### Storage file:
 CONFIG_FILENAME <- "gsheets_config.yml"
 CONFIG_FILEPATH <- here::here(ASSETS_DIR, CONFIG_FILENAME)
+
+
+# Feedback app:
+
+## User interface objects:
+
+### Shiny component identifiers:
+RESPONSE_TABLE_ID <- "responses"
+
+### Interface verbatim:
 
 
 # Simulated data objects:
