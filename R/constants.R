@@ -24,7 +24,7 @@ ASSETS_DIR <- here::here("www")
 DOWNLOAD_LINK_ID <- "download"
 
 ### Interface verbatim:
-APP_TITLE           <- "Descarga de datos para actividad optativa con Jamovi"
+GEN_DATA_APP_TITLE  <- "Descarga de datos para actividad optativa con Jamovi"
 DOWNLOAD_LINK_LABEL <-
   "Haz click aquí si la descarga no se inicia automáticamente"
 CLOSE_WINDOW_MSG    <- paste(
@@ -59,6 +59,9 @@ CONFIG_FILEPATH <- here::here(ASSETS_DIR, CONFIG_FILENAME)
 RESPONSE_TABLE_ID <- "responses"
 
 ### Interface verbatim:
+
+#### Static components:
+FEEDBACK_APP_TITLE  <- "Respuetas de la actividad optativa con Jamovi"
 
 
 # Simulated data objects:

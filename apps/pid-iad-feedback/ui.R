@@ -36,8 +36,7 @@ ui <- fluidPage(
   shinyjs::useShinyjs(), # Used to disable the download button
 
   # Application title
-  # TODO: Decide title & add logos (if necessary)
-  titlePanel(APP_TITLE),
+  titlePanel(FEEDBACK_APP_TITLE),
 
   fillPage(
 
