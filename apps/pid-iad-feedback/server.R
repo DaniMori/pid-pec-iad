@@ -1,12 +1,12 @@
 # ==============================================================================
 #
 # FILE NAME:   server.R
-# DESCRIPTION: Server logic of the "Dataset generation" app for teaching
-#              innovation project in "Introduction to Data Analysis".
+# DESCRIPTION: Server logic of the "Feedback" app for teaching innovation project
+#              in "Introduction to Data Analysis".
 #
 # AUTHOR:      Daniel Morillo
 #
-# DATE:        2024-09-26
+# DATE:        2024-11-29
 #
 # ==============================================================================
 
