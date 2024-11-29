@@ -25,7 +25,6 @@ library(shiny)
 source("R/constants.R",      encoding = 'UTF-8')
 source("R/simulated_data.R", encoding = 'UTF-8')
 source("R/hash_emails.R",    encoding = 'UTF-8')
-source("R/data_storage.R",   encoding = 'UTF-8')
 source("R/log.R",            encoding = 'UTF-8')
 
 ## ---- CONSTANTS: -------------------------------------------------------------
