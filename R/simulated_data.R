@@ -37,3 +37,45 @@ simulate_data <- function(seed) {
   ) |>
     setNames(SIM_VAR_NAMES)
 }
+
+get_model_params <- function(data) {
+
+  ## Constant objects: ----
+  INTERCEPT_TERM     <- "(Intercept)"
+  INTERCEPT_VAR_NAME <- "intercept"
+  SLOPE_VAR_NAME     <- "slope"
+
+  ## Main: ----
+
+  predictor_name <- SIM_VAR_NAMES['predictor']
+  criterion_name <- SIM_VAR_NAMES['criterion']
+  response_terms <- c(INTERCEPT_TERM, predictor_name)
+
+  # Fit model and extract coefficients:
+  model        <- glue::glue("{criterion_name} ~ {predictor_name}") # Formula
+  fitted_model <- data         |> lm(formula = model)
+  coefficients <- fitted_model |> broom::tidy()
+
+  # Get exercise responses from the model results:
+  responses <- coefficients                 |>
+    dplyr::filter(term %in% response_terms) |>
+    dplyr::mutate(
+      estimate = estimate |> round(N_DECIMALS),
+      term     = term     |> dplyr::case_match(
+        INTERCEPT_TERM ~ INTERCEPT_VAR_NAME,
+        SIM_VAR_NAMES['predictor'] ~ SLOPE_VAR_NAME
+      )
+    )                                       |>
+    dplyr::select(term, estimate)           |>
+    tidyr::pivot_wider(names_from = term, values_from = estimate)
+
+  responses |>
+    dplyr::mutate(relationship = slope |> sign() |> factor(levels = -1:1))
+}
+
+get_user_responses <- function(hash) {
+
+  user_sim_data <- simulate_data(hash)
+
+  user_sim_data |> get_model_params()
+}
