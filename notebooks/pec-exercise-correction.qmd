@@ -185,10 +185,12 @@ response_var_labels <- response_vars |> deframe()
 
 The dataset is first downloaded from [the OpenLMS
 course](https://agora.uned.es/course/view.php?id=7595). To download them, we
-need to access the page of responses ("Respuestas") in the activity survey, and
-download them by clicking the button "Descargar". The format used will be "csv"
-(the default one). The data are saved to [the data folder](dat/), with its
-default name, "`{r} DATA_RESPONSES_FILENAME`".
+need to access the [page of
+responses](https://agora.uned.es/mod/feedback/show_entries.php?id=468562)
+("Respuestas") in the activity survey, and download them by clicking the button
+"Descargar". The format used will be "csv" (the default one). The data are saved
+to [the data folder](dat/), with its default name,
+"`{r} DATA_RESPONSES_FILENAME`".
 
 This dataset is then read and preprocessed
 
@@ -304,3 +306,4 @@ data_compensations <- data_criteria |>
 
 data_compensations |> write_csv(file = data_compensation_filepath)
 ```
+
