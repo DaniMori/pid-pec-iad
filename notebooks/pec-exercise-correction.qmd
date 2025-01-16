@@ -284,7 +284,7 @@ data_criteria <- data_student_responses |>
     criteria_all     = download_correct & response_correct & date_correct
   )
 
-data_criteria |> count(criteria_all)
+data_criteria |> count(across(download_correct:criteria_all))
 ```
 
 The number of "TRUE" cases are the number of students that fulfill the
