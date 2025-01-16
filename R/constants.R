@@ -61,7 +61,7 @@ RESPONSE_TABLE_ID <- "responses"
 ### Interface verbatim:
 
 #### Static components:
-FEEDBACK_APP_TITLE  <- "Respuetas de la actividad optativa con Jamovi"
+FEEDBACK_APP_TITLE  <- "Respuestas de la actividad optativa con Jamovi"
 
 
 #### Parameter table:
