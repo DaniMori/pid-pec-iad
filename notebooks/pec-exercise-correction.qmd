@@ -106,8 +106,8 @@ The source datasets are:
 Test mode allows to render the notebook **with all the responses**. Test mode
 can be turned on/off by editing the value of the parameter `test_mode` to
 `true`/`false` in the document "yaml" front matter (line 12). When test mode is
-on, the responses from the teaching team are filtered out applying the following
-criteria:
+off, the responses from the teaching team are filtered out applying the
+following criteria:
 
 -   From the student responses dataset, responses that match the "teacher email
     domain" are directly filtered out.
