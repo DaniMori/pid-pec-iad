@@ -273,7 +273,7 @@ Additionally, we check whether they have responded after downloading the dataset
 #| output: true
 data_criteria <- data_student_responses |>
   select(email_address, email_hash, date) |>
-  full_join(
+  left_join(
     data_downloads_out |> select(email_hash, first_download),
     by = "email_hash"
   ) |>
