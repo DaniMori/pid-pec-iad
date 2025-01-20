@@ -1,0 +1,58 @@
+---
+title: "Untitled"
+format: docx
+---
+
+#### Session title \*:
+
+#### Description \*:
+
+#### Type of session \*: shiny app showcase (5 min)
+
+#### Please provide an abstract (up to 250 words):
+
+#### Level:
+
+begginer, intermediate
+
+#### Additional notes:
+
+*(Visible to organizers and evaluators only.)*
+
+#### Speaker
+
+##### Speaker name \*:
+
+Daniel Morillo-Cuadrado
+
+##### Speaker tagline \*:
+
+Assistant Professor at National University of Remote Education (UNED), Spain
+
+##### Email:
+
+danielmorillo.ac\@gmail.com
+
+##### Speaker biography \*:
+
+##### Speaker photo \*:
+
+*(This event requires a high-resolution photo (min. 1000x1000 pixels). Please
+note that the image will mostly be cropped into a square.)*
+
+##### X (Twitter):
+
+##### LinkedIn:
+
+##### Blog:
+
+##### Company Website:
+
+#### Co-speakers:
+
+-   
+
+-   
+
+*(Optional. Enter email addresses of other speakers, and they'll receive an
+invitation to join your session as co-speakers.)*
