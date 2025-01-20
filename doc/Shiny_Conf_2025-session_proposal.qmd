@@ -7,6 +7,25 @@ format: docx
 
 #### Description \*:
 
+Large scale, remote education comes with many challenges, some of them quite
+different from in-person education. One of them is the ability to create proper
+assessment activities that are also safe against information leakage that may
+lead to fraudulent behaviors (i.e., copying the correct responses from
+classmates).
+
+In this talk we demonstrate a pilot activity for a "Data Analysis 101" course in
+the Bachelor's Degree in Psychology with around 7,600 students. A very simple
+Shiny app generates a personalized dataset for each student, which they can
+download and use to complete an exercise in Jamovi. Their responses are then
+automatically scored offline, and another Shiny app provides them feedback with
+the correct responses. Our application applies Shiny on the field, showcasing
+how a very simple application can satisfy a real-life necessity without much
+sofistication.
+
+<!-- 134 words -->
+
+*(Please provide an abstract (up to 250 words))*
+
 #### Type of session \*: shiny app showcase (5 min)
 
 #### Please provide an abstract (up to 250 words):
