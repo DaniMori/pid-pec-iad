@@ -1,9 +1,11 @@
 ---
-title: "Untitled"
 format: docx
 ---
 
 #### Session title \*:
+
+Generating personalized student synthetic datasets for large-scale educational
+assessment
 
 #### Description \*:
 
@@ -26,9 +28,9 @@ sofistication.
 
 *(Please provide an abstract (up to 250 words))*
 
-#### Type of session \*: shiny app showcase (5 min)
+#### Type of session \*:
 
-#### Please provide an abstract (up to 250 words):
+shiny app showcase (5 min)
 
 #### Level:
 
@@ -54,7 +56,22 @@ danielmorillo.ac\@gmail.com
 
 ##### Speaker biography \*:
 
+I studied a Bachelor's Degree in Telecommunication Engineering at first, but
+soon got interested in behavioral science and turned to the field of Psychology.
+I got my Ph.D. in Clinical and Health Psychology in 2018, focusing my research
+on quantitative measurement. Having worked as data analyst and methodologist in
+both industry and academia, I was exposed and got very interested in Open
+Science practices. Apart from adopting the Open Science approach in my research,
+I am very committed to helping others onboard into them; my wish is to help
+everyone, everyhwere, learn data science. Because of this, I became a certified
+Carpentries instructor in 2021. Since 2024 I am Assistant Professor at the
+National University for Remote Education (UNED) in Spain, where I teach the
+"Data Analysis 101" course in the Degree in Psychology, and several courses in a
+Master's Degree in Behavioral Science Methodology.
+
 ##### Speaker photo \*:
+
+(Está en la carpeta compartida, junto a este archivo)
 
 *(This event requires a high-resolution photo (min. 1000x1000 pixels). Please
 note that the image will mostly be cropped into a square.)*
@@ -63,15 +80,20 @@ note that the image will mostly be cropped into a square.)*
 
 ##### LinkedIn:
 
+https://www.linkedin.com/in/daniel-morillo-b0356716
+
 ##### Blog:
 
 ##### Company Website:
 
+https://www.uned.es
+
 #### Co-speakers:
 
--   
+-   bfcastilla\@psi.uned.es
 
--   
+-   jamartinez\@psi.uned.es
 
 *(Optional. Enter email addresses of other speakers, and they'll receive an
 invitation to join your session as co-speakers.)*
+
