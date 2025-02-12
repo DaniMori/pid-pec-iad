@@ -343,8 +343,23 @@ ID. The name has to be processed to delete accents and reorder the full name as
 "name surname", instead of "surname, name".
 
 ```{r read-student-sheet-template}
-student_template <- readxl::read_excel(STUDENT_TEMPLATE_FILEPATH)
+student_template <- readxl::read_excel(
+  STUDENT_TEMPLATE_FILEPATH,
+  range = cell_limits(c(1, 1), c(NA, NA)),
+  col_names = FALSE
+)
 
+nota <- tibble(...4 = "49905152", ...9 = "1")
+student_template |> rows_update(nota, by = "...4") -> student_template_nota
+
+student_template_nota |> xlsx::write.xlsx(
+  "dat/notas.xls",
+  sheetName = "Hoja1",
+  showNA = FALSE
+)
+```
+
+```{r read-student-name-id}
 students <- student_template |>
   tidyr::separate(...3, into = c("surname", "name"), remove = FALSE, sep = ', ') |>
   dplyr::mutate(
@@ -352,9 +367,7 @@ students <- student_template |>
     full_name = paste(name, surname)
   ) |>
   dplyr::filter(!is.na(...3), ...3 != "Apellidos, nombre")
-```
 
-```{r read-student-sheet-template}
 students <- students |>
   dplyr::left_join(data_criteria, by = c(full_name = "student_name"))
 ```
@@ -399,4 +412,3 @@ data_compensations <- data_criteria |>
 
 data_compensations |> write_csv(file = data_compensation_filepath)
 ```
-
