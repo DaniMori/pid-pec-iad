@@ -33,6 +33,15 @@ begginer, intermediate
 
 #### Additional notes:
 
+The two apps need to be called with the GET parameter "email".
+To avoid interfering with the log of students who downloaded the app, these links take to test versions:
+
+https://danimori.shinyapps.io/pid-pec-iad/?e
+mail=sample\@email.edu
+
+https://danimori.shinyapps.io/pid-iad-feedback/?e
+mail=sample\@email.edu
+
 *(Visible to organizers and evaluators only.)*
 
 #### Speaker
