@@ -198,7 +198,7 @@ This dataset is then read and preprocessed
 data_student_responses <- data_responses_filepath |>
   read_csv() |>
   rename(!!!response_var_labels) |>
-  select(email_address:extra_comments) |>
+  select(student_name, email_address:extra_comments) |>
   mutate(
     email_hash = email_address |> map_int(hash_emails),
     date = date |>
@@ -244,7 +244,7 @@ the items in the exercise.
 
 ```{r correct-student-responses}
 data_response_corrections <- data_student_responses |>
-  select(email_hash, intercept:relationship) |>
+  select(email_hash, student_name, intercept:relationship) |>
   left_join(
     data_correct_responses,
     by     = "email_hash",
@@ -272,7 +272,7 @@ Additionally, we check whether they have responded after downloading the dataset
 ```{r compute-assessment-criteria}
 #| output: true
 data_criteria <- data_student_responses |>
-  select(email_address, email_hash, date) |>
+  select(email_address, student_name, email_hash, date) |>
   left_join(
     data_downloads_out |> select(email_hash, first_download),
     by = "email_hash"
@@ -292,6 +292,22 @@ compensation criteria; the "FALSE" cases are the ones who do not.
 
 ## Students to receive compensation for participation
 
+```{r read-student-sheet-template}
+student_template <-
+  readxl::read_excel("dat/Introducción al Análisis de Datos (011037)-006001.xls")
+
+students <- student_template |>
+  tidyr::separate(...3, into = c("surname", "name"), remove = FALSE, sep = ', ') |>
+  dplyr::mutate(
+    name      = name |> stringi::stri_trans_general("Latin-ASCII"),
+    full_name = paste(name, surname)
+  ) |>
+  dplyr::filter(!is.na(...3), ...3 != "Apellidos, nombre")
+
+students <- students |>
+  dplyr::left_join(data_criteria, by = c(full_name = "student_name"))
+```
+
 The dataset of the students that qualify for the compensation is created and
 exported.
 
@@ -306,4 +322,3 @@ data_compensations <- data_criteria |>
 
 data_compensations |> write_csv(file = data_compensation_filepath)
 ```
-
