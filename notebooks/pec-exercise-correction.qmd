@@ -355,7 +355,9 @@ student_template |> rows_update(nota, by = "...4") -> student_template_nota
 student_template_nota |> xlsx::write.xlsx(
   "dat/notas.xls",
   sheetName = "Hoja1",
-  showNA = FALSE
+  showNA = FALSE,
+  row.names = FALSE,
+  col.names = FALSE
 )
 ```
 
