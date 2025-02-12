@@ -349,7 +349,7 @@ student_template <- readxl::read_excel(
   col_names = FALSE
 )
 
-nota <- tibble(...4 = "49905152", ...9 = "1")
+nota <- tibble(...4 = "49905152", ...9 = "0,2")
 student_template |> rows_update(nota, by = "...4") -> student_template_nota
 
 student_template_nota |> xlsx::write.xlsx(
