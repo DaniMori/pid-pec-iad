@@ -198,7 +198,7 @@ This dataset is then read and preprocessed
 data_student_responses <- data_responses_filepath |>
   read_csv() |>
   rename(!!!response_var_labels) |>
-  select(email_address:extra_comments) |>
+  select(student_name, email_address:extra_comments) |>
   mutate(
     email_hash = email_address |> map_int(hash_emails),
     date = date |>
@@ -244,7 +244,7 @@ the items in the exercise.
 
 ```{r correct-student-responses}
 data_response_corrections <- data_student_responses |>
-  select(email_hash, intercept:relationship) |>
+  select(email_hash, student_name, intercept:relationship) |>
   left_join(
     data_correct_responses,
     by     = "email_hash",
@@ -272,7 +272,7 @@ Additionally, we check whether they have responded after downloading the dataset
 ```{r compute-assessment-criteria}
 #| output: true
 data_criteria <- data_student_responses |>
-  select(email_address, email_hash, date) |>
+  select(email_address, student_name, email_hash, date) |>
   left_join(
     data_downloads_out |> select(email_hash, first_download),
     by = "email_hash"
@@ -292,6 +292,114 @@ compensation criteria; the "FALSE" cases are the ones who do not.
 
 ## Students to receive compensation for participation
 
+### Composition of the compensation dataset
+
+We need the student ID and name to generate the dataset with the specified
+format, but we have the email instead. Therefore, we need to match the email to
+those fields.
+
+#### Template workbook generation
+
+```{r student-template-path}
+STUDENT_TEMPLATE_FILENAME <- "Introducción al Análisis de Datos (011037)-006001.xls"
+
+STUDENT_TEMPLATE_FILEPATH <- here(DATA_FOLDER, STUDENT_TEMPLATE_FILENAME)
+```
+
+We need to create an Excel workbook with a specific format. A workbook with this
+format can be downloaded automatically from the Grading Management System, with
+the following procedure:
+
+1.  Authenticate in the UNED Campus for Teachers:
+    https://www.uned.es/universidad/campus/pdi/docencia.html
+
+2.  Browse to the Grading Management System:
+    https://calificaciones.uned.es/sgc/index.asp
+
+3.  Introduce the last 6 digits of the course code in the field "CÓDIGO
+    ASIGNATURA": 011037
+
+4.  The current course (2024-2025) is selected by default, so click in "Aceptar"
+
+5.  Click on "Carga a través de excel" -\> "Generar ficheros excel"
+
+6.  Activate checkboxes "TODOS LOS APELLIDOS" and "TODOS LOS CENTROS"
+
+7.  Select radio button "Fichero excel agrupando por Centro Asociado"
+
+8.  Textbox "Descripción del fichero" cannot be empty, so fill in with "Notas
+    Jamovi", or similar
+
+9.  Click on "Generar Ficheros"
+
+10. When the progress bar indicates "100%", click on "Descargar Ficheros"
+
+11. Save generated file as `r STUDENT_TEMPLATE_FILEPATH`
+
+#### Student data extraction from the template workbook
+
+Student data are extracted from the template workbook, including the name, and
+ID. The name has to be processed to delete accents and reorder the full name as
+"name surname", instead of "surname, name".
+
+```{r read-student-sheet-template}
+student_template <- readxl::read_excel(
+  STUDENT_TEMPLATE_FILEPATH,
+  range = cell_limits(c(1, 1), c(NA, NA)),
+  col_names = FALSE
+)
+
+nota <- tibble(...4 = "49905152", ...9 = "0,2")
+student_template |> rows_update(nota, by = "...4") -> student_template_nota
+
+student_template_nota |> xlsx::write.xlsx(
+  "dat/notas.xls",
+  sheetName = "Hoja1",
+  showNA = FALSE,
+  row.names = FALSE,
+  col.names = FALSE
+)
+```
+
+```{r read-student-name-id}
+students <- student_template |>
+  tidyr::separate(...3, into = c("surname", "name"), remove = FALSE, sep = ', ') |>
+  dplyr::mutate(
+    name      = name |> stringi::stri_trans_general("Latin-ASCII"),
+    full_name = paste(name, surname)
+  ) |>
+  dplyr::filter(!is.na(...3), ...3 != "Apellidos, nombre")
+
+students <- students |>
+  dplyr::left_join(data_criteria, by = c(full_name = "student_name"))
+```
+
+#### Participant data generation
+
+```{r participant-data-path}
+PARTICIPANT_DATA_FILENAME <- "courseid_7595_participants.csv"
+
+PARTICIPANT_DATA_FILEPATH <- here(DATA_FOLDER, PARTICIPANT_DATA_FILENAME)
+```
+
+1.  Browse to the virtual course in Agora:
+    https://agora.uned.es/course/view.php?id=7595
+
+2.  Click on tab "Participantes"
+
+3.  Scroll down to the end of the page
+
+4.  Click on "Seleccione a todos los usuarios <N>"
+
+5.  Click on "Elegir..."
+
+6.  Click on "**Descargar datos de tabla como**, Valores separados por comas
+    (.csv)"
+
+7.  Save the generated file as `r PARTICIPANT_DATA_FILEPATH`
+
+### Compensation dataset creation
+
 The dataset of the students that qualify for the compensation is created and
 exported.
 
@@ -306,4 +414,3 @@ data_compensations <- data_criteria |>
 
 data_compensations |> write_csv(file = data_compensation_filepath)
 ```
-
