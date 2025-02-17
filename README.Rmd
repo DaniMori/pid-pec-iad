@@ -8,30 +8,25 @@ editor_options:
 
 # Repository `pid-pec-iad`
 
-Posit Cloud Shiny Application sandbox for testing a "Teaching innovation
-project" concept
+Repository for "Teaching innovation project 2025" at UEND. It consists of:
+
+- A Shiny Application for generating personalized student datasets
+
+- A feedback app
+
+- A correction notebook to generate the compensation grades
 
 # License
 
-This template is licensed under the
+This project is licensed under the
 [Creative Commons Attribution 4.0 International license][license]. Please
 see the [license file][licfile].
 
-When using this template, please don't forget to:
+## Attributions
 
-- Adapt this license section to your own needs
-
-- License your own content, and remember that [open is better][choose].
-
-- Link to the [original license][license] and give appropriate credit; please do
-  so by including the following in the "License" section of the README.md file
-  in your own project:
-  
-  > ## Attributions
-  >
-  > This project makes use of the [rproj-template][selflink] Github template
-  > created by [Daniel Morillo][profile] and licensed under the 
-  > [Creative Commons Attribution 4.0 International license][license].
+This project makes use of the [rproj-template][selflink] Github template
+created by [Daniel Morillo][profile] and licensed under the 
+[Creative Commons Attribution 4.0 International license][license].
 
 [license]: https://creativecommons.org/licenses/by/4.0/
 
