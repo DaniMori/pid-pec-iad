@@ -36,6 +36,9 @@ library(here)
 library(tibble)
 library(readr)
 library(roperators)
+library(readxl)
+library(stringi)
+library(writexl)
 ```
 
 ```{r constants}
@@ -70,6 +73,15 @@ CLARITY_VALUES      <- c(
   "4 - Muy claras"
 )
 PROFESSOR_EMAIL_DOMAIN <- "@psi.uned.es"
+
+# Constant objects for generating the response dataset:
+
+## File system objects:
+
+STUDENT_TEMPLATE_FILENAME    <- # NOTE: Last code (006121) may change
+  "Introducción al Análisis de Datos (011037)-006121.xls"
+COURSE_PARTICIPANTS_FILENAME <- "courseid_7595_participants.csv"
+DATA_COMPENSATION_FILENAME   <- "compensation_data.xls"
 ```
 
 ```{r sources}
@@ -100,6 +112,13 @@ The source datasets are:
     from the dataset generation Shiny app.
 
 -   The OpenLMS output dataset with the exercise survey responses.
+
+Then, it creates a dataset with the students that receive the course
+compensation. This requires adapting the compensation data to a template
+generated from the UNED grading system. The format of this template include the
+student name and personal ID, but the OpenLMS data only has the email, so the
+data needs to be matched by name to generate the compensation with the tempate
+format.
 
 ## Testing mode
 
@@ -179,7 +198,7 @@ data_responses_filepath <- here(DATA_FOLDER, DATA_RESPONSES_FILENAME)
 response_vars_filepath  <- here(DATA_FOLDER, RESPONSE_VARS_FILENAME)
 
 # Variable name objects:
-response_vars <- response_vars_filepath |> read_csv(col_types = "c")
+response_vars       <- response_vars_filepath |> read_csv(col_types = "c")
 response_var_labels <- response_vars |> deframe()
 ```
 
@@ -188,8 +207,8 @@ course](https://agora.uned.es/course/view.php?id=7595). To download them, we
 need to access the [page of
 responses](https://agora.uned.es/mod/feedback/show_entries.php?id=468562)
 ("Respuestas") in the activity survey, and download them by clicking the button
-"Descargar". The format used will be "csv" (the default one). The data are saved
-to [the data folder](dat/), with its default name,
+"Descargar". The format used will be "csv" (the default one). Save the dataset
+to [the data folder](dat/) with its default name,
 "`{r} DATA_RESPONSES_FILENAME`".
 
 This dataset is then read and preprocessed
@@ -272,7 +291,7 @@ Additionally, we check whether they have responded after downloading the dataset
 ```{r compute-assessment-criteria}
 #| output: true
 data_criteria <- data_student_responses |>
-  select(email_address, student_name, email_hash, date) |>
+  select(student_name, email_hash, date) |>
   left_join(
     data_downloads_out |> select(email_hash, first_download),
     by = "email_hash"
@@ -294,17 +313,11 @@ compensation criteria; the "FALSE" cases are the ones who do not.
 
 ### Composition of the compensation dataset
 
-We need the student ID and name to generate the dataset with the specified
-format, but we have the email instead. Therefore, we need to match the email to
-those fields.
+We need the student's personal ID (DNI / NIE) and name to generate the dataset
+with the specified format, but we have the email instead. Therefore, we need to
+match the email to those fields.
 
 #### Template workbook generation
-
-```{r student-template-path}
-STUDENT_TEMPLATE_FILENAME <- "Introducción al Análisis de Datos (011037)-006001.xls"
-
-STUDENT_TEMPLATE_FILEPATH <- here(DATA_FOLDER, STUDENT_TEMPLATE_FILENAME)
-```
 
 We need to create an Excel workbook with a specific format. A workbook with this
 format can be downloaded automatically from the Grading Management System, with
@@ -317,9 +330,9 @@ the following procedure:
     https://calificaciones.uned.es/sgc/index.asp
 
 3.  Introduce the last 6 digits of the course code in the field "CÓDIGO
-    ASIGNATURA": 011037
+    ASIGNATURA": `011037`, then click on "Aceptar"
 
-4.  The current course (2024-2025) is selected by default, so click in "Aceptar"
+4.  The current course (2024-2025) is selected by default, so click on "Aceptar"
 
 5.  Click on "Carga a través de excel" -\> "Generar ficheros excel"
 
@@ -334,7 +347,26 @@ the following procedure:
 
 10. When the progress bar indicates "100%", click on "Descargar Ficheros"
 
-11. Save generated file as `r STUDENT_TEMPLATE_FILEPATH`
+```{r student-template-path}
+student_template_filepath <- here(DATA_FOLDER, STUDENT_TEMPLATE_FILENAME)
+```
+
+11. Save generated file as "`{r} student_template_filepath`"
+
+12. Read in the template file
+
+```{r read-student-sheet-template}
+student_template <- read_excel(
+  student_template_filepath,
+  range = cell_limits(c(1, 1), c(NA, NA)), # Read the full sheet
+  col_names = c(
+    "empty_1", "empty_2",            # Empty cells (respect in template)
+    "center", "id", "surname_name",  # Student identification data
+    "empty_6", "empty_7", "empty_8", # Empty cells (respect in template)
+    "grade"                          # Grades (to fill in the grading values)
+  )
+)
+```
 
 #### Student data extraction from the template workbook
 
@@ -342,75 +374,113 @@ Student data are extracted from the template workbook, including the name, and
 ID. The name has to be processed to delete accents and reorder the full name as
 "name surname", instead of "surname, name".
 
-```{r read-student-sheet-template}
-student_template <- readxl::read_excel(
-  STUDENT_TEMPLATE_FILEPATH,
-  range = cell_limits(c(1, 1), c(NA, NA)),
-  col_names = FALSE
-)
-
-nota <- tibble(...4 = "49905152", ...9 = "0,2")
-student_template |> rows_update(nota, by = "...4") -> student_template_nota
-
-student_template_nota |> xlsx::write.xlsx(
-  "dat/notas.xls",
-  sheetName = "Hoja1",
-  showNA = FALSE,
-  row.names = FALSE,
-  col.names = FALSE
-)
-```
-
 ```{r read-student-name-id}
-students <- student_template |>
-  tidyr::separate(...3, into = c("surname", "name"), remove = FALSE, sep = ', ') |>
-  dplyr::mutate(
-    name      = name |> stringi::stri_trans_general("Latin-ASCII"),
-    full_name = paste(name, surname)
+student_data <- student_template |>
+  select(id, surname_name) |>
+  dplyr::filter(!is.na(id), id != "D.N.I.") |>
+  separate(
+    surname_name,
+    into = c("surname", "name"),
+    remove = FALSE,
+    sep = ', '
   ) |>
-  dplyr::filter(!is.na(...3), ...3 != "Apellidos, nombre")
-
-students <- students |>
-  dplyr::left_join(data_criteria, by = c(full_name = "student_name"))
+  mutate(surname = surname |> str_trim()) |>
+  unite(student_name, name, surname, sep = ' ') |>
+  mutate(student_name = student_name |> stri_trans_char("ÁÉÍÓÚ", "AEIOU"))
 ```
 
-#### Participant data generation
+#### Compensation dataset creation
 
-```{r participant-data-path}
-PARTICIPANT_DATA_FILENAME <- "courseid_7595_participants.csv"
+The dataset with the student data is matched to the criteria dataset. To do
+this, we need to process the criteria dataset, filtering only the cases that
+fulfill the compensation criteria, and matching by name. An additional column
+with the compensation is added to the resulting dataset.
 
-PARTICIPANT_DATA_FILEPATH <- here(DATA_FOLDER, PARTICIPANT_DATA_FILENAME)
+```{r generate-compensation-data}
+data_compensation <- data_criteria |>
+  filter(criteria_all) |>
+  select(student_name) |>
+  mutate(student_name = student_name |> stri_trans_char("ÁÉÍÓÚ", "AEIOU"))
+
+student_compensation_data <- student_data |>
+  semi_join(data_compensation, by = "student_name") |>
+  add_column(grade = '0,2') |>
+  select(-student_name)
 ```
 
-1.  Browse to the virtual course in Agora:
-    https://agora.uned.es/course/view.php?id=7595
+### Data integrity checks
 
-2.  Click on tab "Participantes"
+The following checks are performed:
 
-3.  Scroll down to the end of the page
+-   Whether there are repeated names in the student dataset after applying the
+    compensation
 
-4.  Click on "Seleccione a todos los usuarios <N>"
+```{r check-duplicate-students}
+#| output: true
+dup_students_check <- student_compensation_data |>
+  group_by(surname_name) |>
+  filter(n() != 1)
 
-5.  Click on "Elegir..."
+n_dup_students <- dup_students_check |> nrow()
 
-6.  Click on "**Descargar datos de tabla como**, Valores separados por comas
-    (.csv)"
+dup_students_check
+```
 
-7.  Save the generated file as `r PARTICIPANT_DATA_FILEPATH`
+There are `{r} n_dup_students` students who receive compensation that have the
+same name as another student who also receives compensation.
 
-### Compensation dataset creation
+-   Whether there are repeated names in the compensation results dataset:
 
-The dataset of the students that qualify for the compensation is created and
-exported.
+```{r check-duplicates-compensation}
+#| output: true
+dup_data_compensation <- data_compensation |>
+  group_by(student_name) |>
+  filter(n() != 1)
+
+n_dup_compensation <- dup_data_compensation |> nrow()
+
+dup_data_compensation
+```
+
+There are `{r} n_dup_compensation` students who qualify for compensation that
+have the same name as another student who also qualifies for compensation.
+
+(If the previous two checks do not match, that means that the compensation of
+one student is being applied to two or more students.)
+
+-   Whether there are unmatched cases in the compensation data:
+
+```{r unmatched-compensation-students}
+#| output: true
+unmatched_compensation <- data_compensation |>
+  anti_join(student_data, by = join_by(student_name))
+
+n_unmatched <- unmatched_compensation |> nrow()
+
+unmatched_compensation
+```
+
+There are `{r} n_unmatched` students who completed the activity and qualify for
+compensation, but the complete name does not match its equivalent in the student
+template (due to missing compound names, different ways of writing them, or
+missing second surnames) or does not exist.
+
+### Compensation dataset exportation
+
+```{r data-compensation-path}
+data_compensation_filepath <- here(DATA_FOLDER, DATA_COMPENSATION_FILENAME)
+```
+
+The template with the student data is updated with the compensation data. Then,
+the resulting dataset is exported to file "`{r} data_compensation_filepath`".
 
 ```{r create-compensation-dataset}
-DATA_COMPENSATION_FILENAME <- "compensation_data.csv"
+student_template <- student_template |>
+  rows_update(student_compensation_data, by = c("id", "surname_name"))
 
-data_compensation_filepath <- here(DATA_FOLDER, DATA_COMPENSATION_FILENAME)
-
-data_compensations <- data_criteria |>
-  filter(criteria_all) |>
-  select(email_address)
-
-data_compensations |> write_csv(file = data_compensation_filepath)
+student_template |> write_xlsx(
+  data_compensation_filepath |> paste0('x'),
+  col_names = FALSE,
+  format_headers = FALSE
+)
 ```
