@@ -24,7 +24,7 @@ EVENT_TYPES <- c("Access", "Download") |> setNames(nm = _)
 
 ## Time and date configuration:
 TIMESTAMP_FORMAT <- "%Y-%Om-%d %H:%M:%OS3 %Z" # With time zone at the end
-
+LOCAL_TIMEZONE   <- "Europe/Madrid" # Local timezone for the event timestamps
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
@@ -34,6 +34,18 @@ timestamp <- lubridate::stamp(
   exact  = TRUE,
   quiet  = TRUE
 )
+
+# Function to parse stored timestamps
+parse_timestamp <- function(timestamp) {
+
+  time_zones <- timestamp |> stringr::str_extract(pattern = '(?<=\\s)[A-Z]+$')
+
+  # The following parser will work as long as the timestamp format matches the
+  #   value of `TIMESTAMP_FORMAT` in line 26.
+  timestamp |>
+    lubridate::ymd_hms() |>
+    lubridate::force_tzs(tzones = time_zones, tzone_out = LOCAL_TIMEZONE)
+}
 
 get_storage_url <- function(config_filepath, field = "file_id") {
 

@@ -1,0 +1,16 @@
+variable,label
+student_name,Nombre completo del usuario
+groups,Grupos
+email_address,Dirección de correo
+date,Fecha
+intercept,¿Qué valor ha obtenido en la intersección de la regresión? Ponga dos decimales y utilice coma como separador decimal
+slope,¿Qué valor ha obtenido en la pendiente de la regresión? Ponga dos decimales y utilice coma como separador decimal
+relationship,¿Cómo es la relación entre las variables?
+interpretation,"En base a los resultados obtenidos, interpreta la relación entre la autonomía y la satisfacción laboral"
+help_jamovi,¿Cuánto te ha ayudado esta actividad a aprender el uso del sofware Jamovi?
+help_subject,¿Cuánto te ha ayudado esta actividad a entender otros contenidos de la asignatura?
+usefulness_videos,¿Te han resultado útiles los vídeos de Jamovi para resolver la actividad?
+instructions,¿Te han parecido claras las instrucciones y preguntas frecuentes?
+nps,¿Cómo de probable es que recomiendes realizar esta actividad a un compañero?
+difficulties,"Si lo deseas, indica las dificultades que has encontrado para realizar la tarea"
+extra_comments,"Si tienes algún otro comentario, índicalo en el siguiente recuadro"
