@@ -27,10 +27,8 @@ institute: |
       </td>
     </tr>
   </table>
-bibliography:        ../www/Bayesian-Data-Analysis.bib
-csl:                 ../www/apa-old-doi-prefix.csl
-date:                "2025-02-27"
-date-meta:           "2025-02-27"
+date:                "2025-04-11"
+date-meta:           "2025-03-14"
 date-format:         long
 editor:
   mode:              source
@@ -39,13 +37,13 @@ editor:
     canonical:       true
 embed-resources:     true
 knitr:
-  # opts_knit: # Does not work, see line 86
+  # opts_knit: # Does not work, see line 85
   #   root_dir:  here::here()
   opts_chunk: 
     results:         asis
     cache:           true
     autodep:         true
-lang:                es
+lang:                en
 self-contained-math: true
 format:
   revealjs:

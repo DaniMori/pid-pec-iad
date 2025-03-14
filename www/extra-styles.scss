@@ -1,0 +1,30 @@
+/*-- scss:defaults --*/
+
+@import url(https://fonts.googleapis.com/css2?family=Titillium+Web);
+
+// "https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap"
+
+// fonts
+$font-family-sans-serif: Arial;
+
+.titillium-web-bold {
+  font-family: "Titillium Web", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+// colors
+$body-color:   #15141a !default;
+$text-muted:   #427562 !default;
+$link-color:   #8aac5d !default;
+
+// headings
+$presentation-heading-font:  titillium-web-bold, sans-serif;
+$presentation-heading-color: #00533e !default;
+$presentation-h1-font-size: 1.8em;
+
+/*-- scss:rules --*/
+
+.reveal a {
+  line-height: 1.3em;
+}
