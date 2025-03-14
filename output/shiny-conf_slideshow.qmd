@@ -199,13 +199,13 @@ we simulate a univariate linear regression model.
 ::: nonincremental
 1.  Random dataset generator
 
-2.  Tutorial: Instructions + Videos (OpenLMS)
+2.  Download link (OpenLMS):
 :::
 
-![Activity instructions and video tutorial in OpenLMS](../www/IAD_course_Jamovi_instructions.png){height="300px"}
+![Shiny app parameterized URL configuration](../www/IAD_course_setup_link.png){height="300px"}
 
 ::: notes
-In our OpenLMS course we have a set of instructions with video tutorials
+And we can set up a parameterized link to the Shiny app, with a GET parameter which we fill in with the student email (as we need a unique identifier for every student)
 :::
 
 ## Implementation
