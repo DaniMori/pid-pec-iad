@@ -1,0 +1,306 @@
+---
+title:               "PEC Exercise Correction"
+author:              "Daniel Morillo"
+format:
+  html:
+    df-print:        paged
+    toc:             true
+    embed-resources: true
+editor:              source
+execute: 
+  output:            false
+  warning:           false
+params:
+  test_mode:         false
+---
+
+```{r setup}
+#| include: false
+
+# Set working directory
+knitr::opts_knit$set(root.dir = here::here())
+
+# Read in parameters
+test_mode <- params$test_mode
+```
+
+```{r libraries}
+#| include: false
+library(googlesheets4)
+library(dplyr)
+library(lubridate)
+library(stringr)
+library(tidyr)
+library(purrr)
+library(here)
+library(tibble)
+library(readr)
+library(roperators)
+```
+
+```{r constants}
+#| include: false
+
+# Shared file system objects:
+DATA_FOLDER <- "dat"
+
+
+# Constant objects for processing the downloads dataset:
+TEACHING_TEAM_EMAILS_FILENAME <- "teaching_team_emails.csv"
+
+# Constant objects for processing the student responses dataset:
+
+## File system objects:
+DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI.csv"
+RESPONSE_VARS_FILENAME  <- "student_response_variables.csv"
+
+## Variable values:
+RELATIONSHIP_VALUES <- c("Inversa", "No tienen relación", "Directa")
+HELP_VALUES         <- c("1 - Nada", "2 - Un poco", "3 - Algo", "4 - Mucho")
+USEFULNESS_VALUES   <- c(
+  "1 - Nada útiles",
+  "2 - Poco útiles",
+  "3 - Algo útiles",
+  "4 - Muy útiles"
+)
+CLARITY_VALUES      <- c(
+  "1 - Nada claras",
+  "2 - Poco claras",
+  "3 - Algo claras",
+  "4 - Muy claras"
+)
+PROFESSOR_EMAIL_DOMAIN <- "@psi.uned.es"
+```
+
+```{r sources}
+#| include: false
+source("R/data_storage.R",   encoding = 'UTF-8')
+source("R/simulated_data.R", encoding = 'UTF-8')
+source("R/hash_emails.R",    encoding = 'UTF-8')
+```
+
+# Introduction
+
+This document retrieves the information for correcting the exercise of the
+educational innovation project for the IAD course.
+
+Using two source datasets, it computes:
+
+-   The correct answers to the exercise for each student
+
+-   Whether they have answered correctly to the exercise
+
+-   Whether each student fulfills the assessment criteria
+
+-   Which students must receive the course compensation for their participation
+
+The source datasets are:
+
+-   The log of users that have downloaded their personalized, random dataset,
+    from the dataset generation Shiny app.
+
+-   The OpenLMS output dataset with the exercise survey responses.
+
+## Testing mode
+
+Test mode allows to render the notebook **with all the responses**. Test mode
+can be turned on/off by editing the value of the parameter `test_mode` to
+`true`/`false` in the document "yaml" front matter (line 12). When test mode is
+on, the responses from the teaching team are filtered out applying the following
+criteria:
+
+-   From the student responses dataset, responses that match the "teacher email
+    domain" are directly filtered out.
+
+-   From the downloads dataset, a set of teacher emails is loaded, their
+    corresponding hashes are computed, and the matching ones are filtered out.
+
+# Data loading & preprocessing
+
+## Dataset of personalized data downloads
+
+```{r config-downlads-data}
+## File system objects:
+teaching_team_emails_filepath <- here(
+  DATA_FOLDER,
+  TEACHING_TEAM_EMAILS_FILENAME
+)
+```
+
+The downloads are first read from the Google Spreadsheets file connection. Prior
+to reading the dataset, one must make sure that [the Gsheets API connection has
+been successfully authorized](doc/gs_instructions.qmd).
+
+```{r load-download-data}
+data_downloads <- gs_file_link |>
+  read_sheet(col_types = 'icc') |> # Read email hashes as integers
+  mutate(across(timestamp, parse_timestamp)) # `timestamp` as POSIXct time
+
+if (!test_mode) {
+
+  teaching_team_emails <- teaching_team_emails_filepath |> read_csv()
+
+  # Hash emails for filtering out the matching hashes: 
+  teaching_team_hashes <- teaching_team_emails |>
+    transmute(email_hash = email_address |> map_int(hash_emails))
+
+  # Filter out the teaching team emails (i.e. the ones included in the dataset
+  #   with the "teaching team emails":
+  data_downloads <- data_downloads |>
+    anti_join(teaching_team_hashes, by = "email_hash")
+}
+```
+
+Then, the data is processed to extract, for each user:
+
+-   The number of access and download attempts.
+
+-   The timestamp (in the local time of `{r} LOCAL_TIMEZONE`) of the first and
+    last access and download attempts.
+
+```{r process-download-data}
+data_downloads_out <- data_downloads |>
+  arrange(timestamp) |>
+  summarise(
+    attempts = n(),
+    first    = first(timestamp),
+    last     = last(timestamp),
+    .by      = c(email_hash, event) # Compute for each event type and email hash
+  ) |>
+  mutate(across(event, str_to_lower)) |> # Lowercase events for column names
+  pivot_wider(names_from = event, values_from = attempts:last)
+```
+
+## Dataset of activity responses
+
+```{r config-responses-data}
+## File system objects:
+data_responses_filepath <- here(DATA_FOLDER, DATA_RESPONSES_FILENAME)
+response_vars_filepath  <- here(DATA_FOLDER, RESPONSE_VARS_FILENAME)
+
+# Variable name objects:
+response_vars <- response_vars_filepath |> read_csv(col_types = "c")
+response_var_labels <- response_vars |> deframe()
+```
+
+The dataset is first downloaded from [the OpenLMS
+course](https://agora.uned.es/course/view.php?id=7595). To download them, we
+need to access the page of responses ("Respuestas") in the activity survey, and
+download them by clicking the button "Descargar". The format used will be "csv"
+(the default one). The data are saved to [the data folder](dat/), with its
+default name, "`{r} DATA_RESPONSES_FILENAME`".
+
+This dataset is then read and preprocessed
+
+```{r load-responses-data}
+data_student_responses <- data_responses_filepath |>
+  read_csv() |>
+  rename(!!!response_var_labels) |>
+  select(email_address:extra_comments) |>
+  mutate(
+    email_hash = email_address |> map_int(hash_emails),
+    date = date |>
+      parse_date_time(orders = "%d%B%Y %H%M") |>
+      force_tz(tzone = LOCAL_TIMEZONE),
+    relationship = relationship |> factor(
+      levels = RELATIONSHIP_VALUES, labels = -1:1
+    ),
+    across(starts_with("help"), ~ordered(., levels = HELP_VALUES)),
+    across(usefulness_videos,   ~ordered(., levels = USEFULNESS_VALUES)),
+    across(instructions,        ~ordered(., levels = CLARITY_VALUES)),
+    nps = nps |> str_extract("^\\d*") |> as.integer()
+  )
+
+if (!test_mode) {
+  
+  # Filter out the teaching team emails (i.e. the ones that match the "professor
+  #   domain").
+  data_student_responses <- data_student_responses |>
+    filter(email_address |> str_detect(PROFESSOR_EMAIL_DOMAIN, negate = TRUE))
+}
+```
+
+# Output computation
+
+## Correct responses for each student
+
+For each student, the correct answers of the exercise are obtained.
+
+```{r get-correct-responses}
+data_correct_responses <- data_downloads_out |>
+  pull(email_hash) |>
+  set_names() |>
+  map(get_user_responses) |>
+  list_rbind(names_to = "email_hash") |>
+  mutate(across(email_hash, as.integer)) # Turn names to integers for matching
+```
+
+## Student responses correction
+
+For each student, it is computed whether they have answered correctly to each of
+the items in the exercise.
+
+```{r correct-student-responses}
+data_response_corrections <- data_student_responses |>
+  select(email_hash, intercept:relationship) |>
+  left_join(
+    data_correct_responses,
+    by     = "email_hash",
+    suffix = c("_student", "_correct")
+  ) |>
+  mutate(
+    intercept    = map2_lgl(intercept_student, intercept_correct, `%~=%`),
+    slope        = map2_lgl(slope_student,     slope_correct,     `%~=%`),
+    relationship = relationship_student %==% relationship_correct,
+  )
+```
+
+## Assessment criteria fulfillment
+
+To receive the course compensation, each student must have
+
+-   downloaded their personalized dataset, and
+
+-   completed the response survey of the activity.
+
+We merge both datasets to detect the students that have done both steps.
+Additionally, we check whether they have responded after downloading the dataset
+(at least for the first time).
+
+```{r compute-assessment-criteria}
+#| output: true
+data_criteria <- data_student_responses |>
+  select(email_address, email_hash, date) |>
+  full_join(
+    data_downloads_out |> select(email_hash, first_download),
+    by = "email_hash"
+  ) |>
+  mutate(
+    download_correct = !is.na(first_download),
+    response_correct = !is.na(date),
+    date_correct     = first_download < date,
+    criteria_all     = download_correct & response_correct & date_correct
+  )
+
+data_criteria |> count(criteria_all)
+```
+
+The number of "TRUE" cases are the number of students that fulfill the
+compensation criteria; the "FALSE" cases are the ones who do not.
+
+## Students to receive compensation for participation
+
+The dataset of the students that qualify for the compensation is created and
+exported.
+
+```{r create-compensation-dataset}
+DATA_COMPENSATION_FILENAME <- "compensation_data.csv"
+
+data_compensation_filepath <- here(DATA_FOLDER, DATA_COMPENSATION_FILENAME)
+
+data_compensations <- data_criteria |>
+  filter(criteria_all) |>
+  select(email_address)
+
+data_compensations |> write_csv(file = data_compensation_filepath)
+```
