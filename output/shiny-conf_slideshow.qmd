@@ -150,6 +150,8 @@ This implies a failure to assess the learning and ultimately to attain the educa
 
 ## Personalized assessment activity
 
+<br>
+
 -   Same task
 
 -   For each student: different data + responses
@@ -161,40 +163,64 @@ This implies a failure to assess the learning and ultimately to attain the educa
 ::: notes
 Our proposed solution is to implement a task, which is the same for every student.
 
-However, each of them has a pseudo-random, unique synthetic dataset.
+However, each of them has a unique synthetic dataset.
+
+This dataset is created by means of a pseudo-random simulation, with a known unique initializing seed.
 
 In our pilot study, we ask them to run a very simple univariate linear regression in Jamovi, so they learn to use this statistical software and interpret the output.
 :::
 
-## Implementation
+## Implementation {.nonincremental}
 
 ::: nonincremental
 1.  Random dataset generator
 :::
 
 ```{r}
-#| code-line-numbers: "1|3|10-15"
+#| code:              !expr readLines("R/simulated_data.R")[20:39]
+#| code-line-numbers: "1|3|5-6|10-15"
 #| eval:              false
-simulate_data <- function(seed) {
-
-  set.seed(seed)
-
-  slope       <- sample(-1:1, size = 1L) # Simulation regression coefficient
-  sample_size <- sample(SAMPLE_SIZE, size = 1L) # Random sample size
-  n_crit_vals <- length(CRITERION_SCORES) # Nº of values in the criterion scores
-
-  tibble::tibble(
-    predictor = sample(
-      PREDICTOR_SCORES,
-      size    = sample_size,
-      replace = TRUE
-    ),
-    criterion = (slope * predictor + rnorm(sample_size)) |>
-      dplyr::ntile(n_crit_vals)                          |>
-      dplyr::recode(!!!CRITERION_SCORES |> setNames(1:n_crit_vals))
-  ) |>
-    setNames(SIM_VAR_NAMES)
-}
 ```
 
-2.  Shiny app :::
+::: notes
+We have a function that takes an integer nº as argument and uses it to initialize the seed of the pseudorandom nº generator.
+
+\[NEXT\]
+
+Then, we sample a regression coefficient and a sample size, and with these values...
+
+\[NEXT\]
+
+we simulate a univariate linear regression model.
+:::
+
+## Implementation {.nonincremental}
+
+::: nonincremental
+1.  Random dataset generator
+
+2.  Tutorial: Instructions + Videos (OpenLMS)
+:::
+
+![Activity instructions and video tutorial in OpenLMS](../www/IAD_course_Jamovi_instructions.png){height="300px"}
+
+::: notes
+In our OpenLMS course we have a set of instructions with video tutorials
+:::
+
+## Implementation
+
+::: nonincremental
+1.  Random dataset generator
+
+2.  Tutorial: Instructions + Videos (OpenLMS)
+
+3.  Download link (OpenLMS):
+:::
+
+![Shiny app parameterized URL configuration](../www/IAD_course_setup_link.png){height="250px"}
+
+::: notes
+And we can set up a parameterized link to the Shiny app, with a GET parameter which we fill in with the student email (as we need a unique identifier for every student)
+:::
+

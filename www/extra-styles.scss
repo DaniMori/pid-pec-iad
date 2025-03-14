@@ -28,3 +28,8 @@ $presentation-h1-font-size: 1.8em;
 .reveal a {
   line-height: 1.3em;
 }
+
+.reveal pre.sourceCode code {
+  /* height: 500px; */
+  max-height: 400px;
+}
