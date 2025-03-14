@@ -1,0 +1,90 @@
+---
+title:     |
+  Generating personalized student synthetic datasets for large-scale educational assessment
+subtitle:  |
+  ShinyConf 2025
+author:    |
+  <table>
+    <tr>
+      <td><small>Daniel Morillo, Ph.D.</small></td>
+    </tr>
+    <tr>
+      <td>
+        <center>
+          [![](../www/github-logo.png){height="50"}](https://github.com/DaniMori/)&emsp;
+          [![](../www/orcid.png){height="50"}](https://orcid.org/0000-0003-3021-3878)
+        </center>
+      </td>
+    </tr>
+  </table>
+institute: |
+  <table>
+    <tr>
+      <td>
+        <center>
+          [![](../www/logos_fac_psicologia.svg){height="100"}](https://www.uned.es/universidad/facultades/psicologia.html)
+        </center>
+      </td>
+    </tr>
+  </table>
+bibliography:        ../www/Bayesian-Data-Analysis.bib
+csl:                 ../www/apa-old-doi-prefix.csl
+date:                "2025-02-27"
+date-meta:           "2025-02-27"
+date-format:         long
+editor:
+  mode:              source
+  markdown: 
+    wrap:            sentence
+    canonical:       true
+embed-resources:     true
+knitr:
+  # opts_knit: # Does not work, see line 86
+  #   root_dir:  here::here()
+  opts_chunk: 
+    results:         asis
+    cache:           true
+    autodep:         true
+lang:                es
+self-contained-math: true
+format:
+  revealjs:
+    auto-stretch:            true
+    code-annotations:        hover
+    df-print:                paged
+    fig-cap-location:        bottom
+    fig-format:              svg
+    fig-asp:                 1
+    fig-width:               6
+    incremental:             false
+    keep-md:                 false
+    link-external-newwindow: true
+    margin:                  0
+    self-contained:          true
+    slide-number:            false
+    theme:                   ../www/extra-styles.scss
+    transition:              none
+    view-distance:           3
+    template-partials:
+      - ../www/title-slide.html
+editor_options: 
+  chunk_output_type: console
+---
+
+# Introduction
+
+```{r libraries}
+#| cache:   false
+#| include: false
+
+library(knitr)
+library(extrafont)
+```
+
+```{r setup}
+#| cache:   false
+#| include: false
+opts_knit$set(root.dir = here::here()) # See lines 42-43
+```
+
+## UNED
