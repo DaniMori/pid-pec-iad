@@ -45,6 +45,7 @@ knitr:
     echo:            true
     results:         asis
 lang:                en
+preview-links:       true
 self-contained-math: true
 format:
   revealjs:
@@ -55,13 +56,13 @@ format:
     fig-format:              svg
     fig-asp:                 1
     fig-width:               6
-    footer:                  |
-      Generating personalized student synthetic datasets for large-scale
-      educational assessment
-    incremental:             true
+    # footer:                  |
+    #   Generating personalized student synthetic datasets for large-scale
+    #   educational assessment
+    incremental:             false
     keep-md:                 false
     link-external-newwindow: true
-    logo:                    ../www/LOGO_UNED_VECTORIAL.AI
+    # logo:                    ../www/LOGO_UNED_VECTORIAL.AI
     margin:                  0
     self-contained:          true
     slide-number:            false
@@ -110,10 +111,10 @@ And out of them, 35 thousand are enrolled in the degree in Psychology
 
 ## Large-scale remote education
 
-![Students enrolled in Data Analysis 101 course](../www/IAD_course_students_highlighted.png)
+![Students enrolled in Data Analysis 101 course](../www/IAD_course_students_highlighted.png){height="420"}
 
 ::: aside
-[source: UNED OpenLMS course](https://agora.uned.es)
+([source: UNED OpenLMS course](https://agora.uned.es))
 :::
 
 ::: notes
@@ -124,16 +125,16 @@ Continuous assessment activities are a challenge in this context
 
 ## Large-scale remote education
 
+<br>
+
 Challenges: continuous assessment
 
+::: incremental
 -   Response leakage
 
 -   Fraudulent responding
 
 -   Failure of educational objectives
-
-::: aside
-[source: UNED OpenLMS course](https://agora.uned.es)
 :::
 
 ::: notes
@@ -152,6 +153,7 @@ This implies a failure to assess the learning and ultimately to attain the educa
 
 <br>
 
+::: incremental
 -   Same task
 
 -   For each student: different data + responses
@@ -159,6 +161,7 @@ This implies a failure to assess the learning and ultimately to attain the educa
 -   Synthetic, "random" (unique) dataset
 
 -   Pilot study: Univariate linear regression in Jamovi
+:::
 
 ::: notes
 Our proposed solution is to implement a task, which is the same for every student.
@@ -167,18 +170,18 @@ However, each of them has a unique synthetic dataset.
 
 This dataset is created by means of a pseudo-random simulation, with a known unique initializing seed.
 
-In our pilot study, we ask them to run a very simple univariate linear regression in Jamovi, so they learn to use this statistical software and interpret the output.
+In our pilot study, we ask them to run a very simple univariate linear regression in Jamovi, which is an open-source statistical software with a graphical user interface, similar to SPSS.
+
+This way, they learn to use a statistical software and interpret the output.
 :::
 
 ## Implementation {.nonincremental}
 
-::: nonincremental
-1.  Random dataset generator
-:::
+1.  Random dataset generator:
 
-```{r}
+```{r random-dataset-gen-function}
 #| code:              !expr readLines("R/simulated_data.R")[20:39]
-#| code-line-numbers: "1|3|5-6|10-15"
+#| code-line-numbers: "0|1|3|5-6|10-15"
 #| eval:              false
 ```
 
@@ -196,31 +199,109 @@ we simulate a univariate linear regression model.
 
 ## Implementation {.nonincremental}
 
-::: nonincremental
-1.  Random dataset generator
+2.  Parameterized link (OpenLMS):
 
-2.  Download link (OpenLMS):
-:::
-
-![Shiny app parameterized URL configuration](../www/IAD_course_setup_link.png){height="300px"}
+![Parameterized Shiny app URL configuration](../www/IAD_course_setup_link.png){height="400"}
 
 ::: notes
-And we can set up a parameterized link to the Shiny app, with a GET parameter which we fill in with the student email (as we need a unique identifier for every student)
+Then, we set up a parameterized link to a Shiny app, with a GET parameter which we fill in with the student email.
 :::
 
 ## Implementation
 
-::: nonincremental
-1.  Random dataset generator
+3.  Shiny app:
 
-2.  Tutorial: Instructions + Videos (OpenLMS)
-
-3.  Download link (OpenLMS):
-:::
-
-![Shiny app parameterized URL configuration](../www/IAD_course_setup_link.png){height="250px"}
+```{r shiny-server}
+#| code:              !expr readLines("server.R")[53:101]
+#| code-line-numbers: "0|4,10-11,13|16-17"
+#| eval:              false
+```
 
 ::: notes
-And we can set up a parameterized link to the Shiny app, with a GET parameter which we fill in with the student email (as we need a unique identifier for every student)
+Then, the Shiny app just parses the email parameter into a reactive value...
+
+\[NEXT\]
+
+...and computes an integer hash from it.
 :::
 
+## Implementation
+
+3.  Shiny app:
+
+```{r email-hash-computing}
+#| code:              !expr readLines("R/hash_emails.R")[20:23]
+#| code-line-numbers: "3"
+#| eval:              false
+```
+
+::: notes
+This is just a simple hashing function that outputs an integer version of the hash.
+
+That way, we have a unique identifier for every student, which is anonymous and non-reversible,...
+:::
+
+## Implementation
+
+3.  Shiny app:
+
+```{r shiny-server}
+#| code-line-numbers: "20-21|23-24"
+#| eval:              false
+```
+
+::: notes
+...which we can use to record the students who have accessed the app and downloaded their dataset.
+We do this in a Google Spreadsheet that is connected to the app.
+
+\[NEXT\]
+
+More importantly, we call the dataset generating function using this integer hash as the random seed argument.
+:::
+
+## Implementation
+
+1.  Random dataset generator
+
+2.  Parameterized link (OpenLMS)
+
+3.  Shiny app:
+
+    [https://iad-psi-uned.shinyapps.io/pid-pec-iad?email=johndoe%40estudiante.uned.es](https://danimori.shinyapps.io/pid-pec-iad/?email=johndoe%40estudiante.uned.es)
+
+::: notes
+So here's what happens when the student uses the link to the app:
+
+It has basically a title, and a download link.
+But the app has a timeout set to "click" the download link automatically, although they can click on it if it happens to fail.
+
+(Then there is an instruction to close the tab when the download is finished).
+:::
+
+## Implementation
+
+4.  Questionnaire:
+
+![Questionnaire for completing the activity](../www/IAD_course_responses.png){height="400"}
+
+::: notes
+Then we have a questionnaire in the OpenLMS course, where the students can fill in their answers to the activity, and also give some feedback about their satisfaction.
+:::
+
+## Implementation
+
+1.  Random dataset generator
+
+2.  Parameterized link (OpenLMS)
+
+3.  Shiny app
+
+4.  Questionnaire
+
+5.  Feedback Shiny app:
+
+    [https://iad-psi-uned.shinyapps.io/pid-iad-feedback?email=johndoe%40psi.uned.es](https://danimori.shinyapps.io/pid-iad-feedback?email=johndoe%40psi.uned.es)
+
+::: notes
+And the last component is a very similar Shiny app, that parses the email and computes the correct responses from their unique dataset, so they can compare their responses with the actual solution to the exercise.
+:::
