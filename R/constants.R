@@ -16,13 +16,15 @@
 ASSETS_DIR <- here::here("www")
 
 
-# User interface objects:
+# Dataset generation app:
 
-## Shiny component identifiers:
+## User interface objects:
+
+### Shiny component identifiers:
 DOWNLOAD_LINK_ID <- "download"
 
-## Interface verbatim:
-APP_TITLE           <- "Descarga de datos para actividad optativa con Jamovi"
+### Interface verbatim:
+GEN_DATA_APP_TITLE  <- "Descarga de datos para actividad optativa con Jamovi"
 DOWNLOAD_LINK_LABEL <-
   "Haz click aquí si la descarga no se inicia automáticamente"
 CLOSE_WINDOW_MSG    <- paste(
@@ -31,24 +33,51 @@ CLOSE_WINDOW_MSG    <- paste(
 )
 DATASET_FILENAME    <- "regresion_lineal.csv" # Name of downloaded dataset
 
+## Server logic objects:
 
-# Server logic objects:
-
-## Auto download configuration:
+### Auto download configuration:
 AUTO_DOWNLOAD_TIMEOUT <- 200L # Timeout (to start download) in milliseconds
 
-## Google Spreadsheets configuration:
+### Google Spreadsheets configuration:
 
-### Authentication:
+#### Authentication:
 OAUTH_CACHE_PATH <- here::here(".secrets")
 TOKEN_FILENAME   <- "encrypted-oauth-token.rds"
 TOKEN_FILEPATH   <- here::here(OAUTH_CACHE_PATH, TOKEN_FILENAME)
 KEY_VAR_NAME     <- "PID_PEC_IAD_KEY"
 
-### Storage file:
+#### Storage file:
 CONFIG_FILENAME <- "gsheets_config.yml"
 CONFIG_FILEPATH <- here::here(ASSETS_DIR, CONFIG_FILENAME)
 
+
+# Feedback app:
+
+## User interface objects:
+
+### Shiny component identifiers:
+RESPONSE_TABLE_ID <- "responses"
+
+### Interface verbatim:
+
+#### Static components:
+FEEDBACK_APP_TITLE  <- "Respuestas de la actividad optativa con Jamovi"
+
+
+#### Parameter table:
+
+##### Headers:
+ITEM_NUM_LABEL <- "Nº"
+ITEM_LABEL     <- "Pregunta"
+RESPONSE_LABEL <- "Respuesta"
+
+##### Item labels:
+INTERCEPT_LABEL    <- "Intersección"
+SLOPE_LABEL        <- "Pendiente"
+RELATIONSHIP_LABEL <- "Relación"
+
+##### Relationship item values:
+RELATIONSHIP_LABELS <- c("Inversa", "No tienen relación", "Directa")
 
 # Simulated data objects:
 
@@ -57,10 +86,16 @@ SIM_VARIABLES <- c("predictor",         "criterion")
 SIM_VAR_NAMES <- c("autonomia_laboral", "satisfaccion_laboral") |>
   setNames(SIM_VARIABLES)
 
+## Model parameters:
+INTERCEPT_VAR_NAME    <- "intercept"
+SLOPE_VAR_NAME        <- "slope"
+RELATIONSHIP_VAR_NAME <- "relationship"
+
 ## Variable data:
 SAMPLE_SIZE       <- 50:200 # Uniformly random sample size of 50-200 cases
 PREDICTOR_SCORES  <-  0: 10 # Possible scores in the predictor variable
 CRITERION_SCORES  <-  1:  5 # Possible scores in the criterion variable
 
 ## Response configuration data:
-N_DECIMALS     <- 2L # Decimal places to use for rounding numeric results
+N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
+REL_LEVELS <- -1:1 # Levels for the "relationship" item response
