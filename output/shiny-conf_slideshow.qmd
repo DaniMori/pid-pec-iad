@@ -93,7 +93,11 @@ opts_knit$set(root.dir = here::here()) # See lines 42-43
 
 ## Large-scale remote education
 
+<center>
+
 ![Students enrolled at UNED](../www/Stats_total_students.png)
+
+</center>
 
 ::: aside
 ([source: UNED Statistics portal](https://app.uned.es/evacaldos))
@@ -111,7 +115,11 @@ And out of them, 35 thousand are enrolled in the degree in Psychology
 
 ## Large-scale remote education
 
+<center>
+
 ![Students enrolled in Data Analysis 101 course](../www/IAD_course_students_highlighted.png){height="420"}
+
+</center>
 
 ::: aside
 ([source: UNED OpenLMS course](https://agora.uned.es))
@@ -127,7 +135,7 @@ Continuous assessment activities are a challenge in this context
 
 <br>
 
-Challenges: continuous assessment
+#### Challenges: continuous assessment
 
 ::: incremental
 -   Response leakage
@@ -253,13 +261,19 @@ More importantly, we call the dataset generating function using this integer has
 
 3.  Parameterized link (OpenLMS):
 
+<center>
+
 ![Parameterized Shiny app URL configuration](../www/IAD_course_setup_link.png){height="400"}
+
+</center>
 
 ::: notes
 Then, we set up a parameterized link to a Shiny app, with a GET parameter which we fill in with the student email.
 :::
 
 ## Implementation
+
+<br>
 
 1.  Random dataset generator
 
@@ -282,7 +296,11 @@ But the app has a timeout set to "click" the download link automatically, althou
 
 4.  Questionnaire:
 
+<center>
+
 ![Questionnaire for completing the activity](../www/IAD_course_responses.png){height="400"}
+
+</center>
 
 ::: notes
 Then we have a questionnaire in the OpenLMS course, where the students can fill in their answers to the activity, and also give some feedback about their satisfaction.
@@ -335,6 +353,8 @@ This helped us prove that a little effort in development can provide high value 
 :::
 
 ## Future directions
+
+<br>
 
 #### Re: Activity
 
