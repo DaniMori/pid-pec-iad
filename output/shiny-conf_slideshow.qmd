@@ -267,7 +267,7 @@ More importantly, we call the dataset generating function using this integer has
 
 3.  Shiny app:
 
-    [https://iad-psi-uned.shinyapps.io/pid-pec-iad?email=johndoe%40estudiante.uned.es](https://danimori.shinyapps.io/pid-pec-iad/?email=johndoe%40estudiante.uned.es)
+    [https://iad-psi-uned.shinyapps.io/pid-pec-iad?email=johndoe%40alumno.uned.es](https://danimori.shinyapps.io/pid-pec-iad/?email=johndoe%40alumno.uned.es)
 
 ::: notes
 So here's what happens when the student uses the link to the app:
@@ -300,7 +300,7 @@ Then we have a questionnaire in the OpenLMS course, where the students can fill 
 
 5.  Feedback Shiny app:
 
-    [https://iad-psi-uned.shinyapps.io/pid-iad-feedback?email=johndoe%40psi.uned.es](https://danimori.shinyapps.io/pid-iad-feedback?email=johndoe%40psi.uned.es)
+    [https://iad-psi-uned.shinyapps.io/pid-iad-feedback?email=janedoe%40alumno.uned.es](https://danimori.shinyapps.io/pid-iad-feedback?email=dvmorillo%40psi.uned.es)
 
 ::: notes
 And the last component is a very similar Shiny app, that parses the email and computes the correct responses from their unique dataset, so they can compare their responses with the actual solution to the exercise.
