@@ -79,7 +79,7 @@ PROFESSOR_EMAIL_DOMAIN <- "@psi.uned.es"
 ## File system objects:
 
 STUDENT_TEMPLATE_FILENAME    <- # NOTE: Last code (006121) may change
-  "Introducción al Análisis de Datos (011037)-006121.xls"
+  "Introducción al Análisis de Datos (011037)-006401.xls"
 COURSE_PARTICIPANTS_FILENAME <- "courseid_7595_participants.csv"
 DATA_COMPENSATION_FILENAME   <- "compensation_data.xls"
 ```
@@ -251,7 +251,7 @@ For each student, the correct answers of the exercise are obtained.
 data_correct_responses <- data_downloads_out |>
   pull(email_hash) |>
   set_names() |>
-  map(get_user_responses) |>
+  map(get_user_responses) |> # Get correct responses for each student
   list_rbind(names_to = "email_hash") |>
   mutate(across(email_hash, as.integer)) # Turn names to integers for matching
 ```
