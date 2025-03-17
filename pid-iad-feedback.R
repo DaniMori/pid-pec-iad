@@ -20,6 +20,8 @@ setwd(here::here())
 
 library(shiny)
 library(shinyjs, warn.conflicts = FALSE)
+library(readr)
+library(dplyr)
 
 
 ## ---- SOURCES: ---------------------------------------------------------------
@@ -53,6 +55,15 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
 
+  # Read student responses
+  responses <- read_csv(
+    "dat/student_responses.csv",
+    col_types = cols(
+      email_hash   = col_integer(),
+      relationship = col_character()
+    )
+  )
+
   # Reactive values:
   email        <- reactiveVal() # Email read from the session query
   hashed_email <- reactiveVal() # Hashed email for logging and random seed
@@ -71,14 +82,21 @@ server <- function(input, output, session) {
     }
   )
 
-  ## File download handler (activated when the email is valid)
+  ## Output renderer (activated when the email is valid)
   output[[RESPONSE_TABLE_ID]] <- renderTable(
 
     if (!is.null(hashed_email())) {
 
-      hashed_email() |>
+      solutions <- hashed_email() |>
         get_user_responses() |>
-        format_responses()
+        format_responses(response_label = "Soluciones")
+
+      responses <- responses |>
+        filter(email_hash == hashed_email()) |>
+        select(intercept, slope, relationship) |>
+        format_responses(response_label = "Tus respuestas")
+
+      full_join(responses, solutions, by = c(ITEM_NUM_LABEL, ITEM_LABEL))
     }
   )
 }

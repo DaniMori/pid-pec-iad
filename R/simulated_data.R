@@ -78,7 +78,7 @@ get_user_responses <- function(hash) {
   user_sim_data |> get_model_params()
 }
 
-format_responses <- function(responses) {
+format_responses <- function(responses, response_label = RESPONSE_LABEL) {
 
   relationship_levels <- REL_LEVELS |>
     as.character() |>
@@ -102,9 +102,9 @@ format_responses <- function(responses) {
     ) |>
     tidyr::pivot_longer(
       cols      = dplyr::everything(),
-      values_to = RESPONSE_LABEL
+      values_to = response_label
     ) |>
     dplyr::full_join(params_vars_labels, by = c(name = "value")) |>
-    dplyr::select(dplyr::all_of(c(ITEM_LABEL, RESPONSE_LABEL))) |>
+    dplyr::select(dplyr::all_of(c(ITEM_LABEL, response_label))) |>
     tibble::rownames_to_column(ITEM_NUM_LABEL)
 }
