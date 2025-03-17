@@ -494,7 +494,7 @@ to do this, we export the student responses along with the email hash, so that
 we can publish these responses without exposing the students' data.
 
 ```{r create-responses-dataset}
-student_responses_filepath <- here(DATA_FOLDER, STUDENT_RESPONSES_FILENAME)
+student_responses_filepath <- here(STUDENT_RESPONSES_FILENAME)
 
 data_student_responses_out <- data_student_responses |>
   select(email_hash, intercept, slope, relationship, interpretation)
