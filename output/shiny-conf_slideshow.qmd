@@ -197,19 +197,9 @@ Then, we sample a regression coefficient and a sample size, and with these value
 we simulate a univariate linear regression model.
 :::
 
-## Implementation {.nonincremental}
-
-2.  Parameterized link (OpenLMS):
-
-![Parameterized Shiny app URL configuration](../www/IAD_course_setup_link.png){height="400"}
-
-::: notes
-Then, we set up a parameterized link to a Shiny app, with a GET parameter which we fill in with the student email.
-:::
-
 ## Implementation
 
-3.  Shiny app:
+2.  Shiny app:
 
 ```{r shiny-server}
 #| code:              !expr readLines("server.R")[53:101]
@@ -227,7 +217,7 @@ Then, the Shiny app just parses the email parameter into a reactive value...
 
 ## Implementation
 
-3.  Shiny app:
+2.  Shiny app:
 
 ```{r email-hash-computing}
 #| code:              !expr readLines("R/hash_emails.R")[20:23]
@@ -243,7 +233,7 @@ That way, we have a unique identifier for every student, which is anonymous and 
 
 ## Implementation
 
-3.  Shiny app:
+2.  Shiny app:
 
 ```{r shiny-server}
 #| code-line-numbers: "20-21|23-24"
@@ -259,13 +249,23 @@ We do this in a Google Spreadsheet that is connected to the app.
 More importantly, we call the dataset generating function using this integer hash as the random seed argument.
 :::
 
+## Implementation {.nonincremental}
+
+3.  Parameterized link (OpenLMS):
+
+![Parameterized Shiny app URL configuration](../www/IAD_course_setup_link.png){height="400"}
+
+::: notes
+Then, we set up a parameterized link to a Shiny app, with a GET parameter which we fill in with the student email.
+:::
+
 ## Implementation
 
 1.  Random dataset generator
 
-2.  Parameterized link (OpenLMS)
+2.  Shiny app:
 
-3.  Shiny app:
+3.  Parameterized link (OpenLMS):
 
     [https://iad-psi-uned.shinyapps.io/pid-pec-iad?email=johndoe%40alumno.uned.es](https://danimori.shinyapps.io/pid-pec-iad/?email=johndoe%40alumno.uned.es)
 
