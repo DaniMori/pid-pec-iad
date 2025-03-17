@@ -28,10 +28,11 @@
 *.html
 *.pdf
 
-# Directories and links
+# Directories, links and files
 .Rproj.user
 /dat/
 *.lnk
+*.csv
 
 # Shiny publication files
 *.dcf
