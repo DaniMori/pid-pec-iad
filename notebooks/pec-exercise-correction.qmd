@@ -82,6 +82,7 @@ STUDENT_TEMPLATE_FILENAME    <- # NOTE: Last code (006121) may change
   "Introducción al Análisis de Datos (011037)-006401.xls"
 COURSE_PARTICIPANTS_FILENAME <- "courseid_7595_participants.csv"
 DATA_COMPENSATION_FILENAME   <- "compensation_data.xls"
+STUDENT_RESPONSES_FILENAME   <- "student_responses.csv"
 ```
 
 ```{r sources}
@@ -483,4 +484,20 @@ student_template |> write_xlsx(
   col_names = FALSE,
   format_headers = FALSE
 )
+```
+
+## Student responses
+
+In order to implement the feedback app, we need to create a file with the
+student responses, so they can compare them with the correct solutions. In order
+to do this, we export the student responses along with the email hash, so that
+we can publish these responses without exposing the students' data.
+
+```{r create-responses-dataset}
+student_responses_filepath <- here(DATA_FOLDER, STUDENT_RESPONSES_FILENAME)
+
+data_student_responses_out <- data_student_responses |>
+  select(email_hash, intercept, slope, relationship, interpretation)
+
+data_student_responses_out |> write_csv(file = student_responses_filepath)
 ```
