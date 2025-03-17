@@ -57,7 +57,7 @@ server <- function(input, output, session) {
 
   # Read student responses
   responses <- read_csv(
-    "dat/student_responses.csv",
+    "student_responses.csv",
     col_types = cols(
       email_hash   = col_integer(),
       relationship = col_character()
