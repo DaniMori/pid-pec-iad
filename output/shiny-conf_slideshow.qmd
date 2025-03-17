@@ -305,3 +305,55 @@ Then we have a questionnaire in the OpenLMS course, where the students can fill 
 ::: notes
 And the last component is a very similar Shiny app, that parses the email and computes the correct responses from their unique dataset, so they can compare their responses with the actual solution to the exercise.
 :::
+
+## Conclusions
+
+<br>
+
+<br>
+
+-   Participation: 471 respondents (= 6,33%)
+
+<br>
+
+::: incremental
+-   Design: Simple but efficient
+:::
+
+::: notes
+The activity was voluntary (pilot study), so participation was not compulsory.
+We had little participation, only a little more than a 6%.
+However, students were motivated, and even asked us to re-open the activity when it was already finished (although only for course compensation, but nevertheless they were at least interested)
+
+Also, it allowed us to test the project and the performance of the Shiny app, which did not give raise to any incidence or issue.
+
+\[NEXT\]
+
+The app design (actually both of them) was extremely simple, as can be seen.
+But nevertheless, with little coding and complexity it was able to support an actual need in an uncovered niche.
+This helped us prove that a little effort in development can provide high value in the proper conditions (which includes of course making use of Shinyapps.io)
+:::
+
+## Future directions
+
+#### Re: Activity
+
+::: incremental
+-   Improve feedback
+
+-   Compulsory
+
+-   Automatic grading
+:::
+
+::: fragment
+#### Re: Shiny app
+:::
+
+::: incremental
+-   Branding (with `_brand.yml`)
+
+-   Modular design
+:::
+
+## Thanks for your attendance!
