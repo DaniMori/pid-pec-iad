@@ -37,33 +37,25 @@ editor:
     canonical:       true
 embed-resources:     true
 knitr:
-  # opts_knit: # Does not work, see line 85
+  # opts_knit: # Does not work, see line 87
   #   root_dir:  here::here()
-  opts_chunk: 
-    autodep:         true
-    cache:           true
+  opts_chunk:
+    cache:           false
     echo:            true
-    results:         asis
+    eval:            false
 lang:                en
 preview-links:       true
 self-contained-math: true
 format:
   revealjs:
     auto-stretch:            true
-    code-annotations:        hover
-    df-print:                paged
     embed-resources:         true
     fig-cap-location:        bottom
-    fig-format:              svg
     fig-asp:                 1
     fig-width:               6
-    # footer:                  |
-    #   Generating personalized student synthetic datasets for large-scale
-    #   educational assessment
     incremental:             false
     keep-md:                 false
     link-external-newwindow: true
-    # logo:                    ../www/LOGO_UNED_VECTORIAL.AI
     margin:                  0
     self-contained:          true
     slide-number:            false
@@ -80,6 +72,7 @@ editor_options:
 
 ```{r libraries}
 #| cache:   false
+#| eval:    true
 #| include: false
 
 library(knitr)
@@ -88,8 +81,9 @@ library(extrafont)
 
 ```{r setup}
 #| cache:   false
+#| eval:    true
 #| include: false
-opts_knit$set(root.dir = here::here()) # See lines 42-43
+opts_knit$set(root.dir = here::here()) # See lines 40-41
 ```
 
 ## Large-scale remote education
@@ -191,7 +185,6 @@ This way, they learn to use a statistical software and interpret the output.
 ```{r random-dataset-gen-function}
 #| code:              !expr readLines("R/simulated_data.R")[20:39]
 #| code-line-numbers: "0|1|3|5-6|10-15"
-#| eval:              false
 ```
 
 ::: notes
@@ -213,7 +206,6 @@ we simulate a univariate linear regression model.
 ```{r shiny-server}
 #| code:              !expr readLines("server.R")[53:101]
 #| code-line-numbers: "0|4,10-11,13|16-17"
-#| eval:              false
 ```
 
 ::: notes
@@ -231,7 +223,6 @@ Then, the Shiny app just parses the email parameter into a reactive value...
 ```{r email-hash-computing}
 #| code:              !expr readLines("R/hash_emails.R")[20:23]
 #| code-line-numbers: "3"
-#| eval:              false
 ```
 
 ::: notes
@@ -246,7 +237,6 @@ That way, we have a unique identifier for every student, which is anonymous and 
 
 ```{r shiny-server}
 #| code-line-numbers: "20-21|23-24"
-#| eval:              false
 ```
 
 ::: notes
