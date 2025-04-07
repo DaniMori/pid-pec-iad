@@ -431,4 +431,6 @@ This helped us prove that a little effort in development can provide high value 
 :::
 :::::::
 
-<center>Further questions welcome: [dvmorillo\@psi.uned.es](mailto:dvmorillo@psi.uned.es){.email}</center>
+<center>Further questions welcome!
+[dvmorillo\@psi.uned.es](mailto:dvmorillo@psi.uned.es){.email}</center>
+
