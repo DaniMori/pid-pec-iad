@@ -385,7 +385,7 @@ This helped us prove that a little effort in development can provide high value 
 ::: {.column width="33%"}
 <center>
 
-![[Mª Pilar Pozo](https://www.uned.es/universidad/docentes/en/psicologia/maria-del-pilar-pozo-cabanillas.html) (Associate Professor)<br/>Course coordinator](../www/PPC.jpg){height="175px" width="175px"}
+![[Mª Pilar Pozo](https://www.uned.es/universidad/docentes/en/psicologia/maria-del-pilar-pozo-cabanillas.html) (Associate Professor)<br/>Course coordinator](../www/PPC.jpg){height="150px" width="150px"}
 
 </center>
 :::
@@ -393,7 +393,7 @@ This helped us prove that a little effort in development can provide high value 
 ::: {.column width="33%"}
 <center>
 
-![[Belén Fernández](https://www.uned.es/universidad/docentes/en/psicologia/belen-fernandez-castilla.html)<br/>(Associate Professor)](../www/BFC.jpg){height="175px" width="175px"}
+![[Belén Fernández](https://www.uned.es/universidad/docentes/en/psicologia/belen-fernandez-castilla.html)<br/>(Associate Professor)](../www/BFC.jpg){height="150px" width="150px"}
 
 </center>
 :::
@@ -401,7 +401,7 @@ This helped us prove that a little effort in development can provide high value 
 ::: {.column width="33%"}
 <center>
 
-![[José Ángel Martínez](https://www.uned.es/universidad/docentes/en/psicologia/jose-angel-martinez-huertas.html) (Associate Prof.)<br/> Project coordinator](../www/JMH.jpg){height="175px" width="175px"}
+![[José Ángel Martínez](https://www.uned.es/universidad/docentes/en/psicologia/jose-angel-martinez-huertas.html) (Associate Prof.)<br/> Project coordinator](../www/JMH.jpg){height="150px" width="150px"}
 
 </center>
 :::
@@ -414,7 +414,7 @@ This helped us prove that a little effort in development can provide high value 
 ::: {.column width="40%"}
 <center>
 
-![[Celia Serrano](https://www.uned.es/universidad/docentes/en/psicologia/celia-serrano-montilla.html) (Assistant Professor)](../www/CSM.jpg){height="175px" width="175px"}
+![[Celia Serrano](https://www.uned.es/universidad/docentes/en/psicologia/celia-serrano-montilla.html) (Assistant Professor)](../www/CSM.jpg){height="150px" width="150px"}
 
 </center>
 :::
@@ -422,7 +422,7 @@ This helped us prove that a little effort in development can provide high value 
 ::: {.column width="40%"}
 <center>
 
-![[Daniel Morillo](https://www.uned.es/universidad/docentes/en/psicologia/daniel-vicente-morillo-cuadrado.html) (Assistant Professor)](../www/DMC.jpg){height="175px" width="175px"}
+![[Daniel Morillo](https://www.uned.es/universidad/docentes/en/psicologia/daniel-vicente-morillo-cuadrado.html) (Assistant Professor)](../www/DMC.jpg){height="150px" width="150px"}
 
 </center>
 :::
@@ -430,3 +430,5 @@ This helped us prove that a little effort in development can provide high value 
 ::: {.column width="10%"}
 :::
 :::::::
+
+<center>Further questions welcome: [dvmorillo\@psi.uned.es](mailto:dvmorillo@psi.uned.es){.email}</center>
