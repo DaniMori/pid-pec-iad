@@ -294,7 +294,17 @@ But the app has a timeout set to "click" the download link automatically, althou
 </center>
 
 ::: notes
-Then we have a questionnaire in the OpenLMS course, where the students can fill in their answers to the activity, and also give some feedback about their satisfaction.
+Then we have a questionnaire in the OpenLMS course, where the students can fill in their answers to the activity, after fitting the univariate regression model in Jamovi:
+
+-   Intercept
+
+-   Slope
+
+-   Relationship about the variables
+
+-   Interpretation about this relationship
+
+They can also give some feedback about their satisfaction.
 :::
 
 ## Implementation
