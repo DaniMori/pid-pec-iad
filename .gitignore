@@ -27,6 +27,7 @@
 *.docx
 *.html
 *.pdf
+!www/title-slide.html
 
 # Directories and links
 .Rproj.user
