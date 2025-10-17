@@ -148,7 +148,7 @@ logic.
 
 Before trying to run it, the Google Spreadsheets connection must be set up.
 Follow the instructions in document ["Google Spreadsheets connection
-instructions"](doc/gs.instructions.qmd) to do this.
+instructions"](doc/gs_instructions.qmd) to do this.
 
 ## Running the app
 
