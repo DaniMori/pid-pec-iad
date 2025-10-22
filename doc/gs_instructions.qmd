@@ -280,14 +280,14 @@ VAR_NAMES <- c("timestamp", "full_name", "valid")
     everything up until the last "slash" ("/") character. In this example:
 
 ```{r gs-url}
-# TODO: Change line 276 to use a different Google Spreadsheets file created
+# TODO: Change line 286 to use a different Google Spreadsheets file created
 #       following these instructions, if necessary.
 GS_URL <-
   "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
 ```
 
-(Change line 86 to use a different file created following these instructions, if
-necessary.)
+(Change line 286 to use a different file created following these instructions,
+if necessary.)
 
 6.  (OPTIONALLY) In [the Google Drive
     view](https://drive.google.com/drive/u/0/my-drive), find the spreadsheet
