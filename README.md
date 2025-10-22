@@ -31,33 +31,33 @@ license](https://creativecommons.org/licenses/by/4.0/).
 Start by installing the following software components:
 
 - [R version
-  4.4.2](https://cran.rstudio.com/bin/windows/base/old/4.4.2/): In
+  4.4.1](https://cran.rstudio.com/bin/windows/base/old/4.4.1/): In
   Windows, using the [binary
-  installer](https://cran.rstudio.com/bin/windows/base/old/4.4.2/R-4.4.2-win.exe)
+  installer](https://cran.rstudio.com/bin/windows/base/old/4.4.1/R-4.4.1-win.exe)
   is recommended.
 
 <!-- -->
 
 - [Rstudio Desktop](https://posit.co/download/rstudio-desktop/):
   Although not strictly necessary, it is recommended to install the
-  Rstudio IDE; for strict reproducibility, use build [2024.12.0+467 for
+  Rstudio IDE; for strict reproducibility, use build [2025.09.1+401 for
   Windows
-  10/11](https://download1.rstudio.org/electron/windows/RStudio-2024.12.0-467.exe).
+  10/11](https://download1.rstudio.org/electron/windows/RStudio-2025.09.1-401.exe).
 
 <!-- -->
 
 - [Quarto publishing system](https://quarto.org/): An additional
   component used by Rstudio to generate and publish literate computing
-  outputs. For strict reproducibility please use build 1.5.57; On
+  outputs. For strict reproducibility please use build 1.7.32; On
   Windows, use [the 64-bit
-  installer](https://github.com/quarto-dev/quarto-cli/releases/download/v1.5.57/quarto-1.5.57-win.msi).
+  installer](https://github.com/quarto-dev/quarto-cli/releases/download/v1.7.32/quarto-1.7.32-win.msi).
 
 <!-- -->
 
 - [Git client](https://git-scm.com/download): Install the Git client in
   order to be able to clone locally the project repository. On Windows,
   use [the 64-bit Windows
-  installer](https://github.com/git-for-windows/git/releases/download/v2.48.1.windows.1/Git-2.48.1-64-bit.exe).
+  installer](https://github.com/git-for-windows/git/releases/download/v2.51.0.windows.1/Git-2.51.0-64-bit.exe).
 
 ## Installing the project locally
 
@@ -113,26 +113,31 @@ renv::restore()
 
 # Usage
 
-The main files of this repository are the two files that make up the
-Shiny app, [“ui.R”](ui.R) for the interface, and [“server.R”](server.R)
-for the server logic.
+The main purpose of this repository is to create a Shiny app that
+generates the personalized synthetic dataset for each student enrolled
+in the course. In order to do this, we must configure first the Shiny
+app; then we can run it locally to test its functionality, and finally
+deploy it to [shinyapps.io](https://www.shinyapps.io/) so that students
+can access it.
 
 ## Configuration
 
 Before trying to run it, the Google Spreadsheets connection must be set
 up. Follow the instructions in document [“Google Spreadsheets connection
-instructions”](doc/gs.instructions.qmd) to do this.
+instructions”](doc/gs_instructions.qmd) to do this.
 
 ## Running the app
 
-The Shiny app can be run locally in Rstudio from any of these two files;
-when they are open in the text editor, the “Source” button that appears
-in the upper toolbar for scripts and computable documents turns into a
-“Run App” button. Clicking on this button starts the app and opens it in
-the viewer pane or a new window. To make sure the complete functionality
-of the app is working, it is better to run it in a new window (click on
-the right-side down arrow and select “Run in Window”, then click on “Run
-App”).
+The Shiny app can be run locally in Rstudio from any of the two files
+that make up the Shiny app: [“ui.R”](ui.R) for the interface, and
+[“server.R”](server.R) for the server logic. When any of the two is
+active in the text editor, the “Source” button that appears in the upper
+toolbar for scripts and computable documents turns into a “Run App”
+button. To make sure the complete functionality of the app is working,
+it is better to run it in a new window. Instead of just clicking on this
+button, click on the right-side down arrow and make sure the options
+“Run in Window”, instead of “Run in Vewer Pane”, is selected; then click
+on “Run App”.
 
 ## Deploying the app to [shinyapps.io](https://www.shinyapps.io/)
 
