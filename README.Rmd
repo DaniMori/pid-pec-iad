@@ -140,9 +140,11 @@ renv::restore()
 
 # Usage
 
-The main files of this repository are the two files that make up the Shiny app,
-["ui.R"](ui.R) for the interface, and ["server.R"](server.R) for the server
-logic.
+The main purpose of this repository is to create a Shiny app that generates the
+personalized synthetic dataset for each student enrolled in the course.
+In order to do this, we must configure first the Shiny app; then we can run it
+locally to test its functionality, and finally deploy it to
+[shinyapps.io](https://www.shinyapps.io/) so that students can access it.
 
 ## Configuration
 
@@ -152,13 +154,15 @@ instructions"](doc/gs_instructions.qmd) to do this.
 
 ## Running the app
 
-The Shiny app can be run locally in Rstudio from any of these two files;
-when they are open in the text editor, the "Source" button that appears in the
-upper toolbar for scripts and computable documents turns into a "Run App"
-button. Clicking on this button starts the app and opens it in the viewer pane
-or a new window. To make sure the complete functionality of the app is working,
-it is better to run it in a new window (click on the right-side down arrow and
-select "Run in Window", then click on "Run App").
+The Shiny app can be run locally in Rstudio from any of the two files that make
+up the Shiny app: ["ui.R"](ui.R) for the interface, and ["server.R"](server.R)
+for the server logic. When any of the two is active in the text editor, the
+"Source" button that appears in the upper toolbar for scripts and computable
+documents turns into a "Run App" button. Clicking on this button starts the app
+and opens it in the viewer pane or a new window. To make sure the complete
+functionality of the app is working, it is better to run it in a new window
+(click on the right-side down arrow and select "Run in Window", then click on
+"Run App").
 
 ## Deploying the app to [shinyapps.io](https://www.shinyapps.io/)
 
