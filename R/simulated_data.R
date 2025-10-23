@@ -14,6 +14,10 @@
 
 # Simulated data objects:
 
+## Response configuration data:
+N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
+REL_LEVELS <- -1:1 # Levels for the "relationship" item response
+
 ## Variable names:
 SIM_VARIABLES <- c("predictor",         "criterion")
 SIM_VAR_NAMES <- c("autonomia_laboral", "satisfaccion_laboral") |>
@@ -29,17 +33,21 @@ SAMPLE_SIZE       <- 50:200 # Uniformly random sample size of 50-200 cases
 PREDICTOR_SCORES  <-  0: 10 # Possible scores in the predictor variable
 CRITERION_SCORES  <-  1:  5 # Possible scores in the criterion variable
 
-#### Parameter table:
 
-##### Headers:
+# Response output table:
+
+## Headers:
 ITEM_NUM_LABEL <- "Nº"
 ITEM_LABEL     <- "Pregunta"
 RESPONSE_LABEL <- "Respuesta"
 
-##### Item labels:
+## Item labels:
 INTERCEPT_LABEL    <- "Intersección"
 SLOPE_LABEL        <- "Pendiente"
 RELATIONSHIP_LABEL <- "Relación"
+
+## Relationship item values:
+RELATIONSHIP_LABELS <- c("Inversa", "No tienen relación", "Directa")
 
 
 ## ---- FUNCTIONS: -------------------------------------------------------------

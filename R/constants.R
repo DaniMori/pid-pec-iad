@@ -62,14 +62,3 @@ RESPONSE_TABLE_ID <- "responses"
 
 #### Static components:
 FEEDBACK_APP_TITLE  <- "Respuestas de la actividad optativa con Jamovi"
-
-#### Parameter table:
-
-##### Relationship item values:
-RELATIONSHIP_LABELS <- c("Inversa", "No tienen relación", "Directa")
-
-# Simulated data objects:
-
-## Response configuration data:
-N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
-REL_LEVELS <- -1:1 # Levels for the "relationship" item response
