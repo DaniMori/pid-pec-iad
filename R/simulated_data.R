@@ -10,10 +10,37 @@
 #
 # ==============================================================================
 
+## ---- CONSTANTS: -------------------------------------------------------------
 
-## ---- SOURCES: ---------------------------------------------------------------
+# Simulated data objects:
 
-source("R/constants.R", encoding = 'UTF-8')
+## Variable names:
+SIM_VARIABLES <- c("predictor",         "criterion")
+SIM_VAR_NAMES <- c("autonomia_laboral", "satisfaccion_laboral") |>
+  setNames(SIM_VARIABLES)
+
+## Model parameters:
+INTERCEPT_VAR_NAME    <- "intercept"
+SLOPE_VAR_NAME        <- "slope"
+RELATIONSHIP_VAR_NAME <- "relationship"
+
+## Variable data:
+SAMPLE_SIZE       <- 50:200 # Uniformly random sample size of 50-200 cases
+PREDICTOR_SCORES  <-  0: 10 # Possible scores in the predictor variable
+CRITERION_SCORES  <-  1:  5 # Possible scores in the criterion variable
+
+#### Parameter table:
+
+##### Headers:
+ITEM_NUM_LABEL <- "Nº"
+ITEM_LABEL     <- "Pregunta"
+RESPONSE_LABEL <- "Respuesta"
+
+##### Item labels:
+INTERCEPT_LABEL    <- "Intersección"
+SLOPE_LABEL        <- "Pendiente"
+RELATIONSHIP_LABEL <- "Relación"
+
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
