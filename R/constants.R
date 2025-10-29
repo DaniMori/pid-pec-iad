@@ -31,7 +31,7 @@ CLOSE_WINDOW_MSG    <- paste(
   "(Cierra esta ventana cuando acabe la descarga",
   "para volver al curso virtual y continuar con la actividad)"
 )
-DATASET_FILENAME    <- "regresion_lineal.csv" # Name of downloaded dataset
+DATASET_FILENAME    <- "datos_IAD.csv" # Name of downloaded dataset
 
 ## Server logic objects:
 
