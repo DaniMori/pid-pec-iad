@@ -1,8 +1,8 @@
 # ==============================================================================
 #
 # FILE NAME:   simulated_data.R
-# DESCRIPTION: Functionality for creating and analyzing a simulated dataset for
-#              the student's personal exercise
+# DESCRIPTION: Functionality for creating a simulated dataset for the student's
+#              personal exercise
 #
 # AUTHOR:      Daniel Morillo
 #
@@ -11,7 +11,6 @@
 # ==============================================================================
 
 
-## ---- SOURCES: ---------------------------------------------------------------
 ## ---- CONSTANTS: -------------------------------------------------------------
 
 # Simulated data objects:
@@ -32,7 +31,6 @@ PREDICTOR_SCORES  <-   0: 10 # Possible scores in the predictor variable
 CRITERION_SCORES  <-   1:  5 # Possible scores in the criterion variable
 
 ## Response configuration data:
-N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
 REL_LEVELS <- -1:1 # Levels for the "relationship" item response
 
 
@@ -57,75 +55,4 @@ simulate_data <- function(seed) {
       dplyr::recode(!!!CRITERION_SCORES |> setNames(1:n_crit_vals))
   ) |>
     setNames(SIM_VAR_NAMES)
-}
-
-get_model_params <- function(data) {
-
-  ## Constant objects: ----
-  INTERCEPT_TERM     <- "(Intercept)"
-
-  ## Main: ----
-
-  predictor_name <- SIM_VAR_NAMES['predictor']
-  criterion_name <- SIM_VAR_NAMES['criterion']
-  response_terms <- c(INTERCEPT_TERM, predictor_name)
-
-  # Fit model and extract coefficients:
-  model        <- glue::glue("{criterion_name} ~ {predictor_name}") # Formula
-  fitted_model <- data         |> lm(formula = model)
-  coefficients <- fitted_model |> broom::tidy()
-
-  # Get exercise responses from the model results:
-  responses <- coefficients                 |>
-    dplyr::filter(term %in% response_terms) |>
-    dplyr::mutate(
-      estimate = estimate |> round(N_DECIMALS),
-      term     = term     |> dplyr::case_match(
-        INTERCEPT_TERM ~ INTERCEPT_VAR_NAME,
-        SIM_VAR_NAMES['predictor'] ~ SLOPE_VAR_NAME
-      )
-    )                                       |>
-    dplyr::select(term, estimate)           |>
-    tidyr::pivot_wider(names_from = term, values_from = estimate)
-
-  responses |>
-    dplyr::mutate(relationship = slope |> sign() |> factor(levels = REL_LEVELS))
-}
-
-get_user_responses <- function(hash) {
-
-  user_sim_data <- simulate_data(hash)
-
-  user_sim_data |> get_model_params()
-}
-
-format_responses <- function(responses) {
-
-  relationship_levels <- REL_LEVELS |>
-    as.character() |>
-    setNames(RELATIONSHIP_LABELS)
-
-  params_varnames    <- c(
-    INTERCEPT_VAR_NAME,
-    SLOPE_VAR_NAME,
-    RELATIONSHIP_VAR_NAME
-  )
-  params_labels      <- c(INTERCEPT_LABEL, SLOPE_LABEL, RELATIONSHIP_LABEL)
-  params_vars_labels <- params_varnames |>
-    setNames(params_labels) |>
-    tibble::enframe(name = ITEM_LABEL)
-
-  responses |>
-    dplyr::mutate(
-      relationship = relationship |>
-        forcats::fct_recode(!!!relationship_levels),
-      dplyr::across(dplyr::everything(), as.character)
-    ) |>
-    tidyr::pivot_longer(
-      cols      = dplyr::everything(),
-      values_to = RESPONSE_LABEL
-    ) |>
-    dplyr::full_join(params_vars_labels, by = c(name = "value")) |>
-    dplyr::select(dplyr::all_of(c(ITEM_LABEL, RESPONSE_LABEL))) |>
-    tibble::rownames_to_column(ITEM_NUM_LABEL)
 }

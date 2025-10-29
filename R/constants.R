@@ -62,20 +62,3 @@ RESPONSE_TABLE_ID <- "responses"
 
 #### Static components:
 FEEDBACK_APP_TITLE  <- "Respuestas de la actividad optativa con Jamovi"
-
-
-#### Parameter table:
-
-##### Headers:
-ITEM_NUM_LABEL <- "Nº"
-ITEM_LABEL     <- "Pregunta"
-RESPONSE_LABEL <- "Respuesta"
-
-##### Item labels:
-INTERCEPT_LABEL    <- "Intersección"
-SLOPE_LABEL        <- "Pendiente"
-RELATIONSHIP_LABEL <- "Relación"
-
-##### Relationship item values:
-RELATIONSHIP_LABELS <- c("Inversa", "No tienen relación", "Directa")
-
