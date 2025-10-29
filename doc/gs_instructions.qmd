@@ -67,7 +67,10 @@ this project.
 1.  Designate a project-specific cache directory to be used by {gargle}
 
 ```{r setup-cache-dir}
-CACHE_PATH <- ".secrets"
+CACHE_PATH <- ".secrets" # WARNING: The cache cannot be set with here::here()
+                         #          because then {gargle} would try to write the
+                         #          decrypted token (later on) to the absolute
+                         #          path (which doesn't exist on the server).
 options(gargle_oauth_cache = CACHE_PATH)
 ```
 
