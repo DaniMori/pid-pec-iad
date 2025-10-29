@@ -150,6 +150,32 @@ Before trying to run it, the Google Spreadsheets connection must be set up.
 Follow the instructions in document ["Google Spreadsheets connection
 instructions"](doc/gs_instructions.qmd) to do this.
 
+Once the connection is set up, a new Google Spreadsheets file needs to be
+created as the storage backend for the Shiny App. In order to do this, follow
+these instructions:
+
+1. Log in to Google Drive with the account "iad.uned.psi@gmail.com".
+
+2. Create a new Google Spreadsheets file (ideally inside the folder "PID-IAD"),
+   and give it a meaningful name (e.g. "pid-iad-data").
+
+3. Copy its file ID from the direction bar: This is the alphanumeric code
+   between "https://docs.google.com/spreadsheets/d/" and the last slash ("/").
+   DO NOT include any of the two slashes.
+  
+4. Open file "doc/ghseets_config_template.yml", and save it as
+   "doc/gsheets_config.yml".
+
+5. Paste the copied file ID into line 3 of "doc/gsheets_config.yml", between the
+   double quotes, and omitting the "caret" (<>) characters; e.g.: if the URL in
+   the direction bar is
+   `https://docs.google.com/spreadsheets/d/19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw/edit?gid=0#gid=0`,
+   then line 3 of "doc/gsheets_config.yml" must be
+   
+   `file_id: "19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw"`
+
+6. Save the changes to "doc/gsheets_config.yml".
+
 ## Running the app
 
 The Shiny app can be run locally in Rstudio from any of these two files;
