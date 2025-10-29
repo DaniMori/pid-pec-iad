@@ -57,7 +57,7 @@ Start by installing the following software components:
 - [Git client](https://git-scm.com/download): Install the Git client in
   order to be able to clone locally the project repository. On Windows,
   use [the 64-bit Windows
-  installer](https://github.com/git-for-windows/git/releases/download/v2.51.0.windows.1/Git-2.51.0-64-bit.exe).
+  installer](https://github.com/git-for-windows/git/releases/download/v2.51.2.windows.1/Git-2.51.2-64-bit.exe).
 
 ## Installing the project locally
 
@@ -136,8 +136,8 @@ toolbar for scripts and computable documents turns into a “Run App”
 button. To make sure the complete functionality of the app is working,
 it is better to run it in a new window. Instead of just clicking on this
 button, click on the right-side down arrow and make sure the options
-“Run in Window”, instead of “Run in Vewer Pane”, is selected; then click
-on “Run App”.
+“Run in Window”, instead of “Run in Viewer Pane”, is selected; then
+click on “Run App”.
 
 ## Deploying the app to [shinyapps.io](https://www.shinyapps.io/)
 
