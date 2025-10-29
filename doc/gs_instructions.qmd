@@ -274,16 +274,18 @@ For this minimal example, we will create an empty spreadsheet.
     everything up until the last "slash" ("/") character. In this example:
 
 ```{r gs-url}
-# TODO: Change line 286 to use a different Google Spreadsheets file created
-#       following these instructions, if necessary.
+# TODO: Change line 282 to use a different Google Spreadsheets file created
+#       following these instructions, e.g.:
+# GS_URL <-
+#   "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
 GS_URL <-
-  "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
+  "https://docs.google.com/spreadsheets/d/<file_id>/"
 ```
 
-(Change line 286 to use a different file created following these instructions,
+(Change line 282 to use a different file created following these instructions,
 if necessary.)
 
-6.  (OPTIONALLY) In [the Google Drive
+5.  (OPTIONALLY) In [the Google Drive
     view](https://drive.google.com/drive/u/0/my-drive), find the spreadsheet
     file and [share it](https://support.google.com/drive/answer/2494822) with
     other Google account(s) (e.g. collaborators), **granting them "Edit"
@@ -365,7 +367,8 @@ googlesheets4::sheet_append(gs_link, test_data)
     checking the last value (the only one, likely) of `timestamp`.
 
 4.  As the Google Spreadsheets file will not be used anymore (it was only for
-    testing), it can be safely deleted.
+    testing), it can be safely deleted once it has been checked that the
+    connection works.
 
 # Complete code for setting up a connection to a Google Spreadsheets file
 
