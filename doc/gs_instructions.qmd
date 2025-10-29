@@ -257,12 +257,7 @@ It is also recommended that, starting from cell A1, the spreadsheet file has the
 structure of the dataset we want to save in it. This can be done simply by
 typing in the variable names in the first row of the dataset.
 
-For this minimal example, we will create a spreadsheet with the following two
-variables:
-
-```{r dataset-vars}
-VAR_NAMES <- c("timestamp", "full_name", "valid")
-```
+For this minimal example, we will create an empty spreadsheet.
 
 ### Procedure
 
@@ -274,11 +269,7 @@ VAR_NAMES <- c("timestamp", "full_name", "valid")
 3.  In the field "Untitled spreadsheet" type in a name, e.g., "Data_test"
     (without the double quotes).
 
-4.  In cells A1 and A2, respectively, type in the variable names, i.e.,
-    `timestamp`, `full_name` and `valid`. (For better readability, this row can
-    be formatted as **boldface**.)
-
-5.  In the browser, press `CTRL + L` (in Windows) to go to the address bar and
+4.  In the browser, press `CTRL + L` (in Windows) to go to the address bar and
     then `CTRL + C` to copy the spreadsheet file URL, which should include
     everything up until the last "slash" ("/") character. In this example:
 
@@ -365,14 +356,13 @@ test_data <- data.frame(   # The timestamp value will indicate when this code
     lubridate::stamp("2024-12-01 06:00", orders = "%Y%Om%d%H%M")(),
   "John Doe",
   FALSE
-) |>
-  setNames(VAR_NAMES)
+)
 
 googlesheets4::sheet_append(gs_link, test_data)
 ```
 
 3.  Verify that the line has been written, navigating to `{r} GS_URL` and
-    checking the last value of `timestamp`.
+    checking the last value (the only one, likely) of `timestamp`.
 
 4.  As the Google Spreadsheets file will not be used anymore (it was only for
     testing), it can be safely deleted.
