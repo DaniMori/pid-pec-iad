@@ -13,7 +13,7 @@
 ## ---- CONSTANTS: -------------------------------------------------------------
 
 # File system objects:
-ASSETS_DIR <- here::here("www")
+DOCS_DIR <- here::here("doc")
 
 
 # Dataset generation app:
@@ -48,7 +48,7 @@ KEY_VAR_NAME     <- "PID_PEC_IAD_KEY"
 
 #### Storage file:
 CONFIG_FILENAME <- "gsheets_config.yml"
-CONFIG_FILEPATH <- here::here(ASSETS_DIR, CONFIG_FILENAME)
+CONFIG_FILEPATH <- here::here(DOCS_DIR, CONFIG_FILENAME)
 
 
 # Feedback app:
