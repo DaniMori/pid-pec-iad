@@ -216,6 +216,24 @@ select "Run in Window", then click on "Run App").
    default browser, navigating to the URL of the app (the one in the message
    above).
 
+7. Check that the app is running properly: The previous URL will not work
+   because the "email" GET parameter is missing from the URL, so to test it,
+   first go to the
+   [Applications dashboard in shinyapps.io](https://www.shinyapps.io/admin/#/applications/all)
+   and check that the app "pid-pec-iad" is listed with Status "Running".
+   
+8. If the app is running, test the app by browsing to its URL
+   (https://iad-psi-uned-es.shinyapps.io/pid-pec-iad), and then adding the
+   "email" GET parameter in the end, i.e.:
+   
+   https://iad-psi-uned-es.shinyapps.io/pid-pec-iad?email=johndoe@psi.uned.es`
+   
+   (It is highly recommended that you use your own email at the "@*.uned.es"
+   domain.) If the app works properly, a dataset should be downloaded
+   automatically and/or by clicking on the link to download it manually. It
+   should also be checked that the new entries (for "Access" and "Download") are
+   logged in the Google Spreadsheet file.
+
 # Repository structure
 
 The file structure of this repository is as follows:
