@@ -268,7 +268,7 @@ VAR_NAMES <- c("timestamp", "full_name", "valid")
 
 2.  Under "Create spreadsheet" click on "Blank spreadsheet".
 
-3.  In the field "Untitled spreadsheet" type in a name, e.g., "Shiny_app_data"
+3.  In the field "Untitled spreadsheet" type in a name, e.g., "Data_test"
     (without the double quotes).
 
 4.  In cells A1 and A2, respectively, type in the variable names, i.e.,
@@ -370,6 +370,9 @@ googlesheets4::sheet_append(gs_link, test_data)
 
 3.  Verify that the line has been written, navigating to `{r} GS_URL` and
     checking the last value of `timestamp`.
+
+4.  As the Google Spreadsheets file will not be used anymore (it was only for
+    testing), it can be safely deleted.
 
 # Complete code for setting up a connection to a Google Spreadsheets file
 
