@@ -16,8 +16,8 @@
 # Simulated data objects:
 
 ## Variable names:
-SIM_VARIABLES <- c("predictor",         "criterion")
-SIM_VAR_NAMES <- c("autonomia_laboral", "satisfaccion_laboral") |>
+SIM_VARIABLES <- c("predictor",            "criterion")
+SIM_VAR_NAMES <- c("Horas sueño promedio", "Satisfacción vital") |>
   setNames(SIM_VARIABLES)
 
 ## Model parameters:
@@ -26,12 +26,12 @@ SLOPE_VAR_NAME        <- "slope"
 RELATIONSHIP_VAR_NAME <- "relationship"
 
 ## Variable data:
-SAMPLE_SIZE       <- 300:500 # Uniformly random sample size of 300-600 cases
-PREDICTOR_SCORES  <-   0: 10 # Possible scores in the predictor variable
-CRITERION_SCORES  <-   1:  5 # Possible scores in the criterion variable
+SAMPLE_SIZE       <- 300:500      # Uniformly random sample size of 300-500
+PREDICTOR_SCORES  <-   4: 10 / 10 # Possible scores in the "predictor" variable
+CRITERION_SCORES  <-   1:  5      # Possible scores in the "criterion" variable
 
-## Response configuration data:
-REL_LEVELS <- -1:1 # Levels for the "relationship" item response
+## Modeling variables:
+REL_LEVS <- -1:1 # Levels for the "relationship" item response
 
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
@@ -40,7 +40,7 @@ simulate_data <- function(seed) {
 
   set.seed(seed)
 
-  slope       <- sample(-1:1, size = 1L) # Simulation regression coefficient
+  slope       <- sample(REL_LEVS, size = 1L) # Simulated regression coefficient
   sample_size <- sample(SAMPLE_SIZE, size = 1L) # Random sample size
   n_crit_vals <- length(CRITERION_SCORES) # Nº of values in the criterion scores
 
