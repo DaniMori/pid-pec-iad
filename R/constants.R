@@ -79,23 +79,3 @@ RELATIONSHIP_LABEL <- "Relación"
 ##### Relationship item values:
 RELATIONSHIP_LABELS <- c("Inversa", "No tienen relación", "Directa")
 
-# Simulated data objects:
-
-## Variable names:
-SIM_VARIABLES <- c("predictor",         "criterion")
-SIM_VAR_NAMES <- c("autonomia_laboral", "satisfaccion_laboral") |>
-  setNames(SIM_VARIABLES)
-
-## Model parameters:
-INTERCEPT_VAR_NAME    <- "intercept"
-SLOPE_VAR_NAME        <- "slope"
-RELATIONSHIP_VAR_NAME <- "relationship"
-
-## Variable data:
-SAMPLE_SIZE       <- 300:500 # Uniformly random sample size of 300-600 cases
-PREDICTOR_SCORES  <-   0: 10 # Possible scores in the predictor variable
-CRITERION_SCORES  <-   1:  5 # Possible scores in the criterion variable
-
-## Response configuration data:
-N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
-REL_LEVELS <- -1:1 # Levels for the "relationship" item response
