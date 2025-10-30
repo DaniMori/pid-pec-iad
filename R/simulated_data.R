@@ -27,7 +27,7 @@ RELATIONSHIP_VAR_NAME <- "relationship"
 
 ## Variable data:
 SAMPLE_SIZE       <- 300:500      # Uniformly random sample size of 300-500
-PREDICTOR_SCORES  <-   4: 10 / 10 # Possible scores in the "predictor" variable
+PREDICTOR_SCORES  <-  40:100 / 10 # Possible scores in the "predictor" variable
 CRITERION_SCORES  <-   1:  5      # Possible scores in the "criterion" variable
 
 ## Modeling variables:
