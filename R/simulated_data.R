@@ -31,7 +31,7 @@ PREDICTOR_SCORES  <-  40:100 / 10 # Possible scores in the "predictor" variable
 CRITERION_SCORES  <-   1:  5      # Possible scores in the "criterion" variable
 
 ## Modeling variables:
-REL_LEVS <- -1:1 # Levels for the "relationship" item response
+REL_LEVS <- c(-1L, 1L) # Levels for the "relationship" item response
 
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
