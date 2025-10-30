@@ -57,11 +57,11 @@ simulate_data <- function(seed) {
   # Random cut points for the criterion variable (to avoid a "flat" barplot)
   rel_cut_props <- runif(n_crit_vals, min = .2, max = 1) |> cumsum()
   cut_props     <- c(0, rel_cut_props / max(rel_cut_props)) # Normalize
-  cut_quantiles <- output |> pull(criterion) |> quantile(cut_props)
+  cut_quantiles <- output |> dplyr::pull(criterion) |> quantile(cut_props)
 
   # Recode the criterion variable into discrete values using the cut points:
   output |>
-    mutate(
+    dplyr::mutate(
       criterion = criterion |> cut(
         breaks         = cut_quantiles,
         labels         = CRITERION_SCORES,
