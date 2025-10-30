@@ -17,7 +17,7 @@
 
 ## Variable names:
 SIM_VARIABLES <- c("predictor",            "criterion")
-SIM_VAR_NAMES <- c("Horas sueño promedio", "Satisfacción vital") |>
+SIM_VAR_NAMES <- c("Horas sueno promedio", "Satisfaccion vital") |>
   setNames(SIM_VARIABLES)
 
 ## Model parameters:
