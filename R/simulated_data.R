@@ -44,15 +44,29 @@ simulate_data <- function(seed) {
   sample_size <- sample(SAMPLE_SIZE, size = 1L) # Random sample size
   n_crit_vals <- length(CRITERION_SCORES) # Nº of values in the criterion scores
 
-  tibble::tibble(
+  output <- tibble::tibble(
     predictor = sample(
       PREDICTOR_SCORES,
       size    = sample_size,
       replace = TRUE
     ),
-    criterion = (slope * predictor + rnorm(sample_size)) |>
-      dplyr::ntile(n_crit_vals)                          |>
-      dplyr::recode(!!!CRITERION_SCORES |> setNames(1:n_crit_vals))
-  ) |>
+    # Preliminary "continuous version" of the criterion variable
+    criterion = slope * predictor + rnorm(sample_size)
+  )
+
+  # Random cut points for the criterion variable (to avoid a "flat" barplot)
+  rel_cut_props <- runif(n_crit_vals, min = .2, max = 1) |> cumsum()
+  cut_props     <- c(0, rel_cut_props / max(rel_cut_props)) # Normalize
+  cut_quantiles <- output |> pull(criterion) |> quantile(cut_props)
+
+  # Recode the criterion variable into discrete values using the cut points:
+  output |>
+    mutate(
+      criterion = criterion |> cut(
+        breaks         = cut_quantiles,
+        labels         = CRITERION_SCORES,
+        include.lowest = TRUE
+      )
+    ) |>
     setNames(SIM_VAR_NAMES)
 }
