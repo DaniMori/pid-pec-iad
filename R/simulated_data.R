@@ -21,7 +21,7 @@ simulate_data <- function(seed) {
 
   set.seed(seed)
 
-  slope       <- sample(-1:1, size = 1L) # Simulation regression coefficient
+  slope       <- sample(-.5:1, size = 1L) # Simulation regression coefficient
   sample_size <- sample(SAMPLE_SIZE, size = 1L) # Random sample size
   n_crit_vals <- length(CRITERION_SCORES) # Nº of values in the criterion scores
 
