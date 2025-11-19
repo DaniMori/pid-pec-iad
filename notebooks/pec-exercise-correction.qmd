@@ -101,11 +101,11 @@ Using two source datasets, it computes:
 
 -   The correct answers to the exercise for each student
 
--   Whether they have answered correctly to the exercise
+-   Whether they have answered correctly to each item of the exercise
 
 -   Whether each student fulfills the assessment criteria
 
--   Which students must receive the course compensation for their participation
+-   The grading of each student in the activity
 
 The source datasets are:
 
@@ -224,12 +224,13 @@ data_student_responses <- data_responses_filepath |>
     date = date |>
       parse_date_time(orders = "%d%B%Y %H%M") |>
       force_tz(tzone = LOCAL_TIMEZONE),
-    relationship = relationship |> factor(
-      levels = RELATIONSHIP_VALUES, labels = -1:1
-    ),
-    across(starts_with("help"), ~ordered(., levels = HELP_VALUES)),
-    across(usefulness_videos,   ~ordered(., levels = USEFULNESS_VALUES)),
-    across(instructions,        ~ordered(., levels = CLARITY_VALUES)),
+    ## TODO: Format responses
+    # relationship = relationship |> factor(
+    #   levels = RELATIONSHIP_VALUES, labels = -1:1
+    # ),
+    # across(starts_with("help"), ~ordered(., levels = HELP_VALUES)),
+    # across(usefulness_videos,   ~ordered(., levels = USEFULNESS_VALUES)),
+    # across(instructions,        ~ordered(., levels = CLARITY_VALUES)),
     nps = nps |> str_extract("^\\d*") |> as.integer()
   )
 
