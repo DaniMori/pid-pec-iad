@@ -1,0 +1,436 @@
+---
+title:     |
+  Generating personalized student synthetic datasets for large-scale educational assessment
+subtitle:  |
+  ShinyConf 2025
+author:    |
+  <table>
+    <tr>
+      <td><small>Daniel Morillo, Ph.D.</small></td>
+    </tr>
+    <tr>
+      <td>
+        <center>
+          [![](../www/github-logo.png){height="50"}](https://github.com/DaniMori/)&emsp;
+          [![](../www/orcid.png){height="50"}](https://orcid.org/0000-0003-3021-3878)
+        </center>
+      </td>
+    </tr>
+  </table>
+institute: |
+  <table>
+    <tr>
+      <td>
+        <center>
+          [![](../www/logos_fac_psicologia.svg){height="100"}](https://www.uned.es/universidad/facultades/psicologia.html)
+        </center>
+      </td>
+    </tr>
+  </table>
+date:                "2025-04-11"
+date-meta:           "2025-03-14"
+date-format:         long
+editor:
+  mode:              source
+  markdown: 
+    wrap:            sentence
+    canonical:       true
+embed-resources:     true
+knitr:
+  # opts_knit: # Does not work, see line 87
+  #   root_dir:  here::here()
+  opts_chunk:
+    cache:           false
+    echo:            true
+    eval:            false
+lang:                en
+preview-links:       true
+self-contained-math: true
+format:
+  revealjs:
+    auto-stretch:            true
+    embed-resources:         true
+    fig-cap-location:        bottom
+    fig-asp:                 1
+    fig-width:               6
+    incremental:             false
+    keep-md:                 false
+    link-external-newwindow: true
+    margin:                  0
+    self-contained:          true
+    slide-number:            false
+    theme:                   ../www/extra-styles.scss
+    transition:              none
+    view-distance:           3
+    template-partials:
+      - ../www/title-slide.html
+editor_options: 
+  chunk_output_type: console
+---
+
+# Problem
+
+```{r libraries}
+#| cache:   false
+#| eval:    true
+#| include: false
+
+library(knitr)
+library(extrafont)
+```
+
+```{r setup}
+#| cache:   false
+#| eval:    true
+#| include: false
+opts_knit$set(root.dir = here::here()) # See lines 40-41
+```
+
+## Large-scale remote education
+
+<center>
+
+![Students enrolled at UNED](../www/Stats_total_students.png)
+
+</center>
+
+::: aside
+([source: UNED Statistics portal](https://app.uned.es/evacaldos))
+:::
+
+::: notes
+UNED: Remote education university in Spain, since 1972
+
+Currently 177 thousand students signed up for higher education studies
+
+Out of them 71,8% in 4-year Bachelor's degrees, i.e. 127 thousand
+
+And out of them, 35 thousand are enrolled in the degree in Psychology
+:::
+
+## Large-scale remote education
+
+<center>
+
+![Students enrolled in Data Analysis 101 course](../www/IAD_course_students_highlighted.png){height="420"}
+
+</center>
+
+::: aside
+([source: UNED OpenLMS course](https://agora.uned.es))
+:::
+
+::: notes
+In our introductory data analysis course, we have 7400 students enrolled
+
+Continuous assessment activities are a challenge in this context
+:::
+
+## Large-scale remote education
+
+<br>
+
+#### Challenges: continuous assessment
+
+::: incremental
+-   Response leakage
+
+-   Fraudulent responding
+
+-   Failure of educational objectives
+:::
+
+::: notes
+Continuous assessment activities are a challenge in this context.
+
+If we want to create an assessment activity, there's the risk of response leakage (e.g. students who post on youtube all the solutions)
+
+Therefore, many other students simply copy the responses from the leaked ones
+
+This implies a failure to assess the learning and ultimately to attain the educational objectives of the task
+:::
+
+# Solution
+
+## Personalized assessment activity
+
+<br>
+
+::: incremental
+-   Same task
+
+-   For each student: different data + responses
+
+-   Synthetic, "random" (unique) dataset
+
+-   Pilot study: Univariate linear regression in Jamovi
+:::
+
+::: notes
+Our proposed solution is to implement a task, which is the same for every student.
+
+However, each of them has a unique synthetic dataset.
+
+This dataset is created by means of a pseudo-random simulation, with a known unique initializing seed.
+
+In our pilot study, we ask them to run a very simple univariate linear regression in Jamovi, which is an open-source statistical software with a graphical user interface, similar to SPSS.
+
+This way, they learn to use a statistical software and interpret the output.
+:::
+
+## Implementation {.nonincremental}
+
+1.  Random dataset generator:
+
+```{r random-dataset-gen-function}
+#| code:              !expr readLines("R/simulated_data.R")[20:39]
+#| code-line-numbers: "0|1|3|5-6|10-15"
+```
+
+::: notes
+We have a function that takes an integer nº as argument and uses it to initialize the seed of the pseudorandom nº generator.
+
+\[NEXT\]
+
+Then, we sample a regression coefficient and a sample size, and with these values...
+
+\[NEXT\]
+
+we simulate a univariate linear regression model.
+:::
+
+## Implementation
+
+2.  Shiny app:
+
+```{r shiny-server}
+#| code:              !expr readLines("server.R")[53:101]
+#| code-line-numbers: "0|4,10-11,13|16-17"
+```
+
+::: notes
+Then, the Shiny app just parses the email parameter into a reactive value...
+
+\[NEXT\]
+
+...and computes an integer hash from it.
+:::
+
+## Implementation
+
+2.  Shiny app:
+
+```{r email-hash-computing}
+#| code:              !expr readLines("R/hash_emails.R")[20:23]
+#| code-line-numbers: "3"
+```
+
+::: notes
+This is just a simple hashing function that outputs an integer version of the hash.
+
+That way, we have a unique identifier for every student, which is anonymous and non-reversible,...
+:::
+
+## Implementation
+
+2.  Shiny app:
+
+```{r shiny-server}
+#| code-line-numbers: "20-21|23-24"
+```
+
+::: notes
+...which we can use to record the students who have accessed the app and downloaded their dataset.
+We do this in a Google Spreadsheet that is connected to the app.
+
+\[NEXT\]
+
+More importantly, we call the dataset generating function using this integer hash as the random seed argument.
+:::
+
+## Implementation {.nonincremental}
+
+3.  Parameterized link (OpenLMS):
+
+<center>
+
+![Parameterized Shiny app URL configuration](../www/IAD_course_setup_link.png){height="400"}
+
+</center>
+
+::: notes
+Then, we set up a parameterized link to a Shiny app, with a GET parameter which we fill in with the student email.
+:::
+
+## Implementation
+
+<br>
+
+1.  Random dataset generator
+
+2.  Shiny app:
+
+3.  Parameterized link (OpenLMS):
+
+    [https://iad-psi-uned.shinyapps.io/pid-pec-iad?email=johndoe%40alumno.uned.es](https://danimori.shinyapps.io/pid-pec-iad/?email=johndoe%40alumno.uned.es)
+
+::: notes
+So here's what happens when the student uses the link to the app:
+
+It has basically a title, and a download link.
+But the app has a timeout set to "click" the download link automatically, although they can click on it if it happens to fail.
+
+(Then there is an instruction to close the tab when the download is finished).
+:::
+
+## Implementation
+
+4.  Questionnaire:
+
+<center>
+
+![Questionnaire for completing the activity](../www/IAD_course_responses.png){height="400"}
+
+</center>
+
+::: notes
+Then we have a questionnaire in the OpenLMS course, where the students can fill in their answers to the activity, after fitting the univariate regression model in Jamovi:
+
+-   Intercept
+
+-   Slope
+
+-   Relationship about the variables
+
+-   Interpretation about this relationship
+
+They can also give some feedback about their satisfaction.
+:::
+
+## Implementation
+
+1.  Random dataset generator
+
+2.  Parameterized link (OpenLMS)
+
+3.  Shiny app
+
+4.  Questionnaire
+
+5.  Feedback Shiny app:
+
+    [https://iad-psi-uned.shinyapps.io/pid-iad-feedback?email=janedoe%40alumno.uned.es](https://danimori.shinyapps.io/pid-iad-feedback?email=dvmorillo%40psi.uned.es)
+
+::: notes
+And the last component is a very similar Shiny app, that parses the email and computes the correct responses from their unique dataset, so they can compare their responses with the actual solution to the exercise.
+:::
+
+## Conclusions
+
+<br>
+
+<br>
+
+-   Participation: 471 respondents (= 6,33%)
+
+<br>
+
+::: incremental
+-   Design: Simple but efficient
+:::
+
+::: notes
+The activity was voluntary (pilot study), so participation was not compulsory.
+We had little participation, only a little more than a 6%.
+However, students were motivated, and even asked us to re-open the activity when it was already finished (although only for course compensation, but nevertheless they were at least interested)
+
+Also, it allowed us to test the project and the performance of the Shiny app, which did not give raise to any incidence or issue.
+
+\[NEXT\]
+
+The app design (actually both of them) was extremely simple, as can be seen.
+But nevertheless, with little coding and complexity it was able to support an actual need in an uncovered niche.
+This helped us prove that a little effort in development can provide high value in the proper conditions (which includes of course making use of Shinyapps.io)
+:::
+
+## Future directions
+
+<br>
+
+#### Re: Activity
+
+::: incremental
+-   Improve feedback
+
+-   Compulsory
+
+-   Automatic grading
+:::
+
+::: fragment
+#### Re: Shiny app
+:::
+
+::: incremental
+-   Branding (with `_brand.yml`)
+
+-   Modular design
+:::
+
+## Thanks for your attendance! {.smaller}
+
+<br>
+
+:::::: columns
+::: {.column width="33%"}
+<center>
+
+![[Mª Pilar Pozo](https://www.uned.es/universidad/docentes/en/psicologia/maria-del-pilar-pozo-cabanillas.html) (Associate Professor)<br/>Course coordinator](../www/PPC.jpg){height="150px" width="150px"}
+
+</center>
+:::
+
+::: {.column width="33%"}
+<center>
+
+![[Belén Fernández](https://www.uned.es/universidad/docentes/en/psicologia/belen-fernandez-castilla.html)<br/>(Associate Professor)](../www/BFC.jpg){height="150px" width="150px"}
+
+</center>
+:::
+
+::: {.column width="33%"}
+<center>
+
+![[José Ángel Martínez](https://www.uned.es/universidad/docentes/en/psicologia/jose-angel-martinez-huertas.html) (Associate Prof.)<br/> Project coordinator](../www/JMH.jpg){height="150px" width="150px"}
+
+</center>
+:::
+::::::
+
+::::::: columns
+::: {.column width="10%"}
+:::
+
+::: {.column width="40%"}
+<center>
+
+![[Celia Serrano](https://www.uned.es/universidad/docentes/en/psicologia/celia-serrano-montilla.html) (Assistant Professor)](../www/CSM.jpg){height="150px" width="150px"}
+
+</center>
+:::
+
+::: {.column width="40%"}
+<center>
+
+![[Daniel Morillo](https://www.uned.es/universidad/docentes/en/psicologia/daniel-vicente-morillo-cuadrado.html) (Assistant Professor)](../www/DMC.jpg){height="150px" width="150px"}
+
+</center>
+:::
+
+::: {.column width="10%"}
+:::
+:::::::
+
+<center>Further questions welcome!
+[dvmorillo\@psi.uned.es](mailto:dvmorillo@psi.uned.es){.email}</center>
+

@@ -42,8 +42,6 @@ get_model_params <- function(data) {
 
   ## Constant objects: ----
   INTERCEPT_TERM     <- "(Intercept)"
-  INTERCEPT_VAR_NAME <- "intercept"
-  SLOPE_VAR_NAME     <- "slope"
 
   ## Main: ----
 
@@ -70,7 +68,7 @@ get_model_params <- function(data) {
     tidyr::pivot_wider(names_from = term, values_from = estimate)
 
   responses |>
-    dplyr::mutate(relationship = slope |> sign() |> factor(levels = -1:1))
+    dplyr::mutate(relationship = slope |> sign() |> factor(levels = REL_LEVELS))
 }
 
 get_user_responses <- function(hash) {
@@ -78,4 +76,35 @@ get_user_responses <- function(hash) {
   user_sim_data <- simulate_data(hash)
 
   user_sim_data |> get_model_params()
+}
+
+format_responses <- function(responses) {
+
+  relationship_levels <- REL_LEVELS |>
+    as.character() |>
+    setNames(RELATIONSHIP_LABELS)
+
+  params_varnames    <- c(
+    INTERCEPT_VAR_NAME,
+    SLOPE_VAR_NAME,
+    RELATIONSHIP_VAR_NAME
+  )
+  params_labels      <- c(INTERCEPT_LABEL, SLOPE_LABEL, RELATIONSHIP_LABEL)
+  params_vars_labels <- params_varnames |>
+    setNames(params_labels) |>
+    tibble::enframe(name = ITEM_LABEL)
+
+  responses |>
+    dplyr::mutate(
+      relationship = relationship |>
+        forcats::fct_recode(!!!relationship_levels),
+      dplyr::across(dplyr::everything(), as.character)
+    ) |>
+    tidyr::pivot_longer(
+      cols      = dplyr::everything(),
+      values_to = RESPONSE_LABEL
+    ) |>
+    dplyr::full_join(params_vars_labels, by = c(name = "value")) |>
+    dplyr::select(dplyr::all_of(c(ITEM_LABEL, RESPONSE_LABEL))) |>
+    tibble::rownames_to_column(ITEM_NUM_LABEL)
 }

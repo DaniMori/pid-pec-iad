@@ -1,35 +1,28 @@
 
 # Repository `pid-pec-iad`
 
-Posit Cloud Shiny Application sandbox for testing a “Teaching innovation
-project” concept
+Repository for “Teaching innovation project 2025” at UEND. It consists
+of:
+
+- A Shiny Application for generating personalized student datasets
+
+- A feedback app
+
+- A correction notebook to generate the compensation grades
 
 # License
 
-This template is licensed under the [Creative Commons Attribution 4.0
+This project is licensed under the [Creative Commons Attribution 4.0
 International license](https://creativecommons.org/licenses/by/4.0/).
 Please see the [license file](LICENSE.md).
 
-When using this template, please don’t forget to:
+## Attributions
 
-- Adapt this license section to your own needs
-
-- License your own content, and remember that [open is
-  better](https://choosealicense.com/).
-
-- Link to the [original
-  license](https://creativecommons.org/licenses/by/4.0/) and give
-  appropriate credit; please do so by including the following in the
-  “License” section of the README.md file in your own project:
-
-  > ## Attributions
-  >
-  > This project makes use of the
-  > [rproj-template](https://github.com/DaniMori/rproj-template) Github
-  > template created by [Daniel Morillo](https://github.com/DaniMori)
-  > and licensed under the [Creative Commons Attribution 4.0
-  > International
-  > license](https://creativecommons.org/licenses/by/4.0/).
+This project makes use of the
+[rproj-template](https://github.com/DaniMori/rproj-template) Github
+template created by [Daniel Morillo](https://github.com/DaniMori) and
+licensed under the [Creative Commons Attribution 4.0 International
+license](https://creativecommons.org/licenses/by/4.0/).
 
 # Project installation
 
@@ -151,23 +144,23 @@ The file structure of this repository is as follows:
 
     pid-pec-iad
     |
-    |- server.R    (Shiny app server logic)
+    |- server.R (Shiny app server logic)
     |
-    |- ui.R        (Shiny app user interface)
+    |- ui.R     (Shiny app user interface)
     |
-    |--- dat       (To store input datasets; must NEVER be checked-in to Github)
+    |--- apps   (To store apps, e.g. in Shiny)
     |
-    |--- doc       (To store important documentation of the project)
+    |--- dat    (To store input datasets; must NEVER be checked-in to Github)
     |
-    |--- notebooks (Notebooks to explore data and test processes live here)
+    |--- doc    (To store important documentation of the project)
     |
-    |--- R         (R functions created for this project live here)
+    |--- R      (R functions created for this project live here)
     |
-    |--- renv      (System library necesssary for `renv` to work. DON'T TOUCH)
+    |--- renv   (System library necesssary for `renv` to work. DON'T TOUCH)
     |
-    |--- src       (Source scripts that implement the main processes)
+    |--- src    (Source scripts that implement the main processes)
     |
-    |--- www       (Project assets, e.g., images, bibliography files, etc.)
+    |--- www    (Project assets, e.g., images, bibliography files, etc.)
 
 Use the folders as indicated to store the different files and generate
 the outputs of the processes.

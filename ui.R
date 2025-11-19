@@ -37,7 +37,7 @@ ui <- fluidPage(
 
   # Application title
   # TODO: Decide title & add logos (if necessary)
-  titlePanel(APP_TITLE),
+  titlePanel(GEN_DATA_APP_TITLE),
 
   fillPage(
 

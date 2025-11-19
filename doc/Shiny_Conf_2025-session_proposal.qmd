@@ -1,0 +1,94 @@
+---
+format: docx
+editor:
+  markdown: 
+    wrap: sentence
+---
+
+#### Session title \*:
+
+Generating personalized student synthetic datasets for large-scale educational assessment
+
+#### Description \*:
+
+Large scale, remote education comes with many challenges, some of them quite different from in-person education.
+One of them is the ability to create proper assessment activities that are also safe against information leakage that may lead to fraudulent behaviors (i.e., copying the correct responses from classmates).
+
+In this talk we demonstrate a pilot activity for a "Data Analysis 101" course in the Bachelor's Degree in Psychology with around 7,600 students.
+A very simple Shiny app generates a personalized dataset for each student, which they can download and use to complete an exercise in Jamovi.
+Their responses are then automatically scored offline, and another Shiny app provides them feedback with the correct responses.
+Our application applies Shiny on the field, showcasing how a very simple application can satisfy a real-life necessity without much sofistication.
+
+<!-- 134 words -->
+
+*(Please provide an abstract (up to 250 words))*
+
+#### Type of session \*:
+
+shiny app showcase (5 min)
+
+#### Level:
+
+begginer, intermediate
+
+#### Additional notes:
+
+The two apps need to be called with the GET parameter "email".
+To avoid interfering with the log of students who downloaded the app, these links take to test versions:
+
+https://danimori.shinyapps.io/pid-pec-iad/?e
+mail=sample\@email.edu
+
+https://danimori.shinyapps.io/pid-iad-feedback/?e
+mail=sample\@email.edu
+
+*(Visible to organizers and evaluators only.)*
+
+#### Speaker
+
+##### Speaker name \*:
+
+Daniel Morillo-Cuadrado
+
+##### Speaker tagline \*:
+
+Assistant Professor at National University of Remote Education (UNED), Spain
+
+##### Email:
+
+danielmorillo.ac\@gmail.com
+
+##### Speaker biography \*:
+
+I studied a Bachelor's Degree in Telecommunication Engineering at first, but soon got interested in behavioral science and turned to the field of Psychology.
+I got my Ph.D. in Clinical and Health Psychology in 2018, focusing my research on quantitative measurement.
+Having worked as data analyst and methodologist in both industry and academia, I was exposed and got very interested in Open Science practices.
+Apart from adopting the Open Science approach in my research, I am very committed to helping others onboard into them; my wish is to help everyone, everyhwere, learn data science.
+Because of this, I became a certified Carpentries instructor in 2021.
+Since 2024 I am Assistant Professor at the National University for Remote Education (UNED) in Spain, where I teach the "Data Analysis 101" course in the Degree in Psychology, and several courses in a Master's Degree in Behavioral Science Methodology.
+
+##### Speaker photo \*:
+
+(Está en la carpeta compartida, junto a este archivo)
+
+*(This event requires a high-resolution photo (min. 1000x1000 pixels). Please note that the image will mostly be cropped into a square.)*
+
+##### X (Twitter):
+
+##### LinkedIn:
+
+https://www.linkedin.com/in/daniel-morillo-b0356716
+
+##### Blog:
+
+##### Company Website:
+
+https://www.uned.es
+
+#### Co-speakers:
+
+-   bfcastilla\@psi.uned.es
+
+-   jamartinez\@psi.uned.es
+
+*(Optional. Enter email addresses of other speakers, and they'll receive an invitation to join your session as co-speakers.)*
