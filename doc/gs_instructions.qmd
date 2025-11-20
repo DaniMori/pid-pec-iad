@@ -67,7 +67,10 @@ this project.
 1.  Designate a project-specific cache directory to be used by {gargle}
 
 ```{r setup-cache-dir}
-CACHE_PATH <- ".secrets"
+CACHE_PATH <- ".secrets" # WARNING: The cache cannot be set with here::here()
+                         #          because then {gargle} would try to write the
+                         #          decrypted token (later on) to the absolute
+                         #          path (which doesn't exist on the server).
 options(gargle_oauth_cache = CACHE_PATH)
 ```
 
@@ -254,12 +257,7 @@ It is also recommended that, starting from cell A1, the spreadsheet file has the
 structure of the dataset we want to save in it. This can be done simply by
 typing in the variable names in the first row of the dataset.
 
-For this minimal example, we will create a spreadsheet with the following two
-variables:
-
-```{r dataset-vars}
-VAR_NAMES <- c("timestamp", "full_name", "valid")
-```
+For this minimal example, we will create an empty spreadsheet.
 
 ### Procedure
 
@@ -268,28 +266,26 @@ VAR_NAMES <- c("timestamp", "full_name", "valid")
 
 2.  Under "Create spreadsheet" click on "Blank spreadsheet".
 
-3.  In the field "Untitled spreadsheet" type in a name, e.g., "Shiny_app_data"
+3.  In the field "Untitled spreadsheet" type in a name, e.g., "Data_test"
     (without the double quotes).
 
-4.  In cells A1 and A2, respectively, type in the variable names, i.e.,
-    `timestamp`, `full_name` and `valid`. (For better readability, this row can
-    be formatted as **boldface**.)
-
-5.  In the browser, press `CTRL + L` (in Windows) to go to the address bar and
+4.  In the browser, press `CTRL + L` (in Windows) to go to the address bar and
     then `CTRL + C` to copy the spreadsheet file URL, which should include
     everything up until the last "slash" ("/") character. In this example:
 
 ```{r gs-url}
-# TODO: Change line 276 to use a different Google Spreadsheets file created
-#       following these instructions, if necessary.
+# TODO: Change line 282 to use a different Google Spreadsheets file created
+#       following these instructions, e.g.:
+# GS_URL <-
+#   "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
 GS_URL <-
-  "https://docs.google.com/spreadsheets/d/1-PWidqK7TncYK0W9AQd0J0L9GUpxL4SMzYmNg7LYn00/"
+  "https://docs.google.com/spreadsheets/d/<file_id>/"
 ```
 
-(Change line 86 to use a different file created following these instructions, if
-necessary.)
+(Change line 282 to use a different file created following these instructions,
+if necessary.)
 
-6.  (OPTIONALLY) In [the Google Drive
+5.  (OPTIONALLY) In [the Google Drive
     view](https://drive.google.com/drive/u/0/my-drive), find the spreadsheet
     file and [share it](https://support.google.com/drive/answer/2494822) with
     other Google account(s) (e.g. collaborators), **granting them "Edit"
@@ -362,14 +358,17 @@ test_data <- data.frame(   # The timestamp value will indicate when this code
     lubridate::stamp("2024-12-01 06:00", orders = "%Y%Om%d%H%M")(),
   "John Doe",
   FALSE
-) |>
-  setNames(VAR_NAMES)
+)
 
 googlesheets4::sheet_append(gs_link, test_data)
 ```
 
 3.  Verify that the line has been written, navigating to `{r} GS_URL` and
-    checking the last value of `timestamp`.
+    checking the last value (the only one, likely) of `timestamp`.
+
+4.  As the Google Spreadsheets file will not be used anymore (it was only for
+    testing), it can be safely deleted once it has been checked that the
+    connection works.
 
 # Complete code for setting up a connection to a Google Spreadsheets file
 
