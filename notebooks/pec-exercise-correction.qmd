@@ -41,55 +41,30 @@ library(stringi)
 library(writexl)
 ```
 
+```{r sources}
+#| include: false
+source("R/constants.R",              encoding = 'UTF-8')
+source("R/data_storage.R",           encoding = 'UTF-8')
+source("R/simulated_data.R",         encoding = 'UTF-8')
+source("R/read_student_responses.R", encoding = 'UTF-8')
+```
+
 ```{r constants}
 #| include: false
-
-# Shared file system objects:
-DATA_FOLDER <- "dat"
-
 
 # Constant objects for processing the downloads dataset:
 TEACHING_TEAM_EMAILS_FILENAME <- "teaching_team_emails.csv"
 
-# Constant objects for processing the student responses dataset:
-
-## File system objects:
+## File system objects for processing the student responses dataset:
 DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI.csv"
-RESPONSE_VARS_FILENAME  <- "student_response_variables.csv"
+data_responses_filepath <- here(DATA_DIR, DATA_RESPONSES_FILENAME)
 
-## Variable values:
-RELATIONSHIP_VALUES <- c("Inversa", "No tienen relación", "Directa")
-HELP_VALUES         <- c("1 - Nada", "2 - Un poco", "3 - Algo", "4 - Mucho")
-USEFULNESS_VALUES   <- c(
-  "1 - Nada útiles",
-  "2 - Poco útiles",
-  "3 - Algo útiles",
-  "4 - Muy útiles"
-)
-CLARITY_VALUES      <- c(
-  "1 - Nada claras",
-  "2 - Poco claras",
-  "3 - Algo claras",
-  "4 - Muy claras"
-)
-PROFESSOR_EMAIL_DOMAIN <- "@psi.uned.es"
-
-# Constant objects for generating the response dataset:
-
-## File system objects:
-
+## File system objects for generating the response dataset:
 STUDENT_TEMPLATE_FILENAME    <- # NOTE: Last code (006121) may change
   "Introducción al Análisis de Datos (011037)-006401.xls"
 COURSE_PARTICIPANTS_FILENAME <- "courseid_7595_participants.csv"
 DATA_COMPENSATION_FILENAME   <- "compensation_data.xls"
 STUDENT_RESPONSES_FILENAME   <- "student_responses.csv"
-```
-
-```{r sources}
-#| include: false
-source("R/data_storage.R",   encoding = 'UTF-8')
-source("R/simulated_data.R", encoding = 'UTF-8')
-source("R/hash_emails.R",    encoding = 'UTF-8')
 ```
 
 # Introduction
@@ -142,7 +117,7 @@ following criteria:
 ```{r config-downlads-data}
 ## File system objects:
 teaching_team_emails_filepath <- here(
-  DATA_FOLDER,
+  DATA_DIR,
   TEACHING_TEAM_EMAILS_FILENAME
 )
 ```
@@ -193,16 +168,6 @@ data_downloads_out <- data_downloads |>
 
 ## Dataset of activity responses
 
-```{r config-responses-data}
-## File system objects:
-data_responses_filepath <- here(DATA_FOLDER, DATA_RESPONSES_FILENAME)
-response_vars_filepath  <- here(DATA_FOLDER, RESPONSE_VARS_FILENAME)
-
-# Variable name objects:
-response_vars       <- response_vars_filepath |> read_csv(col_types = "c")
-response_var_labels <- response_vars |> deframe()
-```
-
 The dataset is first downloaded from [the OpenLMS
 course](https://agora.uned.es/course/view.php?id=12075). To download them, we
 need to access the [page of
@@ -216,31 +181,7 @@ This dataset is then read and preprocessed
 
 ```{r load-responses-data}
 data_student_responses <- data_responses_filepath |>
-  read_csv() |>
-  rename(!!!response_var_labels) |>
-  select(student_name, email_address:extra_comments) |>
-  mutate(
-    email_hash = email_address |> map_int(hash_emails),
-    date = date |>
-      parse_date_time(orders = "%d%B%Y %H%M") |>
-      force_tz(tzone = LOCAL_TIMEZONE),
-    ## TODO: Format responses
-    # relationship = relationship |> factor(
-    #   levels = RELATIONSHIP_VALUES, labels = -1:1
-    # ),
-    # across(starts_with("help"), ~ordered(., levels = HELP_VALUES)),
-    # across(usefulness_videos,   ~ordered(., levels = USEFULNESS_VALUES)),
-    # across(instructions,        ~ordered(., levels = CLARITY_VALUES)),
-    nps = nps |> str_extract("^\\d*") |> as.integer()
-  )
-
-if (!test_mode) {
-  
-  # Filter out the teaching team emails (i.e. the ones that match the "professor
-  #   domain").
-  data_student_responses <- data_student_responses |>
-    filter(email_address |> str_detect(PROFESSOR_EMAIL_DOMAIN, negate = TRUE))
-}
+  read_student_responses(test = test_mode)
 ```
 
 # Output computation
@@ -350,7 +291,7 @@ the following procedure:
 10. When the progress bar indicates "100%", click on "Descargar Ficheros"
 
 ```{r student-template-path}
-student_template_filepath <- here(DATA_FOLDER, STUDENT_TEMPLATE_FILENAME)
+student_template_filepath <- here(DATA_DIR, STUDENT_TEMPLATE_FILENAME)
 ```
 
 11. Save generated file as "`{r} student_template_filepath`"
@@ -470,7 +411,7 @@ missing second surnames) or does not exist.
 ### Compensation dataset exportation
 
 ```{r data-compensation-path}
-data_compensation_filepath <- here(DATA_FOLDER, DATA_COMPENSATION_FILENAME)
+data_compensation_filepath <- here(DATA_DIR, DATA_COMPENSATION_FILENAME)
 ```
 
 The template with the student data is updated with the compensation data. Then,

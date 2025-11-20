@@ -14,6 +14,7 @@
 
 # File system objects:
 DOCS_DIR <- here::here("doc")
+DATA_DIR <- here::here("dat")
 
 
 # Dataset generation app:
