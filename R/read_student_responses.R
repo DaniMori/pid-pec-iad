@@ -31,6 +31,10 @@ response_vars_filepath <- here::here(DATA_DIR, RESPONSE_VARS_FILENAME)
 ## Variale parsing:
 local_cdm <- readr::locale(decimal_mark = ',') # "comma-decimal-mark" locale
 
+## Symbols for selecting and processing "numeric" items
+num_items_selection <- quo(tidyselect::all_of('item_' |> paste0(c(6, 8:9))))
+
+
 ## Variable values:
 HELP_VALUES       <- c("1 - Nada", "2 - Un poco", "3 - Algo", "4 - Mucho")
 USEFULNESS_VALUES <- c(
@@ -57,7 +61,8 @@ response_vars_labels <- response_vars_filepath |>
 ## ---- FUNCTIONS: -------------------------------------------------------------
 read_student_responses <- function(filepath,
                                    test          = FALSE,
-                                   filter_domain = PROFESSOR_EMAIL_DOMAIN) {
+                                   filter_domain = PROFESSOR_EMAIL_DOMAIN,
+                                   delete_ws     = FALSE) {
 
   responses <- readr::read_csv(filepath) |>
     dplyr::rename(!!!response_vars_labels) |>
@@ -65,19 +70,32 @@ read_student_responses <- function(filepath,
       email_hash = email_address |> purrr::map_int(hash_emails),
       date = date |>
         lubridate::parse_date_time(orders = "%d%B%Y %H%M") |>
-        lubridate::force_tz(tzone = LOCAL_TIMEZONE),
-      dplyr::across(
-        tidyselect::all_of('item_' |> paste0(c(6, 8:9))),
-        ~readr::parse_number(., locale = local_cdm)
-      ),
-      dplyr::across(
-        tidyselect::starts_with("help"),
-        ~ordered(., levels = HELP_VALUES)
-      ),
-      dplyr::across(usefulness_videos, ~ordered(., levels = USEFULNESS_VALUES)),
-      dplyr::across(instructions,      ~ordered(., levels = CLARITY_VALUES)),
-      nps = nps |> str_extract("^\\d*") |> as.integer()
+        lubridate::force_tz(tzone = LOCAL_TIMEZONE)
     )
+
+  # Ad-hoc whitespace deletion of some entries:
+  if (delete_ws) {
+
+    # TODO: Change input form fields to "numeric" for these items (instead of
+    #       "text")
+    responses <- responses |> dplyr::mutate(
+      dplyr::across(!!num_items_selection, ~stringr::str_remove_all(., '\\h+'))
+    )
+  }
+
+  responses <- responses |> dplyr::mutate(
+    dplyr::across(
+      !!num_items_selection,
+      ~readr::parse_number(., locale = local_cdm)
+    ),
+    dplyr::across(
+      tidyselect::starts_with("help"),
+      ~ordered(., levels = HELP_VALUES)
+    ),
+    dplyr::across(usefulness_videos, ~ordered(., levels = USEFULNESS_VALUES)),
+    dplyr::across(instructions,      ~ordered(., levels = CLARITY_VALUES)),
+    nps = nps |> str_extract("^\\d*") |> as.integer()
+  )
 
   if (!test) {
 
