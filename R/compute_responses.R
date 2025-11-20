@@ -30,9 +30,13 @@ INTERCEPT_LABEL    <- "Intersección"
 SLOPE_LABEL        <- "Pendiente"
 RELATIONSHIP_LABEL <- "Relación"
 
-## Relationship item values:
-RELATIONSHIP_LABELS <- c("Inversa", "No tienen relación", "Directa")
-
+## Item values:
+ITEM_5_LABELS     <- c("Sí", "No")
+ITEM_6_VAL_LABELS <- c(
+  "Las variables  tienen una relación directa",
+  "Las variables  tienen una relación indirecta",
+  "Las variables tienen una relación nula (exactamente igual a cero)"
+)
 
 ## Response configuration data:
 N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
