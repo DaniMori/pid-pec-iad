@@ -25,18 +25,16 @@ ITEM_NUM_LABEL <- "Nº"
 ITEM_LABEL     <- "Pregunta"
 RESPONSE_LABEL <- "Respuesta"
 
-## Item labels:
-INTERCEPT_LABEL    <- "Intersección"
-SLOPE_LABEL        <- "Pendiente"
-RELATIONSHIP_LABEL <- "Relación"
-
-## Item values:
-ITEM_5_LABELS     <- c("Sí", "No")
-ITEM_6_VAL_LABELS <- c(
+## Item value labels:
+ITEM_5_VALUES <- c(TRUE, FALSE)
+ITEM_5_LABELS <- c("Sí", "No") |> setNames(ITEM_5_VALUES)
+ITEM_7_VALUES <- c(1, -1, 0)
+ITEM_7_LABELS <- c(
   "Las variables  tienen una relación directa",
   "Las variables  tienen una relación indirecta",
   "Las variables tienen una relación nula (exactamente igual a cero)"
-)
+) |>
+  setNames(ITEM_7_VALUES)
 
 ## Response configuration data:
 N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
@@ -44,36 +42,62 @@ N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
-get_model_params <- function(data) {
+compute_user_responses <- function(data) {
 
   ## Constant objects: ----
-  INTERCEPT_TERM     <- "(Intercept)"
+
+  # Linear regression model objects:
+  INTERCEPT_TERM <- "(Intercept)"
+  criterion_name <- SIM_VAR_NAMES['var_1'] |> glue::backtick()
+  predictor_name <- SIM_VAR_NAMES['var_2'] |> glue::backtick()
+
+  # Data objects:
+  CAT_LS_ITEM_1 <- 2L
+
 
   ## Main: ----
 
-  predictor_name <- SIM_VAR_NAMES['predictor']
-  criterion_name <- SIM_VAR_NAMES['criterion']
-  response_terms <- c(INTERCEPT_TERM, predictor_name)
+  # Transform `var_2` to integer to use it a "linear term" in the regression
+  data <- data |> dplyr::mutate(
+    `Satisfaccion vital` = `Satisfaccion vital` |>
+      as.character() |>
+      as.integer()
+  )
 
   # Fit model and extract coefficients:
-  model        <- glue::glue("{criterion_name} ~ {predictor_name}") # Formula
+  model       <- glue::glue("{criterion_name} ~ {predictor_name}") # Formula
   fitted_model <- data         |> lm(formula = model)
   coefficients <- fitted_model |> broom::tidy()
 
-  # Get exercise responses from the model results:
-  responses <- coefficients                 |>
-    dplyr::filter(term %in% response_terms) |>
-    dplyr::mutate(
-      estimate = estimate |> round(N_DECIMALS),
-      term     = term     |> dplyr::case_match(
-        INTERCEPT_TERM ~ INTERCEPT_VAR_NAME,
-        SIM_VAR_NAMES['predictor'] ~ SLOPE_VAR_NAME
-      )
-    )                                       |>
-    dplyr::select(term, estimate)           |>
-    tidyr::pivot_wider(names_from = term, values_from = estimate)
+  # Compute responses:
 
-  responses |>
+  computed_responses <- data |> dplyr::summarize(
+    item_1 = table(`Satisfaccion vital`)[CAT_LS_ITEM_1],
+    item_2 = median(`Horas sueno promedio`),
+    item_3 = sd(`Horas sueno promedio`) |> round(N_DECIMALS),
+    item_4 = quantile(`Horas sueno promedio`, .34),
+    item_5 = boxplot.stats(`Horas sueno promedio`)$out |>
+      length() |>
+      as.logical() |>
+      as.character() %>%
+      magrittr::extract(ITEM_5_LABELS, .),
+    item_6 = cor(`Satisfaccion vital`, `Horas sueno promedio`) |>
+      round(N_DECIMALS),
+    item_7 = item_6 |>
+      sign() |>
+      as.character() %>%
+      magrittr::extract(ITEM_7_LABELS, .),
+    item_8 = coefficients |>
+      dplyr::filter(term == INTERCEPT_TERM) |>
+      dplyr::pull(estimate) |>
+      round(N_DECIMALS),
+    item_9 = coefficients |>
+      dplyr::filter(term == predictor_name) |>
+      dplyr::pull(estimate) |>
+      round(N_DECIMALS),
+    item_10 =
+  )
+
     dplyr::mutate(relationship = slope |> sign() |> factor(levels = REL_LEVELS))
 }
 
@@ -81,7 +105,7 @@ get_user_responses <- function(hash) {
 
   user_sim_data <- simulate_data(hash)
 
-  user_sim_data |> get_model_params()
+  user_sim_data |> compute_user_responses()
 }
 
 format_responses <- function(responses) {
