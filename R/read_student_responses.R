@@ -65,7 +65,10 @@ read_student_responses <- function(filepath,
       date = date |>
         lubridate::parse_date_time(orders = "%d%B%Y %H%M") |>
         lubridate::force_tz(tzone = LOCAL_TIMEZONE),
-      item_6 = item_6 |> readr::parse_number(locale = local_cdm),
+      dplyr::across(
+        tidyselect::all_of('item_' |> paste0(c(6, 8:9))),
+        ~readr::parse_number(., locale = local_cdm)
+      ),
     )
 
   if (!test) {
