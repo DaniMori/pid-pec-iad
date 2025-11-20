@@ -26,18 +26,17 @@ test_mode <- params$test_mode
 
 ```{r libraries}
 #| include: false
-library(googlesheets4)
-library(dplyr)
-library(lubridate)
-library(stringr)
-library(tidyr)
-library(purrr)
 library(here)
-library(tibble)
+library(dplyr)
+library(googlesheets4)
 library(readr)
-library(roperators)
-library(readxl)
-library(stringi)
+library(purrr)
+library(tidyr)
+library(stringr)
+# library(roperators)
+# library(stringi)
+# library(tibble)
+# library(readxl)
 library(writexl)
 ```
 
@@ -45,7 +44,7 @@ library(writexl)
 #| include: false
 source("R/constants.R",              encoding = 'UTF-8')
 source("R/data_storage.R",           encoding = 'UTF-8')
-source("R/simulated_data.R",         encoding = 'UTF-8')
+source("R/compute_responses.R",      encoding = 'UTF-8')
 source("R/read_student_responses.R", encoding = 'UTF-8')
 ```
 
