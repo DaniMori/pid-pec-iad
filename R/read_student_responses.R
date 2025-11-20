@@ -32,7 +32,9 @@ response_vars_filepath <- here::here(DATA_DIR, RESPONSE_VARS_FILENAME)
 local_cdm <- readr::locale(decimal_mark = ',') # "comma-decimal-mark" locale
 
 ## Symbols for selecting and processing "numeric" items
-num_items_selection <- quo(tidyselect::all_of('item_' |> paste0(c(6, 8:9))))
+num_items_selection <- rlangh::quo(
+  tidyselect::all_of('item_' |> paste0(c(6, 8:9)))
+)
 
 
 ## Variable values:

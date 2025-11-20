@@ -194,7 +194,7 @@ For each student, the correct answers of the exercise are obtained.
 ```{r get-correct-responses}
 data_correct_responses <- data_downloads_out |>
   pull(email_hash) |>
-  set_names() |>
+  set_names() |> # Helps matching each user's responses with its hash
   map(get_user_responses) |> # Get correct responses for each student
   list_rbind(names_to = "email_hash") |>
   mutate(across(email_hash, as.integer)) # Turn names to integers for matching
