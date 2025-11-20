@@ -32,14 +32,14 @@ response_vars_filepath <- here::here(DATA_DIR, RESPONSE_VARS_FILENAME)
 local_cdm <- readr::locale(decimal_mark = ',') # "comma-decimal-mark" locale
 
 ## Variable values:
-HELP_VALUES         <- c("1 - Nada", "2 - Un poco", "3 - Algo", "4 - Mucho")
-USEFULNESS_VALUES   <- c(
+HELP_VALUES       <- c("1 - Nada", "2 - Un poco", "3 - Algo", "4 - Mucho")
+USEFULNESS_VALUES <- c(
   "1 - Nada útiles",
   "2 - Poco útiles",
   "3 - Algo útiles",
   "4 - Muy útiles"
 )
-CLARITY_VALUES      <- c(
+CLARITY_VALUES    <- c(
   "1 - Nada claras",
   "2 - Poco claras",
   "3 - Algo claras",
@@ -58,6 +58,7 @@ response_vars_labels <- response_vars_filepath |>
 read_student_responses <- function(filepath,
                                    test          = FALSE,
                                    filter_domain = PROFESSOR_EMAIL_DOMAIN) {
+
   responses <- readr::read_csv(filepath) |>
     dplyr::rename(!!!response_vars_labels) |>
     dplyr::mutate(
@@ -69,6 +70,13 @@ read_student_responses <- function(filepath,
         tidyselect::all_of('item_' |> paste0(c(6, 8:9))),
         ~readr::parse_number(., locale = local_cdm)
       ),
+      dplyr::across(
+        tidyselect::starts_with("help"),
+        ~ordered(., levels = HELP_VALUES)
+      ),
+      dplyr::across(usefulness_videos, ~ordered(., levels = USEFULNESS_VALUES)),
+      dplyr::across(instructions,      ~ordered(., levels = CLARITY_VALUES)),
+      nps = nps |> str_extract("^\\d*") |> as.integer()
     )
 
   if (!test) {
