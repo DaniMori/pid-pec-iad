@@ -60,7 +60,6 @@ read_student_responses <- function(filepath,
                                    filter_domain = PROFESSOR_EMAIL_DOMAIN) {
   responses <- readr::read_csv(filepath) |>
     dplyr::rename(!!!response_vars_labels) |>
-    dplyr::select(student_name, email_address:item_10) |>
     dplyr::mutate(
       email_hash = email_address |> purrr::map_int(hash_emails),
       date = date |>

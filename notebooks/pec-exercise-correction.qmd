@@ -181,7 +181,8 @@ This dataset is then read and preprocessed
 
 ```{r load-responses-data}
 data_student_responses <- data_responses_filepath |>
-  read_student_responses(test = test_mode)
+  read_student_responses(test = test_mode) |>
+  select(student_name, email_address:item_10)
 ```
 
 # Output computation
