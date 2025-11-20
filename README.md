@@ -121,7 +121,33 @@ for the server logic.
 
 Before trying to run it, the Google Spreadsheets connection must be set
 up. Follow the instructions in document [“Google Spreadsheets connection
-instructions”](doc/gs.instructions.qmd) to do this.
+instructions”](doc/gs_instructions.qmd) to do this.
+
+Once the connection is set up, a new Google Spreadsheets file needs to
+be created as the storage backend for the Shiny App. In order to do
+this, follow these instructions:
+
+1.  Log in to Google Drive with the account “<iad.uned.psi@gmail.com>”.
+
+2.  Create a new Google Spreadsheets file (ideally inside the folder
+    “PID-IAD”), and give it a meaningful name (e.g. “pid-iad-data”).
+
+3.  Copy its file ID from the direction bar: This is the alphanumeric
+    code between “<https://docs.google.com/spreadsheets/d/>” and the
+    last slash (“/”). DO NOT include any of the two slashes.
+
+4.  Open file “doc/ghseets_config_template.yml”, and save it as
+    “doc/gsheets_config.yml”.
+
+5.  Paste the copied file ID into line 3 of “doc/gsheets_config.yml”,
+    between the double quotes, and omitting the “caret” (\<\>)
+    characters; e.g.: if the URL in the direction bar is
+    `https://docs.google.com/spreadsheets/d/19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw/edit?gid=0#gid=0`,
+    then line 3 of “doc/gsheets_config.yml” must be
+
+    `file_id: "19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw"`
+
+6.  Save the changes to “doc/gsheets_config.yml”.
 
 ## Running the app
 
@@ -136,7 +162,77 @@ App”).
 
 ## Deploying the app to [shinyapps.io](https://www.shinyapps.io/)
 
-<!-- # TODO: Complete -->
+1.  Log in to [shinyapps.io](https://www.shinyapps.io/). If necessary,
+    follow the steps to create a new account. (In our case, use the
+    account “<iad.uned.psi@gmail.com>”, authenticating with Google).
+
+2.  In the [shinyapps.io
+    dashboard](https://www.shinyapps.io/admin/#/dashboard), click on the
+    avatar (upper-right corner) and then on “Tokens” in the dropdown
+    menu to go to the “Tokens” tab.
+
+3.  A token will be already created for this account, so you only need
+    to authorize it in your local Rstudio session. Click on the “Show”
+    button; a window will pop-up. Click on “Show secret”, and then on
+    “Copy to clipboard”. On the message window, type “CTRL + C” to copy
+    the R code with the authorization token, and then “Accept” to close
+    the message window, and “Ok” to close the pop-up window.
+
+4.  Paste the copied R code into the Rstudio console and type “ENTER” to
+    run it and authorize the app on your local Rstudio session.
+    **IMPORTANT:** This will leave a trace of the authorization token in
+    your Rstudio history; at this point, make sure you go to the
+    “History” tab and delete the last entry, by selecting it and
+    clicking on the “Remove the selected history entries” button
+    (document with red “X” icon), or by clicking on the “Clear all
+    history entries” (“broom” icon).
+
+5.  Open either the [“ui.R”](ui.R) or [“server.R”](server.R) file in the
+    Rstudio editor. Then click on the “Publish” button; select the
+    corresponding account on [shinyapps.io](https://www.shinyapps.io)
+    (i.e., “iad-psi-uned-es”), and enter the app title (“pid-pec-iad”)
+    in the “Title” text box. Finally, **select carefully** ALL OF and
+    ONLY the following files and folders:
+
+    - .Renviron
+    - .secrets/encrypted-oauth-token-rds
+    - doc/gsheets_config.yml
+    - renv.lock
+    - server.R
+    - ui.R
+    - The R folder
+
+    **IMPORTANT**: Make sure to select the previous files and folders,
+    and only those. There must be 7 checkboxes ticked.
+
+6.  Click on “Publish”. The “Deploy” tab will open, printing out several
+    messages. If the deployment is successful, the tab will ultimately
+    output the message
+
+    `Deployment completed: https://iad-psi-uned-es.shinyapps.io/pid-pec-iad/`
+
+    and the “Deploy” tab will automatically close while a tab will open
+    in the default browser, navigating to the URL of the app (the one in
+    the message above).
+
+7.  Check that the app is running properly: The previous URL will not
+    work because the “email” GET parameter is missing from the URL, so
+    to test it, first go to the [Applications dashboard in
+    shinyapps.io](https://www.shinyapps.io/admin/#/applications/all) and
+    check that the app “pid-pec-iad” is listed with Status “Running”.
+
+8.  If the app is running, test the app by browsing to its URL
+    (<https://iad-psi-uned-es.shinyapps.io/pid-pec-iad>), and then
+    adding the “email” GET parameter in the end, i.e.:
+
+    <https://iad-psi-uned-es.shinyapps.io/pid-pec-iad?email=johndoe@psi.uned.es>\`
+
+    (It is highly recommended that you use your own email at the
+    “@\*.uned.es” domain.) If the app works properly, a dataset should
+    be downloaded automatically and/or by clicking on the link to
+    download it manually. It should also be checked that the new entries
+    (for “Access” and “Download”) are logged in the Google Spreadsheet
+    file.
 
 # Repository structure
 

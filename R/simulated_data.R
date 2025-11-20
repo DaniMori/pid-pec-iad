@@ -1,8 +1,8 @@
 # ==============================================================================
 #
 # FILE NAME:   simulated_data.R
-# DESCRIPTION: Functionality for creating and analyzing a simulated dataset for
-#              the student's personal exercise
+# DESCRIPTION: Functionality for creating a simulated dataset for the student's
+#              personal exercise
 #
 # AUTHOR:      Daniel Morillo
 #
@@ -11,9 +11,28 @@
 # ==============================================================================
 
 
-## ---- SOURCES: ---------------------------------------------------------------
+## ---- CONSTANTS: -------------------------------------------------------------
 
-source("R/constants.R", encoding = 'UTF-8')
+# Simulated data objects:
+
+## Variable names:
+SIM_VARIABLES <- c("predictor",            "criterion")
+SIM_VAR_NAMES <- c("Horas sueno promedio", "Satisfaccion vital") |>
+  setNames(SIM_VARIABLES)
+
+## Model parameters:
+INTERCEPT_VAR_NAME    <- "intercept"
+SLOPE_VAR_NAME        <- "slope"
+RELATIONSHIP_VAR_NAME <- "relationship"
+
+## Variable data:
+SAMPLE_SIZE       <- 300:500      # Uniformly random sample size of 300-500
+PREDICTOR_SCORES  <-  40:100 / 10 # Possible scores in the "predictor" variable
+CRITERION_SCORES  <-   1:  5      # Possible scores in the "criterion" variable
+
+## Modeling variables:
+REL_LEVS <- c(-1L, 1L) # Levels for the "relationship" item response
+
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
@@ -21,90 +40,33 @@ simulate_data <- function(seed) {
 
   set.seed(seed)
 
-  slope       <- sample(-1:1, size = 1L) # Simulation regression coefficient
+  slope       <- sample(REL_LEVS, size = 1L) # Simulated regression coefficient
   sample_size <- sample(SAMPLE_SIZE, size = 1L) # Random sample size
   n_crit_vals <- length(CRITERION_SCORES) # Nº of values in the criterion scores
 
-  tibble::tibble(
+  output <- tibble::tibble(
     predictor = sample(
       PREDICTOR_SCORES,
       size    = sample_size,
       replace = TRUE
     ),
-    criterion = (slope * predictor + rnorm(sample_size)) |>
-      dplyr::ntile(n_crit_vals)                          |>
-      dplyr::recode(!!!CRITERION_SCORES |> setNames(1:n_crit_vals))
-  ) |>
-    setNames(SIM_VAR_NAMES)
-}
-
-get_model_params <- function(data) {
-
-  ## Constant objects: ----
-  INTERCEPT_TERM     <- "(Intercept)"
-
-  ## Main: ----
-
-  predictor_name <- SIM_VAR_NAMES['predictor']
-  criterion_name <- SIM_VAR_NAMES['criterion']
-  response_terms <- c(INTERCEPT_TERM, predictor_name)
-
-  # Fit model and extract coefficients:
-  model        <- glue::glue("{criterion_name} ~ {predictor_name}") # Formula
-  fitted_model <- data         |> lm(formula = model)
-  coefficients <- fitted_model |> broom::tidy()
-
-  # Get exercise responses from the model results:
-  responses <- coefficients                 |>
-    dplyr::filter(term %in% response_terms) |>
-    dplyr::mutate(
-      estimate = estimate |> round(N_DECIMALS),
-      term     = term     |> dplyr::case_match(
-        INTERCEPT_TERM ~ INTERCEPT_VAR_NAME,
-        SIM_VAR_NAMES['predictor'] ~ SLOPE_VAR_NAME
-      )
-    )                                       |>
-    dplyr::select(term, estimate)           |>
-    tidyr::pivot_wider(names_from = term, values_from = estimate)
-
-  responses |>
-    dplyr::mutate(relationship = slope |> sign() |> factor(levels = REL_LEVELS))
-}
-
-get_user_responses <- function(hash) {
-
-  user_sim_data <- simulate_data(hash)
-
-  user_sim_data |> get_model_params()
-}
-
-format_responses <- function(responses) {
-
-  relationship_levels <- REL_LEVELS |>
-    as.character() |>
-    setNames(RELATIONSHIP_LABELS)
-
-  params_varnames    <- c(
-    INTERCEPT_VAR_NAME,
-    SLOPE_VAR_NAME,
-    RELATIONSHIP_VAR_NAME
+    # Preliminary "continuous version" of the criterion variable
+    criterion = slope * predictor + rnorm(sample_size)
   )
-  params_labels      <- c(INTERCEPT_LABEL, SLOPE_LABEL, RELATIONSHIP_LABEL)
-  params_vars_labels <- params_varnames |>
-    setNames(params_labels) |>
-    tibble::enframe(name = ITEM_LABEL)
 
-  responses |>
+  # Random cut points for the criterion variable (to avoid a "flat" barplot)
+  rel_cut_props <- runif(n_crit_vals, min = .2, max = 1) |> cumsum()
+  cut_props     <- c(0, rel_cut_props / max(rel_cut_props)) # Normalize
+  cut_quantiles <- output |> dplyr::pull(criterion) |> quantile(cut_props)
+
+  # Recode the criterion variable into discrete values using the cut points:
+  output |>
     dplyr::mutate(
-      relationship = relationship |>
-        forcats::fct_recode(!!!relationship_levels),
-      dplyr::across(dplyr::everything(), as.character)
+      criterion = criterion |> cut(
+        breaks         = cut_quantiles,
+        labels         = CRITERION_SCORES,
+        include.lowest = TRUE
+      )
     ) |>
-    tidyr::pivot_longer(
-      cols      = dplyr::everything(),
-      values_to = RESPONSE_LABEL
-    ) |>
-    dplyr::full_join(params_vars_labels, by = c(name = "value")) |>
-    dplyr::select(dplyr::all_of(c(ITEM_LABEL, RESPONSE_LABEL))) |>
-    tibble::rownames_to_column(ITEM_NUM_LABEL)
+    setNames(SIM_VAR_NAMES)
 }

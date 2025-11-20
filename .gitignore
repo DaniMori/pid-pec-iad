@@ -39,7 +39,7 @@
 
 # App configuration
 /.secrets/
-www/gsheets_config.yml
+doc/gsheets_config.yml
 
 # Explicit exclusions for dataset and processing notebooks
 !dat/student_response_variables.csv # Student responses variables
