@@ -26,15 +26,34 @@ ITEM_LABEL     <- "Pregunta"
 RESPONSE_LABEL <- "Respuesta"
 
 ## Item value labels:
-ITEM_5_VALUES <- c(TRUE, FALSE)
-ITEM_5_LABELS <- c("Sí", "No") |> setNames(ITEM_5_VALUES)
-ITEM_7_VALUES <- c(1, -1, 0)
+SIGN_LEVELS    <- c(-1, 0, 1) |> as.character()
+LOGICAL_LEVELS <- c(FALSE, TRUE, NA) |> as.character()
+
+ITEM_1_LS_CAT <- 2L # Category "Insatisfecho" in "life satisfaction" variable
+                    #   (for item 1).
+
+ITEM_5_LABELS <- c("No", "Sí", "(Sin respuesta)")
+ITEM_5_VALUES <- LOGICAL_LEVELS |> setNames(ITEM_5_LABELS)
+
 ITEM_7_LABELS <- c(
-  "Las variables  tienen una relación directa",
-  "Las variables  tienen una relación indirecta",
-  "Las variables tienen una relación nula (exactamente igual a cero)"
-) |>
-  setNames(ITEM_7_VALUES)
+  "Las variables  tienen una relación inversa",
+  "Las variables tienen una relación nula (exactamente igual a cero)",
+  "Las variables  tienen una relación directa"
+)
+ITEM_7_VALUES <- SIGN_LEVELS |> setNames(ITEM_7_LABELS)
+
+ITEM_10_LABELS <- c(
+  paste(
+    "A menos promedio semanal de horas diarias de sueño,",
+    "mayor satisfacción vital."
+  ),
+  paste(
+    "La relación entre promedio semanal de horas diarias de sueño y",
+    "la satisfacción vital es nula (exactamente igual a cero)."
+  ),
+  "A más promedio semanal de horas diarias de sueño, mayor satisfacción vital."
+)
+ITEM_10_VALUES <- SIGN_LEVELS |> setNames(ITEM_10_LABELS)
 
 ## Response configuration data:
 N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
@@ -42,7 +61,7 @@ N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
-compute_user_responses <- function(data) {
+compute_correct_responses <- function(data) {
 
   ## Constant objects: ----
 
@@ -50,9 +69,6 @@ compute_user_responses <- function(data) {
   INTERCEPT_TERM <- "(Intercept)"
   criterion_name <- SIM_VAR_NAMES['var_1'] |> glue::backtick()
   predictor_name <- SIM_VAR_NAMES['var_2'] |> glue::backtick()
-
-  # Data objects:
-  CAT_LS_ITEM_1 <- 2L
 
 
   ## Main: ----
@@ -72,21 +88,17 @@ compute_user_responses <- function(data) {
   # Compute responses:
 
   computed_responses <- data |> dplyr::summarize(
-    item_1 = table(`Satisfaccion vital`)[CAT_LS_ITEM_1],
+    item_1 = table(`Satisfaccion vital`)[ITEM_1_LS_CAT],
     item_2 = median(`Horas sueno promedio`),
     item_3 = sd(`Horas sueno promedio`) |> round(N_DECIMALS),
     item_4 = quantile(`Horas sueno promedio`, .34),
     item_5 = boxplot.stats(`Horas sueno promedio`)$out |>
       length() |>
       as.logical() |>
-      as.character() %>%
-      magrittr::extract(ITEM_5_LABELS, .),
+      as.character(),
     item_6 = cor(`Satisfaccion vital`, `Horas sueno promedio`) |>
       round(N_DECIMALS),
-    item_7 = item_6 |>
-      sign() |>
-      as.character() %>%
-      magrittr::extract(ITEM_7_LABELS, .),
+    item_7 = item_6 |> sign() |> as.character(),
     item_8 = coefficients |>
       dplyr::filter(term == INTERCEPT_TERM) |>
       dplyr::pull(estimate) |>
@@ -94,18 +106,26 @@ compute_user_responses <- function(data) {
     item_9 = coefficients |>
       dplyr::filter(term == predictor_name) |>
       dplyr::pull(estimate) |>
-      round(N_DECIMALS),
-    item_10 =
+      round(N_DECIMALS)
   )
 
-    dplyr::mutate(relationship = slope |> sign() |> factor(levels = REL_LEVELS))
+  # Capture warning when factor levels are missing in the data (they will!)
+  suppressWarnings(
+    computed_responses <- computed_responses |> dplyr::mutate(
+      item_5  = item_5 |> forcats::fct_recode(!!!ITEM_5_VALUES),
+      item_7  = item_7 |> forcats::fct_recode(!!!ITEM_7_VALUES),
+      item_10 = item_7 |> forcats::fct_recode(!!!ITEM_10_VALUES)
+    )
+  )
+
+  computed_responses
 }
 
-get_user_responses <- function(hash) {
+get_correct_responses <- function(hash) {
 
   user_sim_data <- simulate_data(hash)
 
-  user_sim_data |> compute_user_responses()
+  user_sim_data |> compute_correct_responses()
 }
 
 format_responses <- function(responses) {
