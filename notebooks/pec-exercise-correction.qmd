@@ -33,7 +33,6 @@ library(readr)
 library(purrr)
 library(tidyr)
 library(stringr)
-# library(roperators)
 # library(stringi)
 # library(tibble)
 # library(readxl)
@@ -44,7 +43,7 @@ library(writexl)
 #| include: false
 source("R/constants.R",              encoding = 'UTF-8')
 source("R/data_storage.R",           encoding = 'UTF-8')
-source("R/compute_responses.R",      encoding = 'UTF-8')
+source("R/score_responses.R",        encoding = 'UTF-8')
 source("R/read_student_responses.R", encoding = 'UTF-8')
 ```
 
@@ -192,6 +191,8 @@ For each student, the correct answers of the exercise are obtained.
 
 ```{r get-correct-responses}
 data_correct_responses <- data_downloads_out |>
+  # Filter out the ones without responses to make it more efficient:
+  semi_join(data_student_responses, by = EMAIL_HASH_VAR) |>
   pull(!!EMAIL_HASH_VAR) |>
   set_names() |> # Helps matching each user's responses with its hash
   map(get_correct_responses) |> # Get correct responses for each student
@@ -206,17 +207,7 @@ the items in the exercise.
 
 ```{r correct-student-responses}
 data_response_corrections <- data_student_responses |>
-  select(email_hash, student_name, intercept:relationship) |>
-  left_join(
-    data_correct_responses,
-    by     = "email_hash",
-    suffix = c("_student", "_correct")
-  ) |>
-  mutate(
-    intercept    = map2_lgl(intercept_student, intercept_correct, `%~=%`),
-    slope        = map2_lgl(slope_student,     slope_correct,     `%~=%`),
-    relationship = relationship_student %==% relationship_correct,
-  )
+  score_student_responses(data_correct_responses)
 ```
 
 ## Assessment criteria fulfillment

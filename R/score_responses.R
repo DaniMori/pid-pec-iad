@@ -1,16 +1,20 @@
 # ==============================================================================
 #
-# FILE NAME:   compute_responses.R
-# DESCRIPTION: Functionality for creating and analyzing a simulated dataset for
-#              the student's personal exercise
+# FILE NAME:   score_responses.R
+# DESCRIPTION: Functionality for assessing and scoring the student responses
 #
 # AUTHOR:      Daniel Morillo
 #
-# DATE:        2025-10-29
+# DATE:        2025-11-26
 #
 # ==============================================================================
 
 
+# ## ---- PACKAGES: --------------------------------------------------------------
+#
+# library(roperators)
+#
+#
 ## ---- SOURCES: ---------------------------------------------------------------
 
 source("R/simulated_data.R", encoding = 'UTF-8')
@@ -25,40 +29,6 @@ ITEM_NUM_LABEL <- "Nº"
 ITEM_LABEL     <- "Pregunta"
 RESPONSE_LABEL <- "Respuesta"
 
-## Item value labels:
-SIGN_LEVELS    <- c(-1, 0, 1) |> as.character()
-LOGICAL_LEVELS <- c(FALSE, TRUE, NA) |> as.character()
-
-ITEM_1_LS_CAT <- 2L # Category "Insatisfecho" in "life satisfaction" variable
-                    #   (for item 1).
-
-ITEM_5_LABELS <- c("No", "Sí", "(Sin respuesta)")
-ITEM_5_VALUES <- LOGICAL_LEVELS |> setNames(ITEM_5_LABELS)
-
-ITEM_7_LABELS <- c(
-  "Las variables  tienen una relación inversa",
-  "Las variables tienen una relación nula (exactamente igual a cero)",
-  "Las variables  tienen una relación directa"
-)
-ITEM_7_VALUES <- SIGN_LEVELS |> setNames(ITEM_7_LABELS)
-
-ITEM_10_LABELS <- c(
-  paste(
-    "A menos promedio semanal de horas diarias de sueño,",
-    "mayor satisfacción vital."
-  ),
-  paste(
-    "La relación entre promedio semanal de horas diarias de sueño y",
-    "la satisfacción vital es nula (exactamente igual a cero)."
-  ),
-  "A más promedio semanal de horas diarias de sueño, mayor satisfacción vital."
-)
-ITEM_10_VALUES <- SIGN_LEVELS |> setNames(ITEM_10_LABELS)
-
-## Response configuration data:
-N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
-
-
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
 get_correct_responses <- function(hash) {
@@ -66,6 +36,48 @@ get_correct_responses <- function(hash) {
   user_sim_data <- simulate_data(hash)
 
   user_sim_data |> compute_correct_responses()
+}
+
+score_student_responses <- function(student_responses, correct_responses) {
+
+  ## Constants: ----
+  ITEM_PREFFIX <- "item_"
+  STUDENT_RESPONSE_SUFFIX <- "_student"
+  CORRECT_RESPONSE_SUFFIX <- "_correct"
+  SCORE_RESPONSE_SUFFIX   <- "_score"
+
+  ## Argument checking and formatting: ----
+  item_vars <- student_responses |>
+    dplyr::select(starts_with(ITEM_PREFFIX)) |>
+    colnames()
+
+  ## Main: ----
+
+  scored_responses <- student_responses |>
+    dplyr::left_join(
+      correct_responses,
+      by     = EMAIL_HASH_VAR,
+      suffix = c(STUDENT_RESPONSE_SUFFIX, CORRECT_RESPONSE_SUFFIX)
+    )
+
+  purrr::walk(
+    item_vars,
+    ~{
+      score_var        <- paste0(., SCORE_RESPONSE_SUFFIX)
+      student_item_var <- paste0(., STUDENT_RESPONSE_SUFFIX) |> rlang::sym()
+      correct_item_var <- paste0(., CORRECT_RESPONSE_SUFFIX) |> rlang::sym()
+
+      scored_responses <<- scored_responses |> dplyr::mutate(
+        !!score_var := purrr::map2_lgl(
+          !!student_item_var,
+          !!correct_item_var,
+          roperators::`%~=%`
+        )
+      )
+    }
+  )
+
+  scored_responses
 }
 
 format_responses <- function(responses) {
