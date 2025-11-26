@@ -15,8 +15,9 @@
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
-source("R/constants.R",   encoding = 'UTF-8')
-source("R/hash_emails.R", encoding = 'UTF-8')
+source("R/constants.R",      encoding = 'UTF-8')
+source("R/hash_emails.R",    encoding = 'UTF-8')
+source("R/simulated_data.R", encoding = 'UTF-8')
 
 
 ## ---- CONSTANTS: -------------------------------------------------------------
@@ -28,12 +29,9 @@ response_vars_filepath <- here::here(DATA_DIR, RESPONSE_VARS_FILENAME)
 
 # Constant objects for processing the student responses dataset:
 
-## Variale parsing:
-local_cdm <- readr::locale(decimal_mark = ',') # "comma-decimal-mark" locale
-
 ## Symbols for selecting and processing "numeric" items
 num_items_selection <- rlang::quo(
-  tidyselect::all_of('item_' |> paste0(c(6, 8:9)))
+  tidyselect::all_of('item_' |> paste0(c(1:4, 6L, 8:9)))
 )
 
 
@@ -64,32 +62,50 @@ response_vars_labels <- response_vars_filepath |>
 read_student_responses <- function(filepath,
                                    test          = FALSE,
                                    filter_domain = PROFESSOR_EMAIL_DOMAIN,
-                                   delete_ws     = FALSE) {
+                                   correct_num   = FALSE) {
 
-  responses <- readr::read_csv(filepath) |>
+  responses <- readr::read_csv(
+    filepath,
+    col_types = cols(.default = col_character())
+  ) |>
     dplyr::rename(!!!response_vars_labels) |>
     dplyr::mutate(
-      email_hash = email_address |> purrr::map_int(hash_emails),
+      !!EMAIL_HASH_VAR := email_address |> purrr::map_int(hash_emails),
       date = date |>
         lubridate::parse_date_time(orders = "%d%B%Y %H%M") |>
         lubridate::force_tz(tzone = LOCAL_TIMEZONE)
     )
 
-  # Ad-hoc whitespace deletion of some entries:
-  if (delete_ws) {
+  if (!test) {
 
-    # TODO: Change input form fields to "numeric" for these items (instead of
-    #       "text")
+    # Filter out the teaching team emails (i.e. the ones that match the
+    #   "professor domain").
+    responses <- responses |> dplyr::filter(
+      email_address |> stringr::str_detect(filter_domain, negate = TRUE)
+    )
+  }
+
+  if (correct_num) {
+
     responses <- responses |> dplyr::mutate(
-      dplyr::across(!!num_items_selection, ~stringr::str_remove_all(., '\\h+'))
+      # Ad-hoc whitespace deletion of some entries:
+      dplyr::across(
+        !!num_items_selection,
+        ~stringr::str_remove_all(., pattern = '\\h+')
+      ),
+      # Ad-hoc correction of decimal marks:
+      dplyr::across(
+        !!num_items_selection,
+        ~stringr::str_replace(., pattern = ',', replacement = '.')
+      )
     )
   }
 
   responses <- responses |> dplyr::mutate(
-    dplyr::across(
-      !!num_items_selection,
-      ~readr::parse_number(., locale = local_cdm)
-    ),
+    dplyr::across(!!num_items_selection, readr::parse_number),
+    item_5  = item_5  |> factor(levels =  ITEM_5_LABELS),
+    item_7  = item_7  |> factor(levels =  ITEM_7_LABELS),
+    item_10 = item_10 |> factor(levels = ITEM_10_LABELS),
     dplyr::across(
       tidyselect::starts_with("help"),
       ~ordered(., levels = HELP_VALUES)
@@ -99,14 +115,5 @@ read_student_responses <- function(filepath,
     nps = nps |> str_extract("^\\d*") |> as.integer()
   )
 
-  if (!test) {
-
-    # Filter out the teaching team emails (i.e. the ones that match the "professor
-    #   domain").
-    responses <- responses |> dplyr::filter(
-      email_address |> stringr::str_detect(filter_domain, negate = TRUE)
-    )
-  }
-
-  return(responses)
+  responses
 }
