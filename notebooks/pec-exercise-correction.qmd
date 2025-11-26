@@ -328,7 +328,7 @@ The grading dataset is exported to file "`{r} data_grading_filepath`".
 grading_data |> write_csv(data_grading_filepath)
 ```
 
-#### Grading dataset upload
+### Grading dataset upload
 
 The grading dataset can now be uploaded to [the activity created in
 Moodle](https://agora.uned.es/mod/assign/view.php?id=756233) previously. To
