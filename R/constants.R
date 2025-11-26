@@ -39,6 +39,10 @@ DATASET_FILENAME    <- "datos_IAD.csv" # Name of downloaded dataset
 ### Auto download configuration:
 AUTO_DOWNLOAD_TIMEOUT <- 200L # Timeout (to start download) in milliseconds
 
+### Variable names:
+EMAIL_HASH_VAR <- "email_hash" # Variable for storing the hashed emails
+
+
 ### Google Spreadsheets configuration:
 
 #### Authentication:

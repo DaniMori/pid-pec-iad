@@ -136,12 +136,12 @@ if (!test_mode) {
 
   # Hash emails for filtering out the matching hashes: 
   teaching_team_hashes <- teaching_team_emails |>
-    transmute(email_hash = email_address |> map_int(hash_emails))
+    transmute(!!EMAIL_HASH_VAR := email_address |> map_int(hash_emails))
 
   # Filter out the teaching team emails (i.e. the ones included in the dataset
   #   with the "teaching team emails":
   data_downloads <- data_downloads |>
-    anti_join(teaching_team_hashes, by = "email_hash")
+    anti_join(teaching_team_hashes, by = EMAIL_HASH_VAR)
 }
 ```
 
@@ -159,7 +159,7 @@ data_downloads_out <- data_downloads |>
     attempts = n(),
     first    = first(timestamp),
     last     = last(timestamp),
-    .by      = c(email_hash, event) # Compute for each event type and email hash
+    .by      = c(!!EMAIL_HASH_VAR, event) # Compute for each event type and email hash
   ) |>
   mutate(across(event, str_to_lower)) |> # Lowercase events for column names
   pivot_wider(names_from = event, values_from = attempts:last)
@@ -180,8 +180,8 @@ This dataset is then read and preprocessed
 
 ```{r load-responses-data}
 data_student_responses <- data_responses_filepath |>
-  select(student_name, email_address:item_10)
   read_student_responses(test = test_mode, correct_num = TRUE) |>
+  select(student_name, email_address, !!EMAIL_HASH_VAR, starts_with("item_"))
 ```
 
 # Output computation
@@ -192,11 +192,11 @@ For each student, the correct answers of the exercise are obtained.
 
 ```{r get-correct-responses}
 data_correct_responses <- data_downloads_out |>
-  pull(email_hash) |>
+  pull(!!EMAIL_HASH_VAR) |>
   set_names() |> # Helps matching each user's responses with its hash
   map(get_correct_responses) |> # Get correct responses for each student
-  list_rbind(names_to = "email_hash") |>
-  mutate(email_hash = email_hash |> as.integer()) # Cast as integer for matching
+  list_rbind(names_to = EMAIL_HASH_VAR) |>
+  mutate(across(!!EMAIL_HASH_VAR, as.integer)) # For matching purposes
 ```
 
 ## Student responses correction
@@ -234,10 +234,10 @@ Additionally, we check whether they have responded after downloading the dataset
 ```{r compute-assessment-criteria}
 #| output: true
 data_criteria <- data_student_responses |>
-  select(student_name, email_hash, date) |>
+  select(student_name, !!EMAIL_HASH_VAR, date) |>
   left_join(
-    data_downloads_out |> select(email_hash, first_download),
-    by = "email_hash"
+    data_downloads_out |> select(!!EMAIL_HASH_VAR, first_download),
+    by = EMAIL_HASH_VAR
   ) |>
   mutate(
     download_correct = !is.na(first_download),
@@ -439,7 +439,7 @@ we can publish these responses without exposing the students' data.
 student_responses_filepath <- here(STUDENT_RESPONSES_FILENAME)
 
 data_student_responses_out <- data_student_responses |>
-  select(email_hash, intercept, slope, relationship, interpretation)
+  select(!!EMAIL_HASH_VAR, intercept, slope, relationship, interpretation)
 
 data_student_responses_out |> write_csv(file = student_responses_filepath)
 ```
