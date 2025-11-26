@@ -253,17 +253,17 @@ dataset and can be graded; the "FALSE" cases are the ones who have not.
 ### Composition of the grading dataset
 
 We need to fill in a grading sheet in a ".csv" file, with a specific format
-created by Moodle. In order to this, we first download the template from Moodle,
-and then fill in the grading of the scored students.
+created by OpenLMS. In order to this, we first download the template from
+OpenLMS, and then fill in the grading of the scored students.
 
 #### Template grading dataset download
 
-To download the template, we first need to create a "Task" in Moodle. This will
+To download the template, we first need to create a "Task" in OpenLMS. This will
 be a "virtual" activity (invisible for the students) where the grading sheet can
 be uploaded.
 
 We have created [this activity in
-Moodle](https://agora.uned.es/mod/assign/view.php?id=756233), with the name
+OpenLMS](https://agora.uned.es/mod/assign/view.php?id=756233), with the name
 "Calificaciones", and set its visibility as "No mostrado a los estudiantes". To
 download the grading sheet template, follow these steps:
 
@@ -331,7 +331,7 @@ grading_data |> write_csv(data_grading_filepath)
 ### Grading dataset upload
 
 The grading dataset can now be uploaded to [the activity created in
-Moodle](https://agora.uned.es/mod/assign/view.php?id=756233) previously. To
+OpenLMS](https://agora.uned.es/mod/assign/view.php?id=756233) previously. To
 upload the data file with the grading sheet template, follow these steps:
 
 1.  Authenticate in the UNED Campus for Teachers (if necessary):
