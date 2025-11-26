@@ -51,18 +51,27 @@ source("R/read_student_responses.R", encoding = 'UTF-8')
 #| include: false
 
 # Constant objects for processing the downloads dataset:
+
+## Dataset with the emails of the teaching team (to filter them out in
+##   "non-test" mode)
 TEACHING_TEAM_EMAILS_FILENAME <- "teaching_team_emails.csv"
+teaching_team_emails_filepath <- here(
+  DATA_DIR,
+  TEACHING_TEAM_EMAILS_FILENAME
+)
 
 ## File system objects for processing the student responses dataset:
 DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI.csv"
 data_responses_filepath <- here(DATA_DIR, DATA_RESPONSES_FILENAME)
 
 ## File system objects for generating the response dataset:
-STUDENT_TEMPLATE_FILENAME    <- # NOTE: Last code (006121) may change
-  "Introducción al Análisis de Datos (011037)-006401.xls"
-COURSE_PARTICIPANTS_FILENAME <- "courseid_7595_participants.csv"
-DATA_COMPENSATION_FILENAME   <- "compensation_data.xls"
+GRADING_TEMPLATE_FILENAME    <- # (Course name and activity code may change)
+  "Calificaciones-Introducción al Análisis de Datos-Calificaciones-756233.csv"
+DATA_GRADING_FILENAME        <- "grading_data.csv"
 STUDENT_RESPONSES_FILENAME   <- "student_responses.csv"
+
+grading_template_filepath  <- here(DATA_DIR, GRADING_TEMPLATE_FILENAME)
+data_grading_filepath      <- here(DATA_DIR, DATA_GRADING_FILENAME)
 ```
 
 # Introduction
@@ -111,14 +120,6 @@ following criteria:
 # Data loading & preprocessing
 
 ## Dataset of personalized data downloads
-
-```{r config-downlads-data}
-## File system objects:
-teaching_team_emails_filepath <- here(
-  DATA_DIR,
-  TEACHING_TEAM_EMAILS_FILENAME
-)
-```
 
 The downloads are first read from the Google Spreadsheets file connection. Prior
 to reading the dataset, one must make sure that [the Gsheets API connection has
