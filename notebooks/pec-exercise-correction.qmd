@@ -203,11 +203,16 @@ data_correct_responses <- data_downloads_out |>
 ## Student responses correction
 
 For each student, it is computed whether they have answered correctly to each of
-the items in the exercise.
+the items in the exercise. Then, the total score is computed as the sum of
+correct answers.
 
 ```{r correct-student-responses}
 data_response_corrections <- data_student_responses |>
-  score_student_responses(data_correct_responses)
+  score_student_responses(data_correct_responses) |>
+  rowwise() |>
+  mutate(
+    total_score = ends_with(SCORE_RESPONSE_SUFFIX) |> c_across() |> sum()
+  )
 ```
 
 ## Assessment criteria fulfillment

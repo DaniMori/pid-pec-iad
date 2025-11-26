@@ -22,12 +22,20 @@ source("R/simulated_data.R", encoding = 'UTF-8')
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
-# Response parameters:
+# Response computation helper objects:
+ITEM_PREFFIX <- "item_"
+STUDENT_RESPONSE_SUFFIX <- "_student"
+CORRECT_RESPONSE_SUFFIX <- "_correct"
+SCORE_RESPONSE_SUFFIX   <- "_score"
+
+
+# Response output parameters:
 
 ## Headers:
 ITEM_NUM_LABEL <- "Nº"
 ITEM_LABEL     <- "Pregunta"
 RESPONSE_LABEL <- "Respuesta"
+
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
@@ -39,12 +47,6 @@ get_correct_responses <- function(hash) {
 }
 
 score_student_responses <- function(student_responses, correct_responses) {
-
-  ## Constants: ----
-  ITEM_PREFFIX <- "item_"
-  STUDENT_RESPONSE_SUFFIX <- "_student"
-  CORRECT_RESPONSE_SUFFIX <- "_correct"
-  SCORE_RESPONSE_SUFFIX   <- "_score"
 
   ## Argument checking and formatting: ----
   item_vars <- student_responses |>
