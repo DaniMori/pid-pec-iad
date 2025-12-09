@@ -10,8 +10,6 @@ editor:              source
 execute: 
   output:            false
   warning:           false
-params:
-  test_mode:         false
 ---
 
 ```{r setup}
@@ -19,9 +17,6 @@ params:
 
 # Set working directory
 knitr::opts_knit$set(root.dir = here::here())
-
-# Read in parameters
-test_mode <- params$test_mode
 ```
 
 ```{r libraries}
@@ -104,69 +99,7 @@ student name and personal ID, but the OpenLMS data only has the email, so the
 data needs to be matched by name to generate the compensation with the tempate
 format.
 
-## Testing mode
-
-Test mode allows to render the notebook **with all the responses**. Test mode
-can be turned on/off by editing the value of the parameter `test_mode` to
-`true`/`false` in the document "yaml" front matter (line 12). When test mode is
-off, the responses from the teaching team are filtered out applying the
-following criteria:
-
--   From the student responses dataset, responses that match the "teacher email
-    domain" are directly filtered out.
-
--   From the downloads dataset, a set of teacher emails is loaded, their
-    corresponding hashes are computed, and the matching ones are filtered out.
-
 # Data loading & preprocessing
-
-## Dataset of personalized data downloads
-
-The downloads are first read from the Google Spreadsheets file connection. Prior
-to reading the dataset, one must make sure that [the Gsheets API connection has
-been successfully authorized](doc/gs_instructions.qmd).
-
-```{r load-download-data}
-data_downloads <- gs_file_link |>
-  read_sheet(col_types = 'icc') |> # Read email hashes as integers
-  mutate(across(timestamp, parse_timestamp)) # `timestamp` as POSIXct time
-
-if (!test_mode) {
-
-  teaching_team_emails <- teaching_team_emails_filepath |> read_csv()
-
-  # Hash emails for filtering out the matching hashes: 
-  teaching_team_hashes <- teaching_team_emails |> mutate(
-    !!EMAIL_HASH_VAR := email_address |> map_int(hash_emails),
-    .keep = "none"
-  )
-
-  # Filter out the teaching team emails (i.e. the ones included in the dataset
-  #   with the "teaching team emails":
-  data_downloads <- data_downloads |>
-    anti_join(teaching_team_hashes, by = EMAIL_HASH_VAR)
-}
-```
-
-Then, the data is processed to extract, for each user:
-
--   The number of access and download attempts.
-
--   The timestamp (in the local time of `{r} LOCAL_TIMEZONE`) of the first and
-    last access and download attempts.
-
-```{r process-download-data}
-data_downloads_out <- data_downloads |>
-  arrange(timestamp) |>
-  summarise(
-    attempts = n(),
-    first    = first(timestamp),
-    last     = last(timestamp),
-    .by      = c(!!EMAIL_HASH_VAR, event) # Compute for each event type and email hash
-  ) |>
-  mutate(across(event, str_to_lower)) |> # Lowercase events for column names
-  pivot_wider(names_from = event, values_from = attempts:last)
-```
 
 ## Dataset of activity responses
 
@@ -189,34 +122,76 @@ data_student_responses <- data_responses_filepath |>
 
 # Output computation
 
-## Correct responses for each student
-
-For each student, the correct answers of the exercise are obtained.
-
-```{r get-correct-responses}
-data_correct_responses <- data_downloads_out |>
-  # Filter out the ones without responses to make it more efficient:
-  semi_join(data_student_responses, by = EMAIL_HASH_VAR) |>
-  pull(!!EMAIL_HASH_VAR) |>
-  set_names() |> # Helps matching each user's responses with its hash
-  map(get_correct_responses) |> # Get correct responses for each student
-  list_rbind(names_to = EMAIL_HASH_VAR) |>
-  mutate(across(!!EMAIL_HASH_VAR, as.integer)) # For matching purposes
-```
-
 ## Student responses correction
 
 For each student, it is computed whether they have answered correctly to each of
 the items in the exercise. Then, the total score is computed as the sum of
 correct answers.
 
-```{r correct-student-responses}
-data_response_corrections <- data_student_responses |>
-  score_student_responses(data_correct_responses) |>
-  rowwise() |>
-  mutate(
-    total_score = ends_with(SCORE_RESPONSE_SUFFIX) |> c_across() |> sum()
+```{r}
+compute_correct_responses <- function(data) {
+  ## Constant objects: ----
+
+  # Linear regression model objects:
+  INTERCEPT_TERM <- "(Intercept)"
+  criterion_name <- SIM_VAR_NAMES['var_1'] |> glue::backtick()
+  predictor_name <- SIM_VAR_NAMES['var_2'] |> glue::backtick()
+
+
+  ## Main: ----
+
+  # Transform `var_2` to integer to use it a "linear term" in the regression
+  data <- data |> dplyr::mutate(`Satisfaccion vital` = `Satisfaccion vital` |>
+                                  as.character() |>
+                                  as.integer())
+
+  # Fit model and extract coefficients:
+  model       <- glue::glue("{criterion_name} ~ {predictor_name}") # Formula
+  fitted_model <- data         |> lm(formula = model)
+  coefficients <- fitted_model |> broom::tidy()
+
+  # Compute responses:
+
+  computed_responses <- data |> dplyr::summarize(
+    item_1 = table(`Satisfaccion vital`)[ITEM_1_LS_CAT],
+    item_2 = median(`Horas sueno promedio`),
+    item_3 = sd(`Horas sueno promedio`) |> round(N_DECIMALS),
+    item_4 = quantile(`Horas sueno promedio`, .34),
+    item_5 = boxplot.stats(`Horas sueno promedio`)$out |>
+      length() |>
+      as.logical() |>
+      as.character(),
+    item_6 = cor(`Satisfaccion vital`, `Horas sueno promedio`) |>
+      round(N_DECIMALS),
+    item_7 = item_6 |> sign() |> as.character(),
+    item_8 = coefficients |>
+      dplyr::filter(term == INTERCEPT_TERM) |>
+      dplyr::pull(estimate) |>
+      round(N_DECIMALS),
+    item_9 = coefficients |>
+      dplyr::filter(term == predictor_name) |>
+      dplyr::pull(estimate) |>
+      round(N_DECIMALS),
+    item_10 = item_9 |> sign() |> as.character(),
   )
+
+  # Capture warning when factor levels are missing in the data (they will!)
+  suppressWarnings(
+    computed_responses <- computed_responses |> dplyr::mutate(
+      item_5  = item_5 |>
+        readr::parse_factor(levels = ITEM_5_VALUES) |>
+        forcats::fct_recode(!!!ITEM_5_VALUES),
+      item_7  = item_7 |>
+        readr::parse_factor(levels = ITEM_7_VALUES) |>
+        forcats::fct_recode(!!!ITEM_7_VALUES),
+      item_10 = item_10 |>
+        readr::parse_factor(levels = ITEM_10_VALUES) |>
+        forcats::fct_recode(!!!ITEM_10_VALUES)
+    )
+  )
+
+  computed_responses
+}
 ```
 
 ## Download dataset checks
@@ -247,109 +222,6 @@ data_criteria |> count(across(data_downloaded:criteria_all))
 
 The number of "TRUE" cases are the number of students that have downloaded the
 dataset and can be graded; the "FALSE" cases are the ones who have not.
-
-## Students to receive scoring for participation
-
-### Composition of the grading dataset
-
-We need to fill in a grading sheet in a ".csv" file, with a specific format
-created by OpenLMS. In order to this, we first download the template from
-OpenLMS, and then fill in the grading of the scored students.
-
-#### Template grading dataset download
-
-To download the template, we first need to create a "Task" in OpenLMS. This will
-be a "virtual" activity (invisible for the students) where the grading sheet can
-be uploaded.
-
-We have created [this activity in
-OpenLMS](https://agora.uned.es/mod/assign/view.php?id=756233), with the name
-"Calificaciones", and set its visibility as "No mostrado a los estudiantes". To
-download the grading sheet template, follow these steps:
-
-1.  Authenticate in the UNED Campus for Teachers (if necessary):
-    https://www.uned.es/universidad/campus/pdi/docencia.html
-
-2.  Browse to the [grading page of the
-    activity](https://agora.uned.es/mod/assign/view.php?id=756233&action=grading).
-
-3.  Click on button "Acciones".
-
-4.  In the drop-down menu, click on "Descargar la hoja de calificaciones".
-
-5.  Save the file with its default name "`{r} GRADING_TEMPLATE_FILENAME`" in
-    [the data folder](dat/).
-
-```{r read-student-grading_template}
-grading_template <- read_csv(
-  grading_template_filepath,
-  col_types = cols(.default = col_character()) # Prevent parsing default values
-)
-```
-
-#### Grading dataset creation
-
-The dataset with the scoring data is matched to the criteria dataset and, for
-the students that fulfill the criteria, the score is written to the template. To
-do this, we match by email hash all the datasets. After matching, we verify that
-the score of the students who do not fulfill the criteria have the expeceted
-score (i.e. zero, as they have probably responded at random).
-
-```{r generate-grading-data}
-grading_data <- data_response_corrections |>
-  ungroup() |>
-  select(email_hash, total_score) |>
-  left_join(
-    data_criteria |> select(email_hash, data_downloaded:criteria_all),
-    by = EMAIL_HASH_VAR
-  )
-
-# Check scores against grading criteria:
-grading_data |> count(across(total_score | data_downloaded:criteria_all))
-
-# Select necessary variables and cases from the grading dataset
-grading_data <- grading_data |>
-  filter(criteria_all) |>
-  select(!!EMAIL_HASH_VAR, total_score)
-
-# Fill in the grading template with the computed scores
-grading_data <- grading_template |>
-  mutate(!!EMAIL_HASH_VAR := `Dirección de correo` |> map_int(hash_emails)) |>
-  left_join(grading_data, by = EMAIL_HASH_VAR) |>
-  mutate(Calificación = total_score) |>
-  select(-!!EMAIL_HASH_VAR, -total_score)
-```
-
-### Grading data exportation
-
-The grading dataset is exported to file "`{r} data_grading_filepath`".
-
-```{r create-compensation-dataset}
-grading_data |> write_csv(data_grading_filepath)
-```
-
-### Grading dataset upload
-
-The grading dataset can now be uploaded to [the activity created in
-OpenLMS](https://agora.uned.es/mod/assign/view.php?id=756233) previously. To
-upload the data file with the grading sheet template, follow these steps:
-
-1.  Authenticate in the UNED Campus for Teachers (if necessary):
-    https://www.uned.es/universidad/campus/pdi/docencia.html
-
-2.  Browse to the [grading page of the
-    activity](https://agora.uned.es/mod/assign/view.php?id=756233&action=grading).
-
-3.  Click on button "Acciones".
-
-4.  In the drop-down menu, click on "Subir la hoja de calificaciones".
-
-5.  In the "file input", drag and drop the file named
-    "`{r} DATA_GRADING_FILENAME`" in [the data folder](dat/).
-
-6.  Click on button "Subir la hoja de calificaciones".
-
-7.  In the confirmation screen, click on "Confirmar".
 
 ## Student responses
 
