@@ -11,7 +11,7 @@ execute:
   output:            false
   warning:           false
 params:
-  test_mode:         false
+  test_mode:         true
 ---
 
 ```{r setup}
@@ -62,7 +62,7 @@ teaching_team_emails_filepath <- here(
 )
 
 ## File system objects for processing the student responses dataset:
-DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI.csv"
+DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI overwritten.csv"
 data_responses_filepath <- here(DATA_DIR, DATA_RESPONSES_FILENAME)
 
 ## File system objects for generating the response dataset:
