@@ -318,6 +318,10 @@ grading_data <- grading_template |>
   left_join(grading_data, by = EMAIL_HASH_VAR) |>
   mutate(Calificación = total_score) |>
   select(-!!EMAIL_HASH_VAR, -total_score)
+
+# Discard the cases that have not been graded (i.e., `Calificación` is `NA`)
+grading_data <- grading_data |>
+  filter(!is.na(Calificación))
 ```
 
 ### Grading data exportation
