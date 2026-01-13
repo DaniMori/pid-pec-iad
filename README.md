@@ -202,13 +202,17 @@ click on “Run App”.
     - .Renviron
     - .secrets/encrypted-oauth-token-rds
     - doc/gsheets_config.yml
+    - R/constants.R
+    - R/data_storage.R
+    - R/hash_emails.R
+    - R/log.R
+    - R/simulated_data.R
     - renv.lock
     - server.R
     - ui.R
-    - The R folder
 
-    **IMPORTANT**: Make sure to select the previous files and folders,
-    and only those. There must be 7 checkboxes ticked.
+    **IMPORTANT**: Make sure to select the previous files and only
+    those. There must be 11 files checkboxed.
 
 6.  Click on “Publish”. The “Deploy” tab will open, printing out several
     messages. If the deployment is successful, the tab will ultimately
