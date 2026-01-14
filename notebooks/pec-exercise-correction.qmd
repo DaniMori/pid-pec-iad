@@ -363,9 +363,12 @@ upload the data file with the grading sheet template, follow these steps:
 5.  In the "file input", drag and drop the file named
     "`{r} DATA_GRADING_FILENAME`" in [the data folder](dat/).
 
-6.  Click on button "Subir la hoja de calificaciones".
+6.  Check box "Permitir la actualización de los registros que se han modificado
+    recientemente en Moodle antes que en la hoja de cálculo."
 
-7.  In the confirmation screen, click on "Confirmar".
+7.  Click on button "Subir la hoja de calificaciones".
+
+8.  In the confirmation screen, click on "Confirmar".
 
 ## Student responses
 
