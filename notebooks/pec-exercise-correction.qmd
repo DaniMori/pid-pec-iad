@@ -104,6 +104,21 @@ student name and personal ID, but the OpenLMS data only has the email, so the
 data needs to be matched by name to generate the compensation with the tempate
 format.
 
+## Pre-requirements
+
+This notebook requires the usage of the dataset with the student responses, and
+the one with the Shiny app logs. The second dataset is directly accessed through
+the Google sheets API, so in order to access the file, the API and the log file
+must be configured, as per the Shiny app instructions.
+
+In order to this, before running this notebook, make sure to follow:
+
+1.  The [“Google Spreadsheets connection
+    instructions”](../doc/gs_instructions.qmd)
+
+2.  The ["Configuration" section](../README.md#configuration) of [the repository
+    README file](../README.md)
+
 ## Testing mode
 
 Test mode allows to render the notebook **with all the responses**. Test mode
