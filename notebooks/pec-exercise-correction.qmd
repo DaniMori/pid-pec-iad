@@ -208,9 +208,7 @@ data_student_responses <- data_responses_filepath |>
 For each student, the correct answers of the exercise are obtained.
 
 ```{r get-correct-responses}
-data_correct_responses <- data_downloads_out |>
-  # Filter out the ones without responses to make it more efficient:
-  semi_join(data_student_responses, by = EMAIL_HASH_VAR) |>
+data_correct_responses <- data_student_responses |>
   pull(!!EMAIL_HASH_VAR) |>
   set_names() |> # Helps matching each user's responses with its hash
   map(get_correct_responses) |> # Get correct responses for each student
