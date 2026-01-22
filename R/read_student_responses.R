@@ -101,8 +101,12 @@ read_student_responses <- function(filepath,
     )
   }
 
+  suppressWarnings( # Avoid warning when there is a non-numeric response
+    responses <- responses |>
+      dplyr::mutate(dplyr::across(!!num_items_selection, readr::parse_number))
+  )
+
   responses <- responses |> dplyr::mutate(
-    dplyr::across(!!num_items_selection, readr::parse_number),
     item_5  = item_5  |> factor(levels =  ITEM_5_LABELS),
     item_7  = item_7  |> factor(levels =  ITEM_7_LABELS),
     item_10 = item_10 |> factor(levels = ITEM_10_LABELS),

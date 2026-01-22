@@ -34,9 +34,6 @@ library(purrr)
 library(tidyr)
 library(stringr)
 library(roperators)
-# library(stringi)
-# library(tibble)
-# library(readxl)
 library(writexl)
 ```
 
@@ -104,6 +101,21 @@ student name and personal ID, but the OpenLMS data only has the email, so the
 data needs to be matched by name to generate the compensation with the tempate
 format.
 
+## Pre-requirements
+
+This notebook requires the usage of the dataset with the student responses, and
+the one with the Shiny app logs. The second dataset is directly accessed through
+the Google sheets API, so in order to access the file, the API and the log file
+must be configured, as per the Shiny app instructions.
+
+In order to this, before running this notebook, make sure to follow:
+
+1.  The [“Google Spreadsheets connection
+    instructions”](../doc/gs_instructions.qmd)
+
+2.  The ["Configuration" section](../README.md#configuration) of [the repository
+    README file](../README.md)
+
 ## Testing mode
 
 Test mode allows to render the notebook **with all the responses**. Test mode
@@ -133,7 +145,9 @@ data_downloads <- gs_file_link |>
 
 if (!test_mode) {
 
-  teaching_team_emails <- teaching_team_emails_filepath |> read_csv()
+  teaching_team_emails <- teaching_team_emails_filepath |> read_csv(
+    col_types = cols(email_address = col_character()),
+  )
 
   # Hash emails for filtering out the matching hashes: 
   teaching_team_hashes <- teaching_team_emails |> mutate(
@@ -194,9 +208,7 @@ data_student_responses <- data_responses_filepath |>
 For each student, the correct answers of the exercise are obtained.
 
 ```{r get-correct-responses}
-data_correct_responses <- data_downloads_out |>
-  # Filter out the ones without responses to make it more efficient:
-  semi_join(data_student_responses, by = EMAIL_HASH_VAR) |>
+data_correct_responses <- data_student_responses |>
   pull(!!EMAIL_HASH_VAR) |>
   set_names() |> # Helps matching each user's responses with its hash
   map(get_correct_responses) |> # Get correct responses for each student
@@ -318,6 +330,10 @@ grading_data <- grading_template |>
   left_join(grading_data, by = EMAIL_HASH_VAR) |>
   mutate(Calificación = total_score) |>
   select(-!!EMAIL_HASH_VAR, -total_score)
+
+# Discard the cases that have not been graded (i.e., `Calificación` is `NA`)
+grading_data <- grading_data |>
+  filter(!is.na(Calificación))
 ```
 
 ### Grading data exportation
@@ -347,9 +363,12 @@ upload the data file with the grading sheet template, follow these steps:
 5.  In the "file input", drag and drop the file named
     "`{r} DATA_GRADING_FILENAME`" in [the data folder](dat/).
 
-6.  Click on button "Subir la hoja de calificaciones".
+6.  Check box "Permitir la actualización de los registros que se han modificado
+    recientemente en Moodle antes que en la hoja de cálculo."
 
-7.  In the confirmation screen, click on "Confirmar".
+7.  Click on button "Subir la hoja de calificaciones".
+
+8.  In the confirmation screen, click on "Confirmar".
 
 ## Student responses
 
