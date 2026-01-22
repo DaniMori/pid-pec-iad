@@ -40,24 +40,24 @@ Start by installing the following software components:
 
 - [Rstudio Desktop](https://posit.co/download/rstudio-desktop/):
   Although not strictly necessary, it is recommended to install the
-  Rstudio IDE; for strict reproducibility, use build [2025.09.1+401 for
+  Rstudio IDE; for strict reproducibility, use build [2026.01.0+392 for
   Windows
-  10/11](https://download1.rstudio.org/electron/windows/RStudio-2025.09.1-401.exe).
+  10/11](https://download1.rstudio.org/electron/windows/RStudio-2026.01.0-392.exe).
 
 <!-- -->
 
 - [Quarto publishing system](https://quarto.org/): An additional
   component used by Rstudio to generate and publish literate computing
-  outputs. For strict reproducibility please use build 1.7.32; On
+  outputs. For strict reproducibility please use build 1.8.25; On
   Windows, use [the 64-bit
-  installer](https://github.com/quarto-dev/quarto-cli/releases/download/v1.7.32/quarto-1.7.32-win.msi).
+  installer](https://github.com/quarto-dev/quarto-cli/releases/download/v1.8.25/quarto-1.8.25-win.msi).
 
 <!-- -->
 
 - [Git client](https://git-scm.com/download): Install the Git client in
   order to be able to clone locally the project repository. On Windows,
   use [the 64-bit Windows
-  installer](https://github.com/git-for-windows/git/releases/download/v2.51.2.windows.1/Git-2.51.2-64-bit.exe).
+  installer](https://github.com/git-for-windows/git/releases/download/v2.52.0.windows.1/Git-2.52.0-64-bit.exe).
 
 ## Installing the project locally
 
@@ -167,9 +167,32 @@ click on “Run App”.
 
 ## Deploying the app to [shinyapps.io](https://www.shinyapps.io/)
 
-1.  Log in to [shinyapps.io](https://www.shinyapps.io/). If necessary,
-    follow the steps to create a new account. (In our case, use the
-    account “<iad.uned.psi@gmail.com>”, authenticating with Google).
+<div class="callout-important">
+
+### Deploying the app in “Production” vs. “Test” mode
+
+When the app is already deployed to
+[shinyapps.io](https://www.shinyapps.io/) and running, in order to avoid
+a collision (which would affect the app usage by the students), a “test
+account” must be used in [shinyapps.io](https://www.shinyapps.io/). For
+example, with email address “<johndoe@psi.uned.es>”, create account
+“john-does-test” in [shinyapps.io](https://www.shinyapps.io/).
+
+Consider the account “iad-psi-uned-es”, associated with email address
+“<iad.uned.psi@gmail.com>”, to be the “production” account”. Then,
+decide beforehand whether you will follow these instructions using the
+“production account” (when the app is not deployed and needs to be set
+up for usage within the “PEC”) or the alternative “test account” (when
+the app is already deployed and running, and the “PEC” is being
+completed by the students during the course).
+
+</div>
+
+1.  Log in to [shinyapps.io](https://www.shinyapps.io/) using the email
+    associated with the account (production/test) that you will use. If
+    necessary, follow the steps to create a new account. (If using the
+    “production account”, log in with email address
+    “<iad.uned.psi@gmail.com>”, authenticating with Google.)
 
 2.  In the [shinyapps.io
     dashboard](https://www.shinyapps.io/admin/#/dashboard), click on the
@@ -189,15 +212,16 @@ click on “Run App”.
     your Rstudio history; at this point, make sure you go to the
     “History” tab and delete the last entry, by selecting it and
     clicking on the “Remove the selected history entries” button
-    (document with red “X” icon), or by clicking on the “Clear all
+    (“document with a red X” icon), or by clicking on the “Clear all
     history entries” (“broom” icon).
 
 5.  Open either the [“ui.R”](ui.R) or [“server.R”](server.R) file in the
     Rstudio editor. Then click on the “Publish” button; select the
     corresponding account on [shinyapps.io](https://www.shinyapps.io)
-    (i.e., “iad-psi-uned-es”), and enter the app title (“pid-pec-iad”)
-    in the “Title” text box. Finally, **select carefully** ALL OF and
-    ONLY the following files and folders:
+    (i.e., “iad-psi-uned-es” if using the “production account”, the
+    “test account” you created if using it), and enter the app title
+    (“pid-pec-iad”) in the “Title” text box. Finally, **select
+    carefully** ALL OF and ONLY the following files and folders:
 
     - .Renviron
     - .secrets/encrypted-oauth-token-rds
@@ -211,17 +235,26 @@ click on “Run App”.
     - server.R
     - ui.R
 
-    **IMPORTANT**: Make sure to select the previous files and only
-    those. There must be 11 files checkboxed.
+<div class="callout-caution">
+
+Make sure to select the previous files and only those. There must be
+exactly 11 files checkboxed.
+
+</div>
 
 6.  Click on “Publish”. The “Deploy” tab will open, printing out several
     messages. If the deployment is successful, the tab will ultimately
-    output the message
+    output a message with the URL where the app is deployed. If using
+    the “production account”, it will be:
 
     `Deployment completed: https://iad-psi-uned-es.shinyapps.io/pid-pec-iad/`
 
-    and the “Deploy” tab will automatically close while a tab will open
-    in the default browser, navigating to the URL of the app (the one in
+    If using the “test account”, it will match
+
+    `Deployment completed: https://<test-account>.shinyapps.io/pid-pec-iad/`
+
+    The “Deploy” tab will automatically close while a tab will open in
+    the default browser, navigating to the URL of the app (the one in
     the message above).
 
 7.  Check that the app is running properly: The previous URL will not
@@ -231,17 +264,29 @@ click on “Run App”.
     check that the app “pid-pec-iad” is listed with Status “Running”.
 
 8.  If the app is running, test the app by browsing to its URL
-    (<https://iad-psi-uned-es.shinyapps.io/pid-pec-iad>), and then
-    adding the “email” GET parameter in the end, i.e.:
+    (<https://iad-psi-uned-es.shinyapps.io/pid-pec-iad> if using the
+    “production account”, something like
+    <https://><test-account>.shinyapps.io/pid-pec-iad if using the “test
+    account”), and then adding an “email” GET parameter at the end,
+    i.e., with the “production account”:
 
     <https://iad-psi-uned-es.shinyapps.io/pid-pec-iad?email=johndoe@psi.uned.es>\`
 
-    (It is highly recommended that you use your own email at the
-    “@\*.uned.es” domain.) If the app works properly, a dataset should
-    be downloaded automatically and/or by clicking on the link to
-    download it manually. It should also be checked that the new entries
-    (for “Access” and “Download”) are logged in the Google Spreadsheet
-    file.
+    with a “test account”, something like:
+
+    <https://><test-account>.shinyapps.io/<pid-pec-iad?email=johndoe@psi.uned.es>\`
+
+<div class="callout-tip">
+
+It is highly recommended that you use your own email at the
+“@\*.uned.es” domain.
+
+</div>
+
+If the app works properly, a dataset should be downloaded automatically
+and/or by clicking on the link to download it manually. It should also
+be checked that the new entries (for “Access” and “Download”) are logged
+in the Google Spreadsheet file.
 
 # Repository structure
 
