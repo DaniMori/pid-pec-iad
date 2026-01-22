@@ -1,8 +1,8 @@
 # ==============================================================================
 #
 # FILE NAME:   simulated_data.R
-# DESCRIPTION: Functionality for creating and analyzing a simulated dataset for
-#              the student's personal exercise
+# DESCRIPTION: Functionality for creating a simulated dataset for the student's
+#              personal exercise and the exercise correct responses
 #
 # AUTHOR:      Daniel Morillo
 #
@@ -11,9 +11,68 @@
 # ==============================================================================
 
 
-## ---- SOURCES: ---------------------------------------------------------------
+## ---- CONSTANTS: -------------------------------------------------------------
 
-source("R/constants.R", encoding = 'UTF-8')
+# Simulated data objects:
+
+## Variable names:
+SIM_VARIABLES <- c("var_1",                "var_2")
+SIM_VAR_NAMES <- c("Horas sueno promedio", "Satisfaccion vital") |>
+  setNames(SIM_VARIABLES)
+
+## Model parameters:
+INTERCEPT_VAR_NAME    <- "intercept"
+SLOPE_VAR_NAME        <- "slope"
+RELATIONSHIP_VAR_NAME <- "relationship"
+
+## Variable data:
+SAMPLE_SIZE  <- 300:500  # Uniformly random sample size of 300-500
+VAR_1_SCORES <-  40:100 / 10 # Possible scores in `var_1`
+VAR_2_SCORES <-   1:  5      # Possible scores in `var_2`
+
+## Modeling variables:
+REL_LEVS <- c(-1L, 1L) # Levels for the "relationship" item response
+
+
+# Response generation objects:
+
+ITEM_1_LS_CAT <- 2L # Category "Insatisfecho" in "life satisfaction" variable
+                    #   (for item 1).
+
+## Item value labels:
+SIGN_LEVELS    <- c(-1, 0, 1) |> as.character()
+LOGICAL_LEVELS <- c(FALSE, TRUE) |> as.character()
+
+ITEM_5_LABELS <- c("No", "Sí")
+ITEM_5_VALUES <- LOGICAL_LEVELS |> setNames(ITEM_5_LABELS)
+
+ITEM_7_LABELS <- c(
+  "Las variables  tienen una relación inversa",
+  "Las variables tienen una relación nula (exactamente igual a cero)",
+  "Las variables  tienen una relación directa"
+)
+ITEM_7_VALUES <- SIGN_LEVELS |> setNames(ITEM_7_LABELS)
+
+ITEM_10_LABELS <- c(
+  paste(
+    'A menos "satisfacción vital",',
+    'mayor "promedio semanal de horas diarias de sueño"'
+  ),
+  paste(
+    'La relación entre la "satisfacción vital" y el "promedio semanal',
+    'de horas diarias de sueño" es nula (exactamente igual a cero)'
+  ),
+  paste(
+    'A más "satisfacción vital",',
+    'mayor "promedio semanal de horas diarias de sueño"'
+  )
+)
+ITEM_10_VALUES <- SIGN_LEVELS |> setNames(ITEM_10_LABELS)
+
+
+## Response configuration data:
+N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
+
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
@@ -21,90 +80,97 @@ simulate_data <- function(seed) {
 
   set.seed(seed)
 
-  slope       <- sample(-1:1, size = 1L) # Simulation regression coefficient
+  slope       <- sample(REL_LEVS, size = 1L) # Simulated regression coefficient
   sample_size <- sample(SAMPLE_SIZE, size = 1L) # Random sample size
-  n_crit_vals <- length(CRITERION_SCORES) # Nº of values in the criterion scores
+  n_crit_vals <- length(VAR_2_SCORES) # Nº of values in `var_2`
 
-  tibble::tibble(
-    predictor = sample(
-      PREDICTOR_SCORES,
+  output <- tibble::tibble(
+    var_1 = sample(
+      VAR_1_SCORES,
       size    = sample_size,
       replace = TRUE
     ),
-    criterion = (slope * predictor + rnorm(sample_size)) |>
-      dplyr::ntile(n_crit_vals)                          |>
-      dplyr::recode(!!!CRITERION_SCORES |> setNames(1:n_crit_vals))
-  ) |>
+    # Preliminary "continuous version" of `var_2`
+    var_2 = slope * var_1 + rnorm(sample_size)
+  )
+
+  # Random cut points for `var_2` (to avoid a "flat" barplot)
+  rel_cut_props <- runif(n_crit_vals, min = .2, max = 1) |> cumsum()
+  cut_props     <- c(0, rel_cut_props / max(rel_cut_props)) # Normalize
+  cut_quantiles <- output |> dplyr::pull(var_2) |> quantile(cut_props)
+
+  # Recode `var_2` into discrete values using the cut points:
+  output |>
+    dplyr::mutate(
+      var_2 = var_2 |> cut(
+        breaks         = cut_quantiles,
+        labels         = VAR_2_SCORES,
+        include.lowest = TRUE
+      )
+    ) |>
     setNames(SIM_VAR_NAMES)
 }
 
-get_model_params <- function(data) {
-
+compute_correct_responses <- function(data) {
   ## Constant objects: ----
-  INTERCEPT_TERM     <- "(Intercept)"
+
+  # Linear regression model objects:
+  INTERCEPT_TERM <- "(Intercept)"
+  criterion_name <- SIM_VAR_NAMES['var_1'] |> glue::backtick()
+  predictor_name <- SIM_VAR_NAMES['var_2'] |> glue::backtick()
+
 
   ## Main: ----
 
-  predictor_name <- SIM_VAR_NAMES['predictor']
-  criterion_name <- SIM_VAR_NAMES['criterion']
-  response_terms <- c(INTERCEPT_TERM, predictor_name)
+  # Transform `var_2` to integer to use it a "linear term" in the regression
+  data <- data |> dplyr::mutate(`Satisfaccion vital` = `Satisfaccion vital` |>
+                                  as.character() |>
+                                  as.integer())
 
   # Fit model and extract coefficients:
-  model        <- glue::glue("{criterion_name} ~ {predictor_name}") # Formula
+  model       <- glue::glue("{criterion_name} ~ {predictor_name}") # Formula
   fitted_model <- data         |> lm(formula = model)
   coefficients <- fitted_model |> broom::tidy()
 
-  # Get exercise responses from the model results:
-  responses <- coefficients                 |>
-    dplyr::filter(term %in% response_terms) |>
-    dplyr::mutate(
-      estimate = estimate |> round(N_DECIMALS),
-      term     = term     |> dplyr::case_match(
-        INTERCEPT_TERM ~ INTERCEPT_VAR_NAME,
-        SIM_VAR_NAMES['predictor'] ~ SLOPE_VAR_NAME
-      )
-    )                                       |>
-    dplyr::select(term, estimate)           |>
-    tidyr::pivot_wider(names_from = term, values_from = estimate)
+  # Compute responses:
 
-  responses |>
-    dplyr::mutate(relationship = slope |> sign() |> factor(levels = REL_LEVELS))
-}
-
-get_user_responses <- function(hash) {
-
-  user_sim_data <- simulate_data(hash)
-
-  user_sim_data |> get_model_params()
-}
-
-format_responses <- function(responses) {
-
-  relationship_levels <- REL_LEVELS |>
-    as.character() |>
-    setNames(RELATIONSHIP_LABELS)
-
-  params_varnames    <- c(
-    INTERCEPT_VAR_NAME,
-    SLOPE_VAR_NAME,
-    RELATIONSHIP_VAR_NAME
+  computed_responses <- data |> dplyr::summarize(
+    item_1 = table(`Satisfaccion vital`)[ITEM_1_LS_CAT],
+    item_2 = median(`Horas sueno promedio`),
+    item_3 = sd(`Horas sueno promedio`) |> round(N_DECIMALS),
+    item_4 = quantile(`Horas sueno promedio`, .34),
+    item_5 = boxplot.stats(`Horas sueno promedio`)$out |>
+      length() |>
+      as.logical() |>
+      as.character(),
+    item_6 = cor(`Satisfaccion vital`, `Horas sueno promedio`) |>
+      round(N_DECIMALS),
+    item_7 = item_6 |> sign() |> as.character(),
+    item_8 = coefficients |>
+      dplyr::filter(term == INTERCEPT_TERM) |>
+      dplyr::pull(estimate) |>
+      round(N_DECIMALS),
+    item_9 = coefficients |>
+      dplyr::filter(term == predictor_name) |>
+      dplyr::pull(estimate) |>
+      round(N_DECIMALS),
+    item_10 = item_9 |> sign() |> as.character(),
   )
-  params_labels      <- c(INTERCEPT_LABEL, SLOPE_LABEL, RELATIONSHIP_LABEL)
-  params_vars_labels <- params_varnames |>
-    setNames(params_labels) |>
-    tibble::enframe(name = ITEM_LABEL)
 
-  responses |>
-    dplyr::mutate(
-      relationship = relationship |>
-        forcats::fct_recode(!!!relationship_levels),
-      dplyr::across(dplyr::everything(), as.character)
-    ) |>
-    tidyr::pivot_longer(
-      cols      = dplyr::everything(),
-      values_to = RESPONSE_LABEL
-    ) |>
-    dplyr::full_join(params_vars_labels, by = c(name = "value")) |>
-    dplyr::select(dplyr::all_of(c(ITEM_LABEL, RESPONSE_LABEL))) |>
-    tibble::rownames_to_column(ITEM_NUM_LABEL)
+  # Capture warning when factor levels are missing in the data (they will!)
+  suppressWarnings(
+    computed_responses <- computed_responses |> dplyr::mutate(
+      item_5  = item_5 |>
+        readr::parse_factor(levels = ITEM_5_VALUES) |>
+        forcats::fct_recode(!!!ITEM_5_VALUES),
+      item_7  = item_7 |>
+        readr::parse_factor(levels = ITEM_7_VALUES) |>
+        forcats::fct_recode(!!!ITEM_7_VALUES),
+      item_10 = item_10 |>
+        readr::parse_factor(levels = ITEM_10_VALUES) |>
+        forcats::fct_recode(!!!ITEM_10_VALUES)
+    )
+  )
+
+  computed_responses
 }

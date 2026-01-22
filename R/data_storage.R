@@ -85,7 +85,7 @@ write_event <- function(hash, event = EVENT_TYPES) {
   SERVER_TIMEZONE  <- "Europe/Madrid"
 
   ## Variable names:
-  LOG_VAR_NAMES <- c("email_hash", "timestamp", "event")
+  LOG_VAR_NAMES <- c(EMAIL_HASH_VAR, "timestamp", "event")
 
 
   # Argument parsing and formatting: ----

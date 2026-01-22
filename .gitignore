@@ -42,4 +42,5 @@
 doc/gsheets_config.yml
 
 # Explicit exclusions for dataset and processing notebooks
-!dat/student_response_variables.csv # Student responses variables
+!dat/student_response_variables.csv
+student_responses.csv
