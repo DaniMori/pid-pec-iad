@@ -47,8 +47,8 @@ ITEM_5_LABELS <- c("No", "Sí")
 ITEM_5_VALUES <- LOGICAL_LEVELS |> setNames(ITEM_5_LABELS)
 
 ITEM_7_LABELS <- c(
-  "Las variables  tienen una relación inversa",
-  "Las variables tienen una relación nula (exactamente igual a cero)",
+  "Las variables  tienen una relación indirecta",
+  "Las variables  tienen una relación nula (exactamente igual a cero)",
   "Las variables  tienen una relación directa"
 )
 ITEM_7_VALUES <- SIGN_LEVELS |> setNames(ITEM_7_LABELS)
