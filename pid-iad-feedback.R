@@ -24,10 +24,10 @@ library(shinyjs, warn.conflicts = FALSE)
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
-source("R/constants.R",         encoding = 'UTF-8')
-source("R/compute_responses.R", encoding = 'UTF-8')
-source("R/hash_emails.R",       encoding = 'UTF-8')
-source("R/log.R",               encoding = 'UTF-8')
+source("R/constants.R",       encoding = 'UTF-8')
+source("R/score_responses.R", encoding = 'UTF-8')
+source("R/hash_emails.R",     encoding = 'UTF-8')
+source("R/log.R",             encoding = 'UTF-8')
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
@@ -77,7 +77,7 @@ server <- function(input, output, session) {
     if (!is.null(hashed_email())) {
 
       hashed_email() |>
-        get_user_responses() |>
+        get_correct_responses() |>
         format_responses()
     }
   )
