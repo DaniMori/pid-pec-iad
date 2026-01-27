@@ -24,7 +24,6 @@ knitr::opts_knit$set(root.dir = here::here())
 #| include: false
 library(here)
 library(dplyr)
-library(googlesheets4)
 library(readr)
 library(purrr)
 library(tidyr)

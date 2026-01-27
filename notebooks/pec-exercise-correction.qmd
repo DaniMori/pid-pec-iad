@@ -59,7 +59,7 @@ teaching_team_emails_filepath <- here(
 )
 
 ## File system objects for processing the student responses dataset:
-DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI overwritten.csv"
+DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI.csv"
 data_responses_filepath <- here(DATA_DIR, DATA_RESPONSES_FILENAME)
 
 ## File system objects for generating the response dataset:
