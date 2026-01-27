@@ -66,7 +66,6 @@ data_responses_filepath <- here(DATA_DIR, DATA_RESPONSES_FILENAME)
 GRADING_TEMPLATE_FILENAME    <- # (Course name and activity code may change)
   "Calificaciones-Introducción al Análisis de Datos-Calificaciones-756233.csv"
 DATA_GRADING_FILENAME        <- "grading_data.csv"
-STUDENT_RESPONSES_FILENAME   <- "student_responses.csv"
 
 grading_template_filepath  <- here(DATA_DIR, GRADING_TEMPLATE_FILENAME)
 data_grading_filepath      <- here(DATA_DIR, DATA_GRADING_FILENAME)
@@ -377,9 +376,6 @@ to do this, we export the student responses along with the email hash, so that
 we can publish these responses without exposing the students' data.
 
 ```{r create-responses-dataset}
-# We use the root folder to avoid accidental exposure of the "dat" folder
-student_responses_filepath <- here(STUDENT_RESPONSES_FILENAME)
-
 data_student_responses_out <- data_student_responses |>
   select(!!EMAIL_HASH_VAR, starts_with("item_")) |>
   mutate(across(where(is.double), ~round(., 2))) # Round numeric responses for

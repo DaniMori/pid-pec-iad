@@ -58,6 +58,14 @@ CONFIG_FILEPATH <- here::here(DOCS_DIR, CONFIG_FILENAME)
 
 # Feedback app:
 
+## File system objects:
+
+### Student responses file:
+STUDENT_RESPONSES_FILENAME <- "student_responses.csv" # File name
+student_responses_filepath <- here::here(STUDENT_RESPONSES_FILENAME)
+                              # The root folder is used to avoid accidental
+                              #   exposure of the "dat" folder when publishing
+                              #   the feedback app.
 ## User interface objects:
 
 ### Shiny component identifiers:
