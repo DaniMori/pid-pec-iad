@@ -103,10 +103,9 @@ format.
 
 ## Pre-requirements
 
-This notebook requires the usage of the dataset with the student responses, and
-the one with the Shiny app logs. The second dataset is directly accessed through
-the Google sheets API, so in order to access the file, the API and the log file
-must be configured, as per the Shiny app instructions.
+The Shiny app log file is directly accessed through the Google sheets API.
+Therefore, both the API and the log file must be configured according to the
+Shiny app instructions.
 
 In order to this, before running this notebook, make sure to follow:
 
