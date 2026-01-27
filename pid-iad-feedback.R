@@ -19,15 +19,14 @@ setwd(here::here())
 ## ---- PACKAGES: --------------------------------------------------------------
 
 library(shiny)
-library(shinyjs, warn.conflicts = FALSE)
 
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
-source("R/constants.R",       encoding = 'UTF-8')
-source("R/score_responses.R", encoding = 'UTF-8')
-source("R/hash_emails.R",     encoding = 'UTF-8')
-source("R/log.R",             encoding = 'UTF-8')
+source("R/constants.R",              encoding = 'UTF-8')
+source("R/score_responses.R",        encoding = 'UTF-8')
+source("R/hash_emails.R",            encoding = 'UTF-8')
+source("R/log.R",                    encoding = 'UTF-8')
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
@@ -36,8 +35,6 @@ source("R/log.R",             encoding = 'UTF-8')
 ## ----create-user-interface----------------------------------------------------
 
 ui <- fluidPage(
-
-  shinyjs::useShinyjs(), # Used to disable the download button
 
   # Application title
   titlePanel(FEEDBACK_APP_TITLE),
