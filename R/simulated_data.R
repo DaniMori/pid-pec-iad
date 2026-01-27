@@ -122,7 +122,7 @@ compute_correct_responses <- function(data) {
 
   ## Main: ----
 
-  # Transform `var_2` to integer to use it a "linear term" in the regression
+  # Transform `var_2` to integer to use it as a "linear term" in the regression
   data <- data |> dplyr::mutate(`Satisfaccion vital` = `Satisfaccion vital` |>
                                   as.character() |>
                                   as.integer())
@@ -133,7 +133,6 @@ compute_correct_responses <- function(data) {
   coefficients <- fitted_model |> broom::tidy()
 
   # Compute responses:
-
   computed_responses <- data |> dplyr::summarize(
     item_1 = table(`Satisfaccion vital`)[ITEM_1_LS_CAT],
     item_2 = median(`Horas sueno promedio`),

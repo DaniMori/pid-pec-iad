@@ -66,7 +66,7 @@ read_student_responses <- function(filepath,
 
   responses <- readr::read_csv(
     filepath,
-    col_types = cols(.default = col_character())
+    col_types = readr::cols(.default = readr::col_character())
   ) |>
     dplyr::rename(!!!response_vars_labels) |>
     dplyr::mutate(
@@ -116,7 +116,7 @@ read_student_responses <- function(filepath,
     ),
     dplyr::across(usefulness_videos, ~ordered(., levels = USEFULNESS_VALUES)),
     dplyr::across(instructions,      ~ordered(., levels = CLARITY_VALUES)),
-    nps = nps |> str_extract("^\\d*") |> as.integer()
+    nps = nps |> stringr::str_extract("^\\d*") |> as.integer()
   )
 
   responses
