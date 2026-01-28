@@ -24,9 +24,11 @@ library(shiny)
 ## ---- SOURCES: ---------------------------------------------------------------
 
 source("R/constants.R",              encoding = 'UTF-8')
+source("R/read_student_responses.R", encoding = 'UTF-8')
 source("R/score_responses.R",        encoding = 'UTF-8')
 source("R/hash_emails.R",            encoding = 'UTF-8')
 source("R/log.R",                    encoding = 'UTF-8')
+
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
@@ -61,37 +63,50 @@ ui <- fluidPage(
 )
 
 ## ----create-server-logic------------------------------------------------------
-
 server <- function(input, output, session) {
 
   # Reactive values:
-  email        <- reactiveVal() # Email read from the session query
   hashed_email <- reactiveVal() # Hashed email for logging and random seed
 
   observe(
     {
       # Get email from query:
-      email(parseQueryString(session$clientData$url_search)$email)
+      email <- parseQueryString(session$clientData$url_search)$email
 
-      validate_email(email()) # Check that email is valid in the first place
+      validate_email(email) # Check that email is valid in the first place
       record_log("Email valid")
 
       ## Create unique hash for the user email:
-      hashed_email(email() |> hash_emails())
+      hashed_email(email |> hash_emails())
       record_log("Email hash created")
     }
   )
 
   ## File download handler (activated when the email is valid)
   output[[RESPONSE_TABLE_ID]] <- renderTable(
+    {
+      hash <- hashed_email()
 
-    if (!is.null(hashed_email())) {
+      if (!is.null(hash)) {
 
-      correct_responses <- hashed_email() |> get_correct_responses()
+        correct_responses <- hash |>
+          get_correct_responses() |>
+          tibble::add_column(email_hash = hash)
 
         student_responses <- data_student_responses |>
-        filter(email_hash == hashed_email())
+          filter_student(hash = hash)
+
+        score_student_responses(
+          student_responses,
+          correct_responses
+        ) |>
+          format_responses()
       }
+    },
+    stripped = TRUE,
+    bordered = TRUE,
+    na       = '',
+    sanitize.text.function = identity # Avoid escaping HTML tags in "TOTAL"
   )
 }
 
