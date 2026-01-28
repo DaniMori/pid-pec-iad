@@ -22,11 +22,6 @@ source("R/simulated_data.R", encoding = 'UTF-8')
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
-# File system objects:
-RESPONSE_VARS_FILENAME <- "student_response_variables.csv"
-response_vars_filepath <- here::here(DATA_DIR, RESPONSE_VARS_FILENAME)
-
-
 # Constant objects for processing the student responses dataset:
 
 ## Symbols for selecting and processing "numeric" items
@@ -53,16 +48,15 @@ CLARITY_VALUES    <- c(
 ## e-mail domain for filtering out test responses:
 PROFESSOR_EMAIL_DOMAIN <- "@psi.uned.es"
 
-## Variable name objects:
-response_vars_labels <- response_vars_filepath |>
-  readr::read_csv(col_types = "c") |>
-  tibble::deframe()
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 read_student_responses <- function(filepath,
                                    test          = FALSE,
                                    filter_domain = PROFESSOR_EMAIL_DOMAIN,
                                    correct_num   = FALSE) {
+
+  # Convert response variable labels to a named vector to use for relabelling:
+  response_vars_labels <- response_vars_labels |> tibble::deframe()
 
   responses <- readr::read_csv(
     filepath,

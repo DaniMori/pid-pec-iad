@@ -17,6 +17,7 @@
 #
 ## ---- SOURCES: ---------------------------------------------------------------
 
+source("R/constants.R",      encoding = 'UTF-8')
 source("R/simulated_data.R", encoding = 'UTF-8')
 
 
@@ -27,14 +28,6 @@ ITEM_PREFFIX <- "item_"
 STUDENT_RESPONSE_SUFFIX <- "_student"
 CORRECT_RESPONSE_SUFFIX <- "_correct"
 SCORE_RESPONSE_SUFFIX   <- "_score"
-
-
-# Response output parameters:
-
-## Headers:
-ITEM_NUM_LABEL <- "Nº"
-ITEM_LABEL     <- "Pregunta"
-RESPONSE_LABEL <- "Respuesta"
 
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
