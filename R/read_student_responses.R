@@ -18,6 +18,7 @@
 source("R/constants.R",      encoding = 'UTF-8')
 source("R/hash_emails.R",    encoding = 'UTF-8')
 source("R/simulated_data.R", encoding = 'UTF-8')
+source("R/log.R",            encoding = 'UTF-8')
 
 
 ## ---- CONSTANTS: -------------------------------------------------------------
@@ -114,4 +115,27 @@ read_student_responses <- function(filepath,
   )
 
   responses
+}
+
+filter_student <- function(data, hash) {
+
+  output <- data |> dplyr::filter(email_hash == hash)
+
+  n_responses <- output |> nrow()
+
+  if (n_responses == 0L) {
+
+    record_log("No user record found.")
+
+    return(output |> dplyr::bind_rows(tibble::tibble(email_hash = hash)))
+  }
+
+  if (n_responses > 1L) {
+
+    record_log("Non-unique user record; using the last valid record.")
+
+    return(output |> dplyr::slice_tail(n = 1L))
+  }
+
+  output
 }
