@@ -19,17 +19,16 @@
 ### Directories:
 DOCS_DIR <- here::here("doc")
 DATA_DIR <- here::here("dat")
+FAR_DIR  <- here::here("feedback-res") # "Feedback app" resources directory
 
 ### Variable names:
 RESPONSE_VARS_FILENAME <- "student_response_variables.csv"
-response_vars_filepath <- here::here(DATA_DIR, RESPONSE_VARS_FILENAME)
+response_vars_filepath <- here::here(FAR_DIR, RESPONSE_VARS_FILENAME)
 
 ### Student responses file:
 STUDENT_RESPONSES_FILENAME <- "student_responses.csv" # File name
-student_responses_filepath <- here::here(STUDENT_RESPONSES_FILENAME)
-                              # The root folder is used to avoid accidental
-                              #   exposure of the "dat" folder when publishing
-                              #   the feedback app.
+student_responses_filepath <- here::here(FAR_DIR, STUDENT_RESPONSES_FILENAME)
+
 ## Variable name objects:
 response_vars_labels <- response_vars_filepath |>
   readr::read_csv(col_types = readr::cols(.default = readr::col_character()))
