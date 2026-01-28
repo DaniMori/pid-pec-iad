@@ -107,7 +107,7 @@ read_student_responses <- function(filepath,
   )
 
   responses <- responses |> dplyr::mutate(
-    item_5  = item_5  |> factor(levels =  ITEM_5_LABELS),
+    item_5  = item_5  |> factor(levels = LOGICAL_LABELS),
     item_7  = item_7  |> factor(levels =  ITEM_7_LABELS),
     item_10 = item_10 |> factor(levels = ITEM_10_LABELS),
     dplyr::across(

@@ -43,8 +43,8 @@ ITEM_1_LS_CAT <- 2L # Category "Insatisfecho" in "life satisfaction" variable
 SIGN_LEVELS    <- c(-1, 0, 1) |> as.character()
 LOGICAL_LEVELS <- c(FALSE, TRUE) |> as.character()
 
-ITEM_5_LABELS <- c("No", "Sí")
-ITEM_5_VALUES <- LOGICAL_LEVELS |> setNames(ITEM_5_LABELS)
+LOGICAL_LABELS <- c("No", "Sí")
+LOGICAL_VALUES <- LOGICAL_LEVELS |> setNames(LOGICAL_LABELS)
 
 ITEM_7_LABELS <- c(
   "Las variables  tienen una relación indirecta",
@@ -160,8 +160,8 @@ compute_correct_responses <- function(data) {
   suppressWarnings(
     computed_responses <- computed_responses |> dplyr::mutate(
       item_5  = item_5 |>
-        readr::parse_factor(levels = ITEM_5_VALUES) |>
-        forcats::fct_recode(!!!ITEM_5_VALUES),
+        readr::parse_factor(levels = LOGICAL_VALUES) |>
+        forcats::fct_recode(!!!LOGICAL_VALUES),
       item_7  = item_7 |>
         readr::parse_factor(levels = ITEM_7_VALUES) |>
         forcats::fct_recode(!!!ITEM_7_VALUES),

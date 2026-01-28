@@ -37,10 +37,10 @@ source("R/log.R",                    encoding = 'UTF-8')
 data_student_responses <- student_responses_filepath |> readr::read_csv(
   col_types = readr::cols(
     email_hash = readr::col_integer(),
-    item_5     = readr::col_factor(levels =  ITEM_5_LABELS),
+    item_5     = readr::col_factor(levels = LOGICAL_LABELS),
     item_7     = readr::col_factor(levels =  ITEM_7_LABELS),
     item_10    = readr::col_factor(levels = ITEM_10_LABELS),
-    .default = readr::col_double()
+    .default   = readr::col_double()
   )
 )
 
@@ -48,7 +48,6 @@ data_student_responses <- student_responses_filepath |> readr::read_csv(
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
 ## ----create-user-interface----------------------------------------------------
-
 ui <- fluidPage(
 
   # Application title
@@ -90,9 +89,9 @@ server <- function(input, output, session) {
 
       correct_responses <- hashed_email() |> get_correct_responses()
 
-      student_responses <- data_student_responses |>
+        student_responses <- data_student_responses |>
         filter(email_hash == hashed_email())
-    }
+      }
   )
 }
 
