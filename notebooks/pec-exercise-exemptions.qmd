@@ -108,7 +108,7 @@ data_student_responses_to_overwrite <- data_student_responses |>
   dplyr::select(-date_day)
 ```
 
-Select the hash of all students to overwrite
+Compute the hash of all students to overwrite
 
 ```{r select-special-hashes}
 #| include: false

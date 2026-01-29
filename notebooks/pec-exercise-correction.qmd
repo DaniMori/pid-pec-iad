@@ -192,8 +192,10 @@ responses](https://agora.uned.es/mod/feedback/show_entries.php?id=625026)
 to [the data folder](dat/) with its default name,
 "`{r} DATA_RESPONSES_FILENAME`".
 
-**Note**: if you want to define any exemptions by date for a specific set of
+::: callout-note
+If you want to define any exemptions by date for a specific set of
 items, run the `pec-exercise-exemptions.qmd` notebook at this point.
+:::
 
 This dataset is then read and preprocessed
 
