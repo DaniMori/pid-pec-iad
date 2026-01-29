@@ -23,10 +23,13 @@ source("R/simulated_data.R", encoding = 'UTF-8')
 ## ---- CONSTANTS: -------------------------------------------------------------
 
 # Response computation helper objects:
-ITEM_PREFFIX <- "item_"
+ITEM_PREFFIX            <- "item_"
 STUDENT_RESPONSE_SUFFIX <- "_student"
 CORRECT_RESPONSE_SUFFIX <- "_correct"
 SCORE_RESPONSE_SUFFIX   <- "_score"
+
+# Response configuration objects:
+N_DECIMALS <- 2L # Decimal places to use for rounding numeric responses
 
 
 # Response output parameters:
