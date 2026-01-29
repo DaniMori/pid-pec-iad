@@ -68,28 +68,40 @@ score_student_responses <- function(student_responses,
   ## Constant objects: ----
   score_response <- function(response, correct_response) {
 
-    rounded_correct <- correct_response |> round(digits = N_DECIMALS)
+    test_correct <- if (is.numeric(correct_response)) {
 
-    if (is.numeric(response) != is.numeric(correct_response)) {
+      if (!is.numeric(correct_response)) {
 
-      stop (
-        "The student and the correct response are not",
-        "both of the 'numeric' type."
-      )
+        stop (
+          "The student and the correct response are not",
+          "both of the 'numeric' type."
+        )
+      }
+
+      correct_response |> round(digits = N_DECIMALS)
+
+    } else {
+
+      correct_response
     }
 
-    if (trunc_accept && is.numeric(response) && is.numeric(correct_response)) {
+    if (trunc_accept && is.numeric(correct_response)) {
 
       truncated_correct <- correct_response |>
         trunc_prec(precision = N_DECIMALS)
 
-      if (truncated_correct != rounded_correct) {
+      if (truncated_correct != test_correct) {
 
-        if (response == truncated_correct) response <- rounded_correct
+        # Make sure the condition is `FALSE` if `response` is `NA`
+        if (roperators::`%~=%`(response, truncated_correct)) {
+
+          response <- test_correct # Change the student response to the "valid"
+                                   #   one, if the conditions are met.
+        }
       }
     }
 
-    roperators::`%~=%`(response, rounded_correct)
+    roperators::`%~=%`(response, test_correct)
   }
 
   ## Argument checking and formatting: ----
