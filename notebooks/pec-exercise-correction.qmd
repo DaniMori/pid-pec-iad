@@ -11,7 +11,7 @@ execute:
   output:            false
   warning:           false
 params:
-  test_mode:         true
+  test_mode:         false
 ---
 
 ```{r setup}
@@ -193,8 +193,8 @@ to [the data folder](dat/) with its default name,
 "`{r} DATA_RESPONSES_FILENAME`".
 
 ::: callout-note
-If you want to define any exemptions by date for a specific set of
-items, run the `pec-exercise-exemptions.qmd` notebook at this point.
+If you want to define any exemptions by date for a specific set of items, run
+the `pec-exercise-exemptions.qmd` notebook at this point.
 :::
 
 This dataset is then read and preprocessed
@@ -345,7 +345,7 @@ grading_data <- grading_data |>
 The grading dataset is exported to file "`{r} data_grading_filepath`".
 
 ```{r create-compensation-dataset}
-grading_data |> write_csv(data_grading_filepath)
+grading_data |> write_excel_csv(data_grading_filepath)
 ```
 
 ### Grading dataset upload
@@ -390,5 +390,5 @@ data_student_responses_out <- data_student_responses |>
   mutate(across(where(is.double), ~round(., 2))) # Round numeric responses for
                                                  #   writing them
 
-data_student_responses_out |> write_csv(file = student_responses_filepath)
+data_student_responses_out |> write_excel_csv(file = student_responses_filepath)
 ```
