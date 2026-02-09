@@ -83,24 +83,14 @@ to [the data folder](dat/) with its default name,
 This dataset is then read and preprocessed
 
 ```{r load-responses-data}
-#| include: false
 data_student_responses <- data_responses_filepath |>
   read_student_responses(test = F, correct_num = TRUE) |>
   select(email_address, date, !!EMAIL_HASH_VAR, starts_with("item_"))
 ```
 
-Ensure `date` is available as POSIXct (read_student_responses usually does this)
-
-```{r check-datetime-format}
-#| include: false
-data_student_responses <- data_student_responses |>
-  dplyr::mutate(date = as.POSIXct(date, tz = LOCAL_TIMEZONE))
-```
-
 Select special cases by submission date (day-level, inclusive range)
 
 ```{r select-special-cases}
-#| include: false
 data_student_responses_to_overwrite <- data_student_responses |>
   dplyr::filter(!is.na(date)) |>
   dplyr::mutate(date_day = as.Date(date, tz = LOCAL_TIMEZONE)) |>
@@ -111,7 +101,6 @@ data_student_responses_to_overwrite <- data_student_responses |>
 Compute the hash of all students to overwrite
 
 ```{r select-special-hashes}
-#| include: false
 special_cases_hashes <- data_student_responses_to_overwrite |>
   dplyr::transmute(!!EMAIL_HASH_VAR := as.integer(.data[[EMAIL_HASH_VAR]])) |>
   dplyr::distinct()
@@ -124,7 +113,6 @@ special_cases_hashes <- data_student_responses_to_overwrite |>
 For each student, the correct answers of the exercise are obtained.
 
 ```{r get-correct-responses}
-#| include: false
 data_correct_responses <- special_cases_hashes |>
   pull(!!EMAIL_HASH_VAR) |>
   set_names() |>                  # Helps matching each user's responses with its hash
@@ -133,10 +121,110 @@ data_correct_responses <- special_cases_hashes |>
   mutate(across(!!EMAIL_HASH_VAR, as.integer)) # For matching purposes
 ```
 
+```{r refine-special-cases-by-reversed-model}
+# Helper funtion: compute correct answers when DV/IV are swapped (only items 8-10)
+compute_correct_responses_reversed <- function(data) {
+
+  INTERCEPT_TERM <- "(Intercept)"
+
+  # Swapped model vs the official one in compute_correct_responses()
+  criterion_name <- SIM_VAR_NAMES["var_2"] |> glue::backtick()
+  predictor_name <- SIM_VAR_NAMES["var_1"] |> glue::backtick()
+
+  # Same transformation used in compute_correct_responses() (var_2 as integer)
+  data <- data |>
+    dplyr::mutate(
+      `Satisfaccion vital` = `Satisfaccion vital` |>
+        as.character() |>
+        as.integer()
+    )
+
+  model        <- glue::glue("{criterion_name} ~ {predictor_name}")
+  fitted_model <- stats::lm(formula = model, data = data)
+  coefficients <- broom::tidy(fitted_model)
+
+  out <- data |> dplyr::summarise(
+    item_8  = coefficients |>
+      dplyr::filter(term == INTERCEPT_TERM) |>
+      dplyr::pull(estimate) |>
+      round(N_DECIMALS),
+    item_9  = coefficients |>
+      dplyr::filter(term == predictor_name) |>
+      dplyr::pull(estimate) |>
+      round(N_DECIMALS),
+    item_10 = item_9 |> sign() |> as.character()
+  )
+
+  out <- out |> dplyr::mutate(
+    item_10 = item_10 |>
+      readr::parse_factor(levels = ITEM_10_VALUES) |>
+      forcats::fct_recode(!!!ITEM_10_VALUES)
+  )
+  
+  out
+}
+
+get_correct_responses_reversed <- function(hash) {
+  simulate_data(hash) |> compute_correct_responses_reversed()
+}
+
+# Compute reversed keys for the same date-window candidates
+data_correct_responses_rev <- special_cases_hashes |>
+  dplyr::pull(!!EMAIL_HASH_VAR) |>
+  set_names() |>
+  purrr::map(get_correct_responses_reversed) |>
+  purrr::list_rbind(names_to = EMAIL_HASH_VAR) |>
+  dplyr::mutate(across(!!EMAIL_HASH_VAR, as.integer)) |>
+  dplyr::select(!!EMAIL_HASH_VAR, dplyr::all_of(ITEMS_TO_OVERWRITE)) |>
+  dplyr::rename_with(~ paste0(.x, "_rev"), dplyr::all_of(ITEMS_TO_OVERWRITE))
+
+data_correct_responses_fwd <- data_correct_responses |>
+  dplyr::select(!!EMAIL_HASH_VAR, dplyr::all_of(ITEMS_TO_OVERWRITE)) |>
+  dplyr::rename_with(~ paste0(.x, "_fwd"), dplyr::all_of(ITEMS_TO_OVERWRITE))
+
+# Compare student answers vs forward/reversed keys to detect "reversed solvers"
+candidates <- data_student_responses_to_overwrite |>
+  dplyr::select(!!EMAIL_HASH_VAR, dplyr::all_of(ITEMS_TO_OVERWRITE)) |>
+  dplyr::distinct(.data[[EMAIL_HASH_VAR]], .keep_all = TRUE) |>
+  dplyr::left_join(data_correct_responses_fwd, by = EMAIL_HASH_VAR) |>
+  dplyr::left_join(data_correct_responses_rev, by = EMAIL_HASH_VAR)
+
+for (it in ITEMS_TO_OVERWRITE) {
+  candidates[[paste0(it, "_match_fwd")]] <- purrr::map2_lgl(
+    candidates[[it]], candidates[[paste0(it, "_fwd")]],
+    roperators::`%~=%`
+  ) |> dplyr::coalesce(FALSE)
+
+  candidates[[paste0(it, "_match_rev")]] <- purrr::map2_lgl(
+    candidates[[it]], candidates[[paste0(it, "_rev")]],
+    roperators::`%~=%`
+  ) |> dplyr::coalesce(FALSE)
+}
+
+# Apply exemption only if they match the reversed model
+candidates <- candidates |>
+  dplyr::mutate(
+    rev_ok = item_8_match_rev & item_9_match_rev,
+    apply_exemption = rev_ok
+  )
+
+# Refine the special cases to overwrite
+special_cases_hashes <- candidates |>
+  dplyr::filter(apply_exemption) |>
+  dplyr::transmute(!!EMAIL_HASH_VAR := as.integer(.data[[EMAIL_HASH_VAR]])) |>
+  dplyr::distinct()
+
+# Keep only the forward answer key for the truly exempted cases (used to overwrite to "officially correct")
+data_correct_responses <- data_correct_responses |>
+  dplyr::semi_join(special_cases_hashes, by = EMAIL_HASH_VAR)
+
+
+
+```
+
 Next, we calculate the correct answers for the special cases:
 
 ```{r calculate-correct-responses-special-cases}
-#| include: false
 # Build overrides: correct answers for ONLY the special-case students and ONLY the affected items
 special_overrides <- data_correct_responses |>
   dplyr::select(dplyr::all_of(c(EMAIL_HASH_VAR, ITEMS_TO_OVERWRITE))) |>
@@ -153,7 +241,6 @@ type of every item we want to overwrite to ensure it is the same as in the
 original data.
 
 ```{r overwrite-special-cases}
-#| include: false
 # Join override columns into the main responses (do NOT change types here)
 data_student_responses_overwritten <- data_student_responses |>
   dplyr::left_join(special_overrides, by = EMAIL_HASH_VAR)
