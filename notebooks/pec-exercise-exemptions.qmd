@@ -204,7 +204,7 @@ for (it in ITEMS_TO_OVERWRITE) {
 # Apply exemption only if they match the reversed model
 candidates <- candidates |>
   dplyr::mutate(
-    rev_ok = item_8_match_rev & item_9_match_rev,
+    rev_ok = item_8_match_rev | item_9_match_rev,
     apply_exemption = rev_ok
   )
 
