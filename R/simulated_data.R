@@ -70,10 +70,6 @@ ITEM_10_LABELS <- c(
 ITEM_10_VALUES <- SIGN_LEVELS |> setNames(ITEM_10_LABELS)
 
 
-## Response configuration data:
-N_DECIMALS <- 2L   # Decimal places to use for rounding numeric results
-
-
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
 simulate_data <- function(seed) {
@@ -134,26 +130,26 @@ compute_correct_responses <- function(data) {
 
   # Compute responses:
 
+  # Correct numeric responses are computed with machine precision, to take into
+  #   account the possibility of accepting (incorrectly) truncated (instead of
+  #   rounded) values as correct.
   computed_responses <- data |> dplyr::summarize(
     item_1 = table(`Satisfaccion vital`)[ITEM_1_LS_CAT],
     item_2 = median(`Horas sueno promedio`),
-    item_3 = sd(`Horas sueno promedio`) |> round(N_DECIMALS),
+    item_3 = sd(`Horas sueno promedio`),
     item_4 = quantile(`Horas sueno promedio`, .34),
     item_5 = boxplot.stats(`Horas sueno promedio`)$out |>
       length() |>
       as.logical() |>
       as.character(),
-    item_6 = cor(`Satisfaccion vital`, `Horas sueno promedio`) |>
-      round(N_DECIMALS),
+    item_6 = cor(`Satisfaccion vital`, `Horas sueno promedio`),
     item_7 = item_6 |> sign() |> as.character(),
     item_8 = coefficients |>
       dplyr::filter(term == INTERCEPT_TERM) |>
-      dplyr::pull(estimate) |>
-      round(N_DECIMALS),
+      dplyr::pull(estimate),
     item_9 = coefficients |>
       dplyr::filter(term == predictor_name) |>
-      dplyr::pull(estimate) |>
-      round(N_DECIMALS),
+      dplyr::pull(estimate),
     item_10 = item_9 |> sign() |> as.character(),
   )
 
