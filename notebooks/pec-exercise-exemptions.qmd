@@ -343,3 +343,13 @@ Finally we export the new datafile overwritting the original one
 # Export using the original filename (raw format)
 readr::write_excel_csv(data_student_responses_raw, data_responses_filepath)
 ```
+
+## Check dataset overwriting
+
+The overwritten dataset is tested with the reading function, to check that this notebook can be run and inserted safely in the "correction process".
+
+```{r load-responses-data}
+data_student_responses <- data_responses_filepath |>
+  read_student_responses(correct_num = TRUE)
+```
+
