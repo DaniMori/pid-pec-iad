@@ -29,9 +29,6 @@ library(purrr)
 library(tidyr)
 library(stringr)
 library(roperators)
-# library(stringi)
-# library(tibble)
-# library(readxl)
 library(writexl)
 ```
 
