@@ -33,6 +33,14 @@ student_responses_filepath <- here::here(FAR_DIR, STUDENT_RESPONSES_FILENAME)
 response_vars_labels <- response_vars_filepath |>
   readr::read_csv(col_types = readr::cols(.default = readr::col_character()))
 
+# Event related constants:
+
+## Variable values:
+EVENT_TYPES <- c("Access", "Download") |> setNames(nm = _)
+
+## Time and date configuration:
+TIMESTAMP_FORMAT <- "%Y-%Om-%d %H:%M:%OS3 %Z" # With time zone at the end
+LOCAL_TIMEZONE   <- "Europe/Madrid" # Local timezone for the event timestamps
 
 # Dataset generation app:
 
