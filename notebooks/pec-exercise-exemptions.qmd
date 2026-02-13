@@ -360,7 +360,7 @@ readr::write_excel_csv(overrides_emails, here(DATA_DIR, "overrides_emails.csv"))
 The overwritten dataset is tested with the reading function, to check that this
 notebook can be run and inserted safely in the "correction process".
 
-```{r load-responses-data}
+```{r test-exported-responses}
 data_student_responses <- data_responses_filepath |>
   read_student_responses(correct_num = TRUE)
 ```
