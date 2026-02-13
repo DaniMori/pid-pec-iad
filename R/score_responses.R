@@ -174,21 +174,36 @@ format_responses <- function(responses) {
     )
 
   # Avoid warning when there are missing levels (e.g., all responses are
-  #   correct)
+  #   correct):
   suppressWarnings(
     output <- output |> dplyr::mutate(
       valid = score |>
         as.character() |>
-        forcats::fct_recode(!!!LOGICAL_VALUES),
-      score = score |> as.integer()
+        forcats::fct_recode(!!!LOGICAL_VALUES)
     )
   )
 
   total_score <- output |> # Compute the student's total score
-    dplyr::summarise(score = sum(score)) |>
-    tibble::add_column(valid = TOTAL_SCORE)
+    dplyr::summarise(
+      score = sum(score),
+      bonus = score * BONUS_MAX / NUM_ITEMS
+    ) |>
+    dplyr::mutate(
+      score = score |> scales::number(accuracy = 1),
+      bonus = bonus |> scales::number(accuracy =  .01, prefix = '+')
+    ) |>
+    tidyr::pivot_longer(everything(), values_to = "score") |>
+    dplyr::select(-name) |>
+    # Make the "total" and "bonus" label appear under the "valid" column
+    tibble::add_column(valid = c(TOTAL_SCORE_LABEL, BONUS_LABEL))
 
-  output <- output |> dplyr::bind_rows(total_score)
+  output <- output |>
+    dplyr::mutate(
+      score = score |> # Output the scores as numbers instead of logical values:
+        as.integer() |>
+        as.character()
+    ) |>
+    dplyr::bind_rows(total_score)
 
   output |> dplyr::select( # Assign labels and reorder
     !!ITEM_NUM_LABEL         := item,

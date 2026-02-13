@@ -101,4 +101,9 @@ STUDENT_RESPONSE_LABEL <- "Tu respuesta"
 CORRECT_RESPONSE_LABEL <- "Respuesta correcta"
 VALID_RESPONSE_LABEL   <- "Acierto"
 SCORE_LABEL            <- "Puntuación"
-TOTAL_SCORE            <- htmltools::strong("TOTAL:") |> as.character()
+TOTAL_SCORE_LABEL      <- htmltools::strong("TOTAL:")        |> as.character()
+BONUS_LABEL            <- htmltools::strong("Bonificación:") |> as.character()
+
+#### Response output table additional values:
+BONUS_MAX <- 0.5 # Bonus in case of scoring all the items correctly
+NUM_ITEMS <- 10L # Total nº of items to score
