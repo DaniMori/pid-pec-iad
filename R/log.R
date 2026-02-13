@@ -1,6 +1,6 @@
 # ==============================================================================
 #
-# FILE NAME:   logs.R
+# FILE NAME:   log.R
 # DESCRIPTION: Utility for logging messages in Shiny apps
 #
 # AUTHOR:      Daniel Morillo

@@ -17,6 +17,7 @@
 #
 ## ---- SOURCES: ---------------------------------------------------------------
 
+source("R/constants.R",      encoding = 'UTF-8')
 source("R/simulated_data.R", encoding = 'UTF-8')
 
 
@@ -30,14 +31,6 @@ SCORE_RESPONSE_SUFFIX   <- "_score"
 
 # Response configuration objects:
 N_DECIMALS <- 2L # Decimal places to use for rounding numeric responses
-
-
-# Response output parameters:
-
-## Headers:
-ITEM_NUM_LABEL <- "Nº"
-ITEM_LABEL     <- "Pregunta"
-RESPONSE_LABEL <- "Respuesta"
 
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
@@ -154,31 +147,83 @@ trunc_prec <- function(x, precision = 0L) {
 
 format_responses <- function(responses) {
 
-  relationship_levels <- REL_LEVELS |>
-    as.character() |>
-    setNames(RELATIONSHIP_LABELS)
-
-  params_varnames    <- c(
-    INTERCEPT_VAR_NAME,
-    SLOPE_VAR_NAME,
-    RELATIONSHIP_VAR_NAME
-  )
-  params_labels      <- c(INTERCEPT_LABEL, SLOPE_LABEL, RELATIONSHIP_LABEL)
-  params_vars_labels <- params_varnames |>
-    setNames(params_labels) |>
-    tibble::enframe(name = ITEM_LABEL)
-
-  responses |>
+  output <- responses |>
+    dplyr::select(-email_hash) |>
     dplyr::mutate(
-      relationship = relationship |>
-        forcats::fct_recode(!!!relationship_levels),
-      dplyr::across(dplyr::everything(), as.character)
+      dplyr::across(
+        tidyselect::where(are_whole_numbers),
+        scales::label_number(accuracy = 1, decimal.mark = ',')
+      ),
+      dplyr::across(
+        tidyselect::where(is.double),
+        scales::label_number(accuracy = 0.01, decimal.mark = ',')
+      )
     ) |>
     tidyr::pivot_longer(
-      cols      = dplyr::everything(),
-      values_to = RESPONSE_LABEL
+      tidyselect::everything(),
+      names_to      = c('item', '.value'),
+      names_pattern = "(item_\\d+)_(.+)"
     ) |>
-    dplyr::full_join(params_vars_labels, by = c(name = "value")) |>
-    dplyr::select(dplyr::all_of(c(ITEM_LABEL, RESPONSE_LABEL))) |>
-    tibble::rownames_to_column(ITEM_NUM_LABEL)
+    dplyr::left_join(
+      response_vars_labels,
+      by   = c("item" = "variable"),
+      copy = TRUE,
+    ) |>
+    dplyr::mutate(
+      item  = item |> readr::parse_number() |> as.integer()
+    )
+
+  # Avoid warning when there are missing levels (e.g., all responses are
+  #   correct)
+  suppressWarnings(
+    output <- output |> dplyr::mutate(
+      valid = score |>
+        as.character() |>
+        forcats::fct_recode(!!!LOGICAL_VALUES)
+    )
+  )
+
+  total_score <- output |>
+    dplyr::mutate(score = score |> as.integer()) |> # (Instead of boolean)
+    dplyr::summarise(score = sum(score)) |> # Compute the student's total score
+    tibble::add_column(valid = TOTAL_SCORE_LABEL)
+
+  output <- output |> dplyr::bind_rows(total_score)
+
+  output |> dplyr::select( # Assign labels and reorder
+    !!ITEM_NUM_LABEL         := item,
+    !!ITEM_LABEL             := label,
+    !!STUDENT_RESPONSE_LABEL := student,
+    !!CORRECT_RESPONSE_LABEL := correct,
+    !!VALID_RESPONSE_LABEL   := valid,
+    !!SCORE_LABEL            := score
+  )
+}
+
+#' Tests whether a numeric vector contains whole numbers only. It accepts any
+#' type of vector input, returning `FALSE` if the input is not a numeric vector.
+#'
+#' @param x   Input vector to test
+#' @param tol Tolerance for the whole number test (defaults to
+#'            `sqrt(.Machine$double.eps)`); see omnibus::is.wholeNumber() for
+#'            details.
+#'
+#' @returns `TRUE` if `x` is a numeric vector containing whole numbers (or `NA`)
+#'          only, `FALSE` otherwise.
+are_whole_numbers <- function(x, tol = .Machine$double.eps^0.5) {
+
+  if (!is.numeric(x)) return(FALSE)
+
+  omnibus::is.wholeNumber(x, tol = tol) |> all(na.rm = TRUE)
+}
+
+get_bonus <- function(scores, bonus_max = BONUS_MAX) {
+
+  mean_score <- scores |>
+    dplyr::select(ends_with(SCORE_RESPONSE_SUFFIX)) |>
+    tidyr::pivot_longer(everything(), values_to = "score") |>
+    dplyr::summarize(bonus = score |> mean()) |>
+    dplyr::pull(bonus)
+
+  mean_score * bonus_max
 }

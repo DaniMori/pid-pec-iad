@@ -12,9 +12,26 @@
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
-# File system objects:
+# Common objects (used by more than one component):
+
+## File system objects:
+
+### Directories:
 DOCS_DIR <- here::here("doc")
 DATA_DIR <- here::here("dat")
+FAR_DIR  <- here::here("feedback-res") # "Feedback app" resources directory
+
+### Variable names:
+RESPONSE_VARS_FILENAME <- "student_response_variables.csv"
+response_vars_filepath <- here::here(FAR_DIR, RESPONSE_VARS_FILENAME)
+
+### Student responses file:
+STUDENT_RESPONSES_FILENAME <- "student_responses.csv" # File name
+student_responses_filepath <- here::here(FAR_DIR, STUDENT_RESPONSES_FILENAME)
+
+## Variable name objects:
+response_vars_labels <- response_vars_filepath |>
+  readr::read_csv(col_types = readr::cols(.default = readr::col_character()))
 
 # Event related constants:
 
@@ -42,6 +59,7 @@ CLOSE_WINDOW_MSG    <- paste(
 )
 DATASET_FILENAME    <- "datos_IAD.csv" # Name of downloaded dataset
 
+
 ## Server logic objects:
 
 ### Auto download configuration:
@@ -66,12 +84,27 @@ CONFIG_FILEPATH <- here::here(DOCS_DIR, CONFIG_FILENAME)
 
 # Feedback app:
 
+## Additional values for score computing:
+BONUS_MAX <- 0.5 # Maximum grading bonus (if responding all the items correctly)
+
+
 ## User interface objects:
 
 ### Shiny component identifiers:
 RESPONSE_TABLE_ID <- "responses"
+BONUS_OUTPUT_ID   <- "bonus"
 
 ### Interface verbatim:
 
 #### Static components:
-FEEDBACK_APP_TITLE  <- "Respuestas de la actividad optativa con Jamovi"
+FEEDBACK_APP_TITLE <- "Respuestas de la actividad optativa con Jamovi"
+BONUS_OUTPUT_LABEL <- "Tu bonificación en la nota:"
+
+#### Response output table headers & labels:
+ITEM_NUM_LABEL         <- "Nº"
+ITEM_LABEL             <- "Pregunta"
+STUDENT_RESPONSE_LABEL <- "Tu respuesta"
+CORRECT_RESPONSE_LABEL <- "Respuesta correcta"
+VALID_RESPONSE_LABEL   <- "Acierto"
+SCORE_LABEL            <- "Puntuación"
+TOTAL_SCORE_LABEL      <- htmltools::strong("TOTAL:") |> as.character()

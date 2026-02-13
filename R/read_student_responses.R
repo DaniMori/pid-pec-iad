@@ -18,14 +18,10 @@
 source("R/constants.R",      encoding = 'UTF-8')
 source("R/hash_emails.R",    encoding = 'UTF-8')
 source("R/simulated_data.R", encoding = 'UTF-8')
+source("R/log.R",            encoding = 'UTF-8')
 
 
 ## ---- CONSTANTS: -------------------------------------------------------------
-
-# File system objects:
-RESPONSE_VARS_FILENAME <- "student_response_variables.csv"
-response_vars_filepath <- here::here(DATA_DIR, RESPONSE_VARS_FILENAME)
-
 
 # Constant objects for processing the student responses dataset:
 
@@ -53,10 +49,6 @@ CLARITY_VALUES    <- c(
 ## e-mail domain for filtering out test responses:
 PROFESSOR_EMAIL_DOMAIN <- "@psi.uned.es"
 
-## Variable name objects:
-response_vars_labels <- response_vars_filepath |>
-  readr::read_csv(col_types = "c") |>
-  tibble::deframe()
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 read_student_responses <- function(filepath,
@@ -64,9 +56,12 @@ read_student_responses <- function(filepath,
                                    filter_domain = PROFESSOR_EMAIL_DOMAIN,
                                    correct_num   = FALSE) {
 
+  # Convert response variable labels to a named vector to use for relabelling:
+  response_vars_labels <- response_vars_labels |> tibble::deframe()
+
   responses <- readr::read_csv(
     filepath,
-    col_types = cols(.default = col_character())
+    col_types = readr::cols(.default = readr::col_character())
   ) |>
     dplyr::rename(!!!response_vars_labels) |>
     dplyr::mutate(
@@ -107,7 +102,7 @@ read_student_responses <- function(filepath,
   )
 
   responses <- responses |> dplyr::mutate(
-    item_5  = item_5  |> factor(levels =  ITEM_5_LABELS),
+    item_5  = item_5  |> factor(levels = LOGICAL_LABELS),
     item_7  = item_7  |> factor(levels =  ITEM_7_LABELS),
     item_10 = item_10 |> factor(levels = ITEM_10_LABELS),
     dplyr::across(
@@ -116,8 +111,31 @@ read_student_responses <- function(filepath,
     ),
     dplyr::across(usefulness_videos, ~ordered(., levels = USEFULNESS_VALUES)),
     dplyr::across(instructions,      ~ordered(., levels = CLARITY_VALUES)),
-    nps = nps |> str_extract("^\\d*") |> as.integer()
+    nps = nps |> stringr::str_extract("^\\d*") |> as.integer()
   )
 
   responses
+}
+
+filter_student <- function(data, hash) {
+
+  output <- data |> dplyr::filter(email_hash == hash)
+
+  n_responses <- output |> nrow()
+
+  if (n_responses == 0L) {
+
+    record_log("No user record found.")
+
+    return(output |> dplyr::bind_rows(tibble::tibble(email_hash = hash)))
+  }
+
+  if (n_responses > 1L) {
+
+    record_log("Non-unique user record; using the last valid record.")
+
+    return(output |> dplyr::slice_tail(n = 1L))
+  }
+
+  output
 }
