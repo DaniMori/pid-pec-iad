@@ -288,9 +288,12 @@ We input the new data in the original format.
 
 ```{r overwrite-raw-and-export}
 # Map standard vars (item_*) to raw column names using the same mapping as read_student_responses()
-raw_email_col <- unname(response_vars_labels["email_address"])
-raw_item_cols <- unname(response_vars_labels[ITEMS_TO_OVERWRITE])
-names(raw_item_cols) <- ITEMS_TO_OVERWRITE
+raw_email_col <- response_vars_labels |>
+  filter(variable == "email_address") |>
+  pull(label)
+raw_item_cols <- response_vars_labels |>
+  filter(variable %in% ITEMS_TO_OVERWRITE) |>
+  tibble::deframe()
 
 # Create a function to format numeric values to match the raw CSV style (decimal comma)
 fmt_num_es <- function(x, digits = N_DECIMALS) {
