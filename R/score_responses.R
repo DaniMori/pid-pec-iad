@@ -170,8 +170,7 @@ format_responses <- function(responses) {
       copy = TRUE,
     ) |>
     dplyr::mutate(
-      item  = item |> readr::parse_number() |> as.integer(),
-      score = score |> as.integer()
+      item  = item |> readr::parse_number() |> as.integer()
     )
 
   # Avoid warning when there are missing levels (e.g., all responses are
@@ -181,6 +180,7 @@ format_responses <- function(responses) {
       valid = score |>
         as.character() |>
         forcats::fct_recode(!!!LOGICAL_VALUES),
+      score = score |> as.integer()
     )
   )
 
