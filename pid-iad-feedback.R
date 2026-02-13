@@ -19,6 +19,7 @@ setwd(here::here())
 ## ---- PACKAGES: --------------------------------------------------------------
 
 library(shiny)
+library(htmltools)
 
 
 ## ---- SOURCES: ---------------------------------------------------------------
@@ -57,6 +58,15 @@ ui <- fluidPage(
 
   fillPage(
 
+    tags$br(),
+
+    tags$p(
+      tags$strong(BONUS_OUTPUT_LABEL),
+      textOutput(BONUS_OUTPUT_ID, inline = TRUE)
+    ),
+
+    tags$br(),
+
     # Output table with the correct responses:
     tableOutput(RESPONSE_TABLE_ID)
   )
@@ -67,6 +77,7 @@ server <- function(input, output, session) {
 
   # Reactive values:
   hashed_email <- reactiveVal() # Hashed email for logging and random seed
+  bonus_output <- reactiveVal() # Bonus output to show in the UI
 
   observe(
     {
@@ -82,7 +93,7 @@ server <- function(input, output, session) {
     }
   )
 
-  ## File download handler (activated when the email is valid)
+  ## Table output (activated when the email is valid and the hash computed)
   output[[RESPONSE_TABLE_ID]] <- renderTable(
     {
       hash <- hashed_email()
@@ -96,17 +107,26 @@ server <- function(input, output, session) {
         student_responses <- data_student_responses |>
           filter_student(hash = hash)
 
-        score_student_responses(
+        scored_responses <- score_student_responses(
           student_responses,
           correct_responses
-        ) |>
-          format_responses()
+        )
+
+        bonus_output(scored_responses |> get_bonus())
+
+        scored_responses |> format_responses()
       }
     },
     stripped = TRUE,
     bordered = TRUE,
     na       = '',
     sanitize.text.function = identity # Avoid escaping HTML tags in "TOTAL"
+  )
+
+  ## Bonus output (activated when the email is valid and the hash computed)
+  output[[BONUS_OUTPUT_ID]] <- renderText(
+    bonus_output() |>
+      scales::number(accuracy =  .01, prefix = '+') # Format for putting out
   )
 }
 

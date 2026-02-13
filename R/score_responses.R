@@ -179,14 +179,14 @@ format_responses <- function(responses) {
     output <- output |> dplyr::mutate(
       valid = score |>
         as.character() |>
-        forcats::fct_recode(!!!LOGICAL_VALUES),
-      score = score |> as.integer()
+        forcats::fct_recode(!!!LOGICAL_VALUES)
     )
   )
 
-  total_score <- output |> # Compute the student's total score
-    dplyr::summarise(score = sum(score)) |>
-    tibble::add_column(valid = TOTAL_SCORE)
+  total_score <- output |>
+    dplyr::mutate(score = score |> as.integer()) |> # (Instead of boolean)
+    dplyr::summarise(score = sum(score)) |> # Compute the student's total score
+    tibble::add_column(valid = TOTAL_SCORE_LABEL)
 
   output <- output |> dplyr::bind_rows(total_score)
 
@@ -215,4 +215,15 @@ are_whole_numbers <- function(x, tol = .Machine$double.eps^0.5) {
   if (!is.numeric(x)) return(FALSE)
 
   omnibus::is.wholeNumber(x, tol = tol) |> all(na.rm = TRUE)
+}
+
+get_bonus <- function(scores, bonus_max = BONUS_MAX) {
+
+  mean_score <- scores |>
+    dplyr::select(ends_with(SCORE_RESPONSE_SUFFIX)) |>
+    tidyr::pivot_longer(everything(), values_to = "score") |>
+    dplyr::summarize(bonus = score |> mean()) |>
+    dplyr::pull(bonus)
+
+  mean_score * bonus_max
 }

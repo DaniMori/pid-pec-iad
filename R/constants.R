@@ -84,15 +84,21 @@ CONFIG_FILEPATH <- here::here(DOCS_DIR, CONFIG_FILENAME)
 
 # Feedback app:
 
+## Additional values for score computing:
+BONUS_MAX <- 0.5 # Maximum grading bonus (if responding all the items correctly)
+
+
 ## User interface objects:
 
 ### Shiny component identifiers:
 RESPONSE_TABLE_ID <- "responses"
+BONUS_OUTPUT_ID   <- "bonus"
 
 ### Interface verbatim:
 
 #### Static components:
-FEEDBACK_APP_TITLE  <- "Respuestas de la actividad optativa con Jamovi"
+FEEDBACK_APP_TITLE <- "Respuestas de la actividad optativa con Jamovi"
+BONUS_OUTPUT_LABEL <- "Tu bonificación en la nota:"
 
 #### Response output table headers & labels:
 ITEM_NUM_LABEL         <- "Nº"
@@ -101,4 +107,4 @@ STUDENT_RESPONSE_LABEL <- "Tu respuesta"
 CORRECT_RESPONSE_LABEL <- "Respuesta correcta"
 VALID_RESPONSE_LABEL   <- "Acierto"
 SCORE_LABEL            <- "Puntuación"
-TOTAL_SCORE            <- htmltools::strong("TOTAL:") |> as.character()
+TOTAL_SCORE_LABEL      <- htmltools::strong("TOTAL:") |> as.character()
