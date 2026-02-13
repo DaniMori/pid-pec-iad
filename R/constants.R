@@ -16,6 +16,14 @@
 DOCS_DIR <- here::here("doc")
 DATA_DIR <- here::here("dat")
 
+# Event related constants:
+
+## Variable values:
+EVENT_TYPES <- c("Access", "Download") |> setNames(nm = _)
+
+## Time and date configuration:
+TIMESTAMP_FORMAT <- "%Y-%Om-%d %H:%M:%OS3 %Z" # With time zone at the end
+LOCAL_TIMEZONE   <- "Europe/Madrid" # Local timezone for the event timestamps
 
 # Dataset generation app:
 
