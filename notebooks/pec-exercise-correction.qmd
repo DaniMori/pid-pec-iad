@@ -230,7 +230,10 @@ data_response_corrections <- data_student_responses |>
   score_student_responses(data_correct_responses) |>
   rowwise() |>
   mutate(
-    total_score = ends_with(SCORE_RESPONSE_SUFFIX) |> c_across() |> sum()
+    grading_bonus = ends_with(SCORE_RESPONSE_SUFFIX) |>
+      c_across() |>
+      mean() *
+      BONUS_MAX
   )
 ```
 
@@ -313,26 +316,26 @@ score (i.e. zero, as they have probably responded at random).
 ```{r generate-grading-data}
 grading_data <- data_response_corrections |>
   ungroup() |>
-  select(email_hash, total_score) |>
+  select(email_hash, grading_bonus) |>
   left_join(
     data_criteria |> select(email_hash, data_downloaded:criteria_all),
     by = EMAIL_HASH_VAR
   )
 
 # Check scores against grading criteria:
-grading_data |> count(across(total_score | data_downloaded:criteria_all))
+grading_data |> count(across(grading_bonus | data_downloaded:criteria_all))
 
 # Select necessary variables and cases from the grading dataset
 grading_data <- grading_data |>
   filter(criteria_all) |>
-  select(!!EMAIL_HASH_VAR, total_score)
+  select(!!EMAIL_HASH_VAR, grading_bonus)
 
 # Fill in the grading template with the computed scores
 grading_data <- grading_template |>
   mutate(!!EMAIL_HASH_VAR := `Dirección de correo` |> map_int(hash_emails)) |>
   left_join(grading_data, by = EMAIL_HASH_VAR) |>
-  mutate(Calificación = total_score) |>
-  select(-!!EMAIL_HASH_VAR, -total_score)
+  mutate(Calificación = grading_bonus) |>
+  select(-!!EMAIL_HASH_VAR, -grading_bonus)
 
 # Discard the cases that have not been graded (i.e., `Calificación` is `NA`)
 grading_data <- grading_data |>
