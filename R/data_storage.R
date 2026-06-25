@@ -15,17 +15,6 @@
 
 source("R/constants.R", encoding = 'UTF-8')
 
-## ---- CONSTANTS: -------------------------------------------------------------
-
-# Event related constants:
-
-## Variable values:
-EVENT_TYPES <- c("Access", "Download") |> setNames(nm = _)
-
-## Time and date configuration:
-TIMESTAMP_FORMAT <- "%Y-%Om-%d %H:%M:%OS3 %Z" # With time zone at the end
-LOCAL_TIMEZONE   <- "Europe/Madrid" # Local timezone for the event timestamps
-
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
 # Function to create an event timestamp
@@ -85,7 +74,7 @@ write_event <- function(hash, event = EVENT_TYPES) {
   SERVER_TIMEZONE  <- "Europe/Madrid"
 
   ## Variable names:
-  LOG_VAR_NAMES <- c("email_hash", "timestamp", "event")
+  LOG_VAR_NAMES <- c(EMAIL_HASH_VAR, "timestamp", "event")
 
 
   # Argument parsing and formatting: ----

@@ -1,0 +1,22 @@
+variable,label
+student_name,Nombre completo del usuario
+groups,Grupos
+email_address,Dirección de correo
+date,Fecha
+item_1,¿Cuál es la frecuencia absoluta de participantes en la categoría “Insatisfecho” de la variable satisfacción vital?
+item_2,¿Cuál es la mediana de la variable "promedio semanal de horas diarias de sueño"? (Ponga dos decimales y utilice coma como separador decimal)
+item_3,¿Cuál es la desviación típica de la variable "promedio semanal de horas diarias de sueño"? (Ponga dos decimales y utilice coma como separador decimal)
+item_4,¿Qué valor de la variable promedio semanal de horas diarias de sueño corresponde al percentil 34? (Ponga dos decimales y utilice coma como separador decimal)
+item_5,Genere un diagrama de caja y bigotes de la variable "promedio semanal de horas diarias de sueño".  Adjunte el gráfico obtenido en “Tarea para entregar..." que se encuentra en la pestaña de la Actividad JAMOVI . ¿Se detectan valores atípicos?
+item_6,¿Cuál es la correlación entre las variables "promedio semanal de horas diarias de sueño" y "satisfacción vital"? (Ponga dos decimales y utilice coma como separador decimal)
+item_7,¿Cómo interpretaría esta correlación teniendo en cuenta exclusivamente su signo?
+item_8,Realice una regresión lineal donde la variable "satisfacción vital" prediga el "promedio semanal de horas diarias de sueño" ¿Qué valor ha obtenido en el origen o intersección de la regresión?  Ponga dos decimales y utilice coma como separador decimal
+item_9,Continuando con la regresión lineal de la pregunta 8 ¿Qué valor ha obtenido la pendiente de la regresión? Ponga dos decimales y utilice coma como separador decimal
+item_10,¿Cómo interpretaría el resultado de la regresión teniendo en cuenta exclusivamente su signo?
+help_jamovi,¿Cuánto te ha ayudado esta actividad a aprender el uso del sofware Jamovi?
+help_subject,¿Cuánto te ha ayudado esta actividad a entender otros contenidos de la asignatura?
+usefulness_videos,¿Te han resultado útiles los vídeos de Jamovi para resolver la actividad?
+instructions,¿Te han parecido claras las instrucciones y preguntas frecuentes?
+nps,¿Cómo de probable es que recomiendes realizar esta actividad a un compañero?
+difficulties,"Si lo deseas, indica las dificultades que has encontrado para realizar la tarea"
+extra_comments,"Si tienes algún otro comentario, índicalo en el siguiente recuadro"

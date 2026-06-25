@@ -1,0 +1,366 @@
+---
+title:               "PEC Exercise Correction Overwrite"
+author:              "Alejandro Martínez-Mingo"
+format:
+  html:
+    df-print:        paged
+    toc:             true
+    embed-resources: true
+editor:              source
+execute: 
+  output:            false
+  warning:           false
+---
+
+```{r setup}
+#| include: false
+
+# Set working directory
+knitr::opts_knit$set(root.dir = here::here())
+
+```
+
+```{r libraries}
+#| include: false
+library(here)
+library(dplyr)
+library(readr)
+library(purrr)
+library(tidyr)
+library(stringr)
+library(roperators)
+library(writexl)
+```
+
+```{r sources}
+#| include: false
+source("R/constants.R",              encoding = 'UTF-8')
+source("R/score_responses.R",        encoding = 'UTF-8')
+source("R/read_student_responses.R", encoding = 'UTF-8')
+```
+
+```{r constants}
+#| include: false
+
+# Constant objects for processing the downloads dataset:
+
+## File system objects for processing the student responses dataset:
+DATA_RESPONSES_FILENAME <- "Respuestas actividad optativa de JAMOVI.csv"
+data_responses_filepath <- here(DATA_DIR, DATA_RESPONSES_FILENAME)
+
+# Dates (local) that define the special-case window (inclusive)
+SPECIAL_CASES_DATE_FROM <- as.Date("2025-11-03")
+SPECIAL_CASES_DATE_TO   <- as.Date("2025-11-17")
+
+# Items to overwrite
+ITEMS_TO_OVERWRITE <- c("item_8", "item_9", "item_10")
+```
+
+# Introduction
+
+This document overwrites the responses of the students in
+`Respuestas actividad optativa de JAMOVI.csv` returning the same file, that
+should be used in the `pec-exercise-correction.qmd` in the case of need.
+
+# Data processing
+
+We just need to import the dataset with the students responses to the activity
+
+## Dataset of activity responses
+
+The dataset is first downloaded from [the OpenLMS
+course](https://agora.uned.es/course/view.php?id=12075). To download them, we
+need to access the [page of
+responses](https://agora.uned.es/mod/feedback/show_entries.php?id=625026)
+("Respuestas") in the activity survey, and download them by clicking the button
+"Descargar". The format used will be "csv" (the default one). Save the dataset
+to [the data folder](dat/) with its default name,
+"`{r} DATA_RESPONSES_FILENAME`".
+
+This dataset is then read and preprocessed
+
+```{r load-responses-data}
+data_student_responses <- data_responses_filepath |>
+  read_student_responses(test = F, correct_num = TRUE) |>
+  select(email_address, date, !!EMAIL_HASH_VAR, starts_with("item_"))
+```
+
+Select special cases by submission date (day-level, inclusive range)
+
+```{r select-special-cases}
+data_student_responses_to_overwrite <- data_student_responses |>
+  dplyr::filter(!is.na(date)) |>
+  dplyr::mutate(date_day = as.Date(date, tz = LOCAL_TIMEZONE)) |>
+  dplyr::filter(dplyr::between(date_day, SPECIAL_CASES_DATE_FROM, SPECIAL_CASES_DATE_TO)) |>
+  dplyr::select(-date_day)
+```
+
+Compute the hash of all students to overwrite
+
+```{r select-special-hashes}
+special_cases_hashes <- data_student_responses_to_overwrite |>
+  dplyr::transmute(!!EMAIL_HASH_VAR := as.integer(.data[[EMAIL_HASH_VAR]])) |>
+  dplyr::distinct()
+```
+
+# Output
+
+## Compute correct questions and overwrite
+
+For each student, the correct answers of the exercise are obtained.
+
+```{r get-correct-responses}
+data_correct_responses <- special_cases_hashes |>
+  pull(!!EMAIL_HASH_VAR) |>
+  set_names() |>                  # Helps matching each user's responses with its hash
+  map(get_correct_responses) |>    # Get correct responses for each selected student
+  list_rbind(names_to = EMAIL_HASH_VAR) |>
+  mutate(across(!!EMAIL_HASH_VAR, as.integer)) # For matching purposes
+```
+
+```{r refine-special-cases-by-reversed-model}
+# Helper funtion: compute correct answers when DV/IV are swapped (only items 8-10)
+compute_correct_responses_reversed <- function(data) {
+
+  INTERCEPT_TERM <- "(Intercept)"
+
+  # Swapped model vs the official one in compute_correct_responses()
+  criterion_name <- SIM_VAR_NAMES["var_2"] |> glue::backtick()
+  predictor_name <- SIM_VAR_NAMES["var_1"] |> glue::backtick()
+
+  # Same transformation used in compute_correct_responses() (var_2 as integer)
+  data <- data |>
+    dplyr::mutate(
+      `Satisfaccion vital` = `Satisfaccion vital` |>
+        as.character() |>
+        as.integer()
+    )
+
+  model        <- glue::glue("{criterion_name} ~ {predictor_name}")
+  fitted_model <- stats::lm(formula = model, data = data)
+  coefficients <- broom::tidy(fitted_model)
+
+  out <- data |> dplyr::summarise(
+    item_8  = coefficients |>
+      dplyr::filter(term == INTERCEPT_TERM) |>
+      dplyr::pull(estimate) |>
+      round(N_DECIMALS),
+    item_9  = coefficients |>
+      dplyr::filter(term == predictor_name) |>
+      dplyr::pull(estimate) |>
+      round(N_DECIMALS),
+    item_10 = item_9 |> sign() |> as.character()
+  )
+
+  out <- out |> dplyr::mutate(
+    item_10 = item_10 |>
+      readr::parse_factor(levels = ITEM_10_VALUES) |>
+      forcats::fct_recode(!!!ITEM_10_VALUES)
+  )
+  
+  out
+}
+
+get_correct_responses_reversed <- function(hash) {
+  simulate_data(hash) |> compute_correct_responses_reversed()
+}
+
+# Compute reversed keys for the same date-window candidates
+data_correct_responses_rev <- special_cases_hashes |>
+  dplyr::pull(!!EMAIL_HASH_VAR) |>
+  set_names() |>
+  purrr::map(get_correct_responses_reversed) |>
+  purrr::list_rbind(names_to = EMAIL_HASH_VAR) |>
+  dplyr::mutate(across(!!EMAIL_HASH_VAR, as.integer)) |>
+  dplyr::select(!!EMAIL_HASH_VAR, dplyr::all_of(ITEMS_TO_OVERWRITE)) |>
+  dplyr::rename_with(~ paste0(.x, "_rev"), dplyr::all_of(ITEMS_TO_OVERWRITE))
+
+data_correct_responses_fwd <- data_correct_responses |>
+  dplyr::select(!!EMAIL_HASH_VAR, dplyr::all_of(ITEMS_TO_OVERWRITE)) |>
+  dplyr::rename_with(~ paste0(.x, "_fwd"), dplyr::all_of(ITEMS_TO_OVERWRITE))
+
+# Compare student answers vs forward/reversed keys to detect "reversed solvers"
+candidates <- data_student_responses_to_overwrite |>
+  dplyr::select(!!EMAIL_HASH_VAR, dplyr::all_of(ITEMS_TO_OVERWRITE)) |>
+  dplyr::distinct(.data[[EMAIL_HASH_VAR]], .keep_all = TRUE) |>
+  dplyr::left_join(data_correct_responses_fwd, by = EMAIL_HASH_VAR) |>
+  dplyr::left_join(data_correct_responses_rev, by = EMAIL_HASH_VAR)
+
+for (it in ITEMS_TO_OVERWRITE) {
+  candidates[[paste0(it, "_match_fwd")]] <- purrr::map2_lgl(
+    candidates[[it]], candidates[[paste0(it, "_fwd")]],
+    roperators::`%~=%`
+  ) |> dplyr::coalesce(FALSE)
+
+  candidates[[paste0(it, "_match_rev")]] <- purrr::map2_lgl(
+    candidates[[it]], candidates[[paste0(it, "_rev")]],
+    roperators::`%~=%`
+  ) |> dplyr::coalesce(FALSE)
+}
+
+# Apply exemption only if they match the reversed model
+candidates <- candidates |>
+  dplyr::mutate(
+    rev_ok = item_8_match_rev | item_9_match_rev,
+    apply_exemption = rev_ok
+  )
+
+# Refine the special cases to overwrite
+special_cases_hashes <- candidates |>
+  dplyr::filter(apply_exemption) |>
+  dplyr::transmute(!!EMAIL_HASH_VAR := as.integer(.data[[EMAIL_HASH_VAR]])) |>
+  dplyr::distinct()
+
+# Keep only the forward answer key for the truly exempted cases (used to overwrite to "officially correct")
+data_correct_responses <- data_correct_responses |>
+  dplyr::semi_join(special_cases_hashes, by = EMAIL_HASH_VAR)
+
+
+
+```
+
+Next, we calculate the correct answers for the special cases:
+
+```{r calculate-correct-responses-special-cases}
+# Build overrides: correct answers for ONLY the special-case students and ONLY the affected items
+special_overrides <- data_correct_responses |>
+  dplyr::select(dplyr::all_of(c(EMAIL_HASH_VAR, ITEMS_TO_OVERWRITE))) |>
+  dplyr::distinct(.data[[EMAIL_HASH_VAR]], .keep_all = TRUE) |>
+  dplyr::rename_with(
+    ~ paste0(.x, "_override"),
+    dplyr::all_of(ITEMS_TO_OVERWRITE)
+  )
+```
+
+In the next chunk we overwrite the special cases. I found some problems since
+some types were coerced during the overwritting process, so we need to check the
+type of every item we want to overwrite to ensure it is the same as in the
+original data.
+
+```{r overwrite-special-cases}
+# Join override columns into the main responses (do NOT change types here)
+data_student_responses_overwritten <- data_student_responses |>
+  dplyr::left_join(special_overrides, by = EMAIL_HASH_VAR)
+
+# Overwrite item-by-item, preserving the original column type
+for (item in ITEMS_TO_OVERWRITE) {
+  override_col <- paste0(item, "_override")
+  if (!override_col %in% names(data_student_responses_overwritten)) next
+
+  # Cast override values to the same type as the target column to avoid vctrs upcasting.
+  target <- data_student_responses_overwritten[[item]]
+  ov     <- data_student_responses_overwritten[[override_col]]
+
+  if (is.integer(target)) {
+    ov <- as.integer(ov)
+  } else if (is.numeric(target)) {
+    ov <- as.numeric(ov)
+  } else if (is.logical(target)) {
+    ov <- as.logical(ov)
+  } else {
+    ov <- as.character(ov)
+  }
+
+  idx <- !is.na(ov)
+  data_student_responses_overwritten[[item]][idx] <- ov[idx]
+}
+
+# Drop helper override columns
+data_student_responses_overwritten <- data_student_responses_overwritten |>
+  dplyr::select(-dplyr::any_of(paste0(ITEMS_TO_OVERWRITE, "_override")))
+```
+
+Now, `data_student_responses_overwritten` should have the new overwritten
+responses in the selected items for the selected students and can be used
+directly in the `pec-exercise-correction.qmd` notebook, but we assume that the
+original file should be overwritten. For doing this in the raw format we need to
+load the raw data first.
+
+```{r load-responses-data-raw}
+data_student_responses_raw <- readr::read_csv(
+  data_responses_filepath,
+  show_col_types = FALSE,
+  col_types = readr::cols(.default = readr::col_character())
+)
+```
+
+We input the new data in the original format.
+
+```{r overwrite-raw-and-export}
+# Map standard vars (item_*) to raw column names using the same mapping as read_student_responses()
+raw_email_col <- response_vars_labels |>
+  filter(variable == "email_address") |>
+  pull(label)
+raw_item_cols <- response_vars_labels |>
+  filter(variable %in% ITEMS_TO_OVERWRITE) |>
+  tibble::deframe()
+
+# Create a function to format numeric values to match the raw CSV style (decimal comma)
+fmt_num_es <- function(x, digits = N_DECIMALS) {
+  x <- suppressWarnings(as.numeric(x))
+  ifelse(
+    is.na(x),
+    NA_character_,
+    format(round(x, digits), nsmall = digits, decimal.mark = ",",
+           scientific = FALSE, trim = TRUE)
+  )
+}
+
+# Build the updates table
+updates_raw <- data_student_responses_overwritten |>
+  dplyr::semi_join(special_cases_hashes, by = EMAIL_HASH_VAR) |>
+  dplyr::select(email_hash, dplyr::all_of(ITEMS_TO_OVERWRITE)) |>
+  dplyr::distinct(email_hash, .keep_all = TRUE) |>
+  dplyr::mutate(
+    dplyr::across(
+      dplyr::all_of(ITEMS_TO_OVERWRITE),
+      \(x) dplyr::case_when(
+        is.numeric(x)  ~ fmt_num_es(x),
+        is.integer(x)  ~ fmt_num_es(x),
+        is.factor(x)   ~ as.character(x),
+        is.logical(x)  ~ as.character(x),
+        TRUE           ~ as.character(x)
+      )
+    )
+  ) |>
+  dplyr::rename(!!!stats::setNames(ITEMS_TO_OVERWRITE, raw_item_cols))
+
+# Compute hashes for RAW rows, locate rows, and overwrite cells
+raw_hash <- purrr::map_int(
+  data_student_responses_raw[[raw_email_col]],
+  \(x) if (is.na(x) || x == "") NA_integer_ else hash_emails(x)
+)
+idx <- match(updates_raw$email_hash, raw_hash)
+ok  <- !is.na(idx)
+for (raw_col in unname(raw_item_cols)) {
+  data_student_responses_raw[[raw_col]][idx[ok]] <- updates_raw[[raw_col]][ok]
+}
+```
+
+Finally we export the new datafile overwritting the original one
+
+```{r data-export}
+# Export using the original filename (raw format)
+readr::write_excel_csv(data_student_responses_raw, data_responses_filepath)
+```
+
+Additionally, we also export the emails of the students whose responses have
+been changed to notify them about the correction.
+
+```{r}
+overrides_emails <- data_student_responses |>
+  semi_join(special_overrides, by = "email_hash") |>
+  select(email_address)
+
+readr::write_excel_csv(overrides_emails, here(DATA_DIR, "overrides_emails.csv"))
+```
+
+## Check dataset overwriting
+
+The overwritten dataset is tested with the reading function, to check that this
+notebook can be run and inserted safely in the "correction process".
+
+```{r test-exported-responses}
+data_student_responses <- data_responses_filepath |>
+  read_student_responses(correct_num = TRUE)
+```
