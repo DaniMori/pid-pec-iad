@@ -10,6 +10,7 @@ deployApp(
     "R"
   ),
   appPrimaryDoc = "app.R",
-  appName = "data-download",
-  account = "iad-psi-uned"
+  appName = "Data Download App",
+  account = "iad-psi-uned",
+  server  = "connect.posit.cloud"
 )
