@@ -24,7 +24,6 @@ library(shinyjs, warn.conflicts = FALSE)
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
-source("R/constants.R", encoding = 'UTF-8')
 source("R/constants.R",      encoding = 'UTF-8')
 source("R/simulated_data.R", encoding = 'UTF-8')
 source("R/hash_emails.R",    encoding = 'UTF-8')
