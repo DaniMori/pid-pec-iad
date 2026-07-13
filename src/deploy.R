@@ -1,9 +1,32 @@
-library(rsconnect)
+# ==============================================================================
+#
+# FILE NAME:   deploy.R
+# DESCRIPTION: Utility function for deploying app to Posit Connect Cloud
+#
+# AUTHOR:      Daniel Morillo
+#
+# DATE:        2026-07-13
+#
+# ==============================================================================
 
-file.copy("data-download.R", "app.R")
 
-deployApp(
-  appFiles      = c(
+## ---- SOURCES: ---------------------------------------------------------------
+
+source("R/deploy_app.R", encoding = 'UTF-8')
+
+
+## ---- CONSTANTS: -------------------------------------------------------------
+
+# APPLICATION OBJECTS:
+APP_MAIN <- "data-download.R"
+APP_NAME <- "Data Download App"
+
+
+## ---- MAIN: -------------------------------------------------------------
+
+deploy_app(
+  main      = APP_MAIN,
+  app_files = c(
     "app.R",
     ".Renviron",
     ".secrets/encrypted-oauth-token.rds",
@@ -16,11 +39,6 @@ deployApp(
     "R/log.R",
     "R/simulated_data.R"
   ),
-  appName       = "Data Download App",
-  appPrimaryDoc = "app.R",
-  account       = "iad-psi-uned",
-  server        = "connect.posit.cloud",
-  forceUpdate   = TRUE
+  app_name  = APP_NAME
 )
 
-file.remove("app.R")
