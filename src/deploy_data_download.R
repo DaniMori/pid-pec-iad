@@ -1,7 +1,7 @@
 # ==============================================================================
 #
 # FILE NAME:   deploy_data_downlad.R
-# DESCRIPTION: Utility function for deploying app to Posit Connect Cloud
+# DESCRIPTION: Script for deploying the Data Download app to Posit Connect Cloud
 #
 # AUTHOR:      Daniel Morillo
 #
