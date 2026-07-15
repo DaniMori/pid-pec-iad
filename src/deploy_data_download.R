@@ -31,7 +31,6 @@ deploy_app(
     ".Renviron",
     ".secrets/encrypted-oauth-token.rds",
     "doc/gsheets_config.yml",
-    "R/_disable_autoload.R",
     "R/constants.R",
     "R/data_storage.R",
     "R/hash_emails.R",

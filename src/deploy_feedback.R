@@ -31,7 +31,6 @@ deploy_app(
     ".Renviron",
     ".secrets/encrypted-oauth-token.rds",
     "feedback-res/student_response_variables.csv",
-    "R/_disable_autoload.R",
     "feedback-res/student_responses.csv",
     "R/constants.R",
     "R/hash_emails.R",
