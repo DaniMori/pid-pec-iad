@@ -31,33 +31,33 @@ license](https://creativecommons.org/licenses/by/4.0/).
 Start by installing the following software components:
 
 - [R version
-  4.4.1](https://cran.rstudio.com/bin/windows/base/old/4.4.1/): In
+  4.6.1](https://cran.rstudio.com/bin/windows/base/old/4.6.1/): In
   Windows, using the [binary
-  installer](https://cran.rstudio.com/bin/windows/base/old/4.4.1/R-4.4.1-win.exe)
+  installer](https://cran.rstudio.com/bin/windows/base/old/4.6.1/R-4.6.1-win.exe)
   is recommended.
 
 <!-- -->
 
 - [Rstudio Desktop](https://posit.co/download/rstudio-desktop/):
   Although not strictly necessary, it is recommended to install the
-  Rstudio IDE; for strict reproducibility, use build [2026.01.0+392 for
+  Rstudio IDE; for strict reproducibility, use build [2026.07.0+139 for
   Windows
-  10/11](https://download1.rstudio.org/electron/windows/RStudio-2026.01.0-392.exe).
+  10/11](https://download1.rstudio.org/electron/windows/RStudio-2026.07.0-139.exe).
 
 <!-- -->
 
 - [Quarto publishing system](https://quarto.org/): An additional
   component used by Rstudio to generate and publish literate computing
-  outputs. For strict reproducibility please use build 1.8.25; On
+  outputs. For strict reproducibility please use build 1.9.38; On
   Windows, use [the 64-bit
-  installer](https://github.com/quarto-dev/quarto-cli/releases/download/v1.8.25/quarto-1.8.25-win.msi).
+  installer](https://github.com/quarto-dev/quarto-cli/releases/download/v1.9.38/quarto-1.9.38-win.msi).
 
 <!-- -->
 
 - [Git client](https://git-scm.com/download): Install the Git client in
   order to be able to clone locally the project repository. On Windows,
   use [the 64-bit Windows
-  installer](https://github.com/git-for-windows/git/releases/download/v2.52.0.windows.1/Git-2.52.0-64-bit.exe).
+  installer](https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.1/Git-2.55.0-64-bit.exe).
 
 ## Installing the project locally
 
@@ -117,8 +117,8 @@ The main purpose of this repository is to create a Shiny app that
 generates the personalized synthetic dataset for each student enrolled
 in the course. In order to do this, we must configure first the Shiny
 app; then we can run it locally to test its functionality, and finally
-deploy it to [shinyapps.io](https://www.shinyapps.io/) so that students
-can access it.
+deploy it to [Posit Connect Cloud](https://connect.posit.cloud) so that
+students can access it.
 
 ## Configuration
 
@@ -154,33 +154,32 @@ this, follow these instructions:
 
 ## Running the app
 
-The Shiny app can be run locally in Rstudio from any of the two files
-that make up the Shiny app: [“ui.R”](ui.R) for the interface, and
-[“server.R”](server.R) for the server logic. When any of the two is
-active in the text editor, the “Source” button that appears in the upper
-toolbar for scripts and computable documents turns into a “Run App”
-button. To make sure the complete functionality of the app is working,
-it is better to run it in a new window. Instead of just clicking on this
-button, click on the right-side down arrow and make sure the options
-“Run in Window”, instead of “Run in Viewer Pane”, is selected; then
-click on “Run App”.
+The Shiny app can be run locally in Rstudio from the file
+[“app.R”](app.R). When it is active in the text editor, the “Source”
+dropdown menu that appears in the upper toolbar for scripts and
+computable documents turns into a “Run App” menu. To make sure the
+complete functionality of the app is working, it is better to run it on
+a web browser. Instead of just clicking on this button, click on the
+right-side down arrow and make sure the option “Run External” (instead
+of “Run in Window” or “Run in Viewer Pane”) is selected; then click on
+“Run App”.
 
-## Deploying the app to [shinyapps.io](https://www.shinyapps.io/)
+## Deploying the “Data Download” app to [Posit Connect Cloud](https://connect.posit.cloud)
 
 <div class="callout-important">
 
 ### Deploying the app in “Production” vs. “Test” mode
 
-When the app is already deployed to
-[shinyapps.io](https://www.shinyapps.io/) and running, in order to avoid
-a collision (which would affect the app usage by the students), a “test
-account” must be used in [shinyapps.io](https://www.shinyapps.io/). For
-example, with email address “<johndoe@psi.uned.es>”, create account
-“john-does-test” in [shinyapps.io](https://www.shinyapps.io/).
+When the app is already deployed to [Connect
+Cloud](https://connect.posit.cloud) and running, in order to avoid a
+collision (which would affect the app usage by the students), a “test
+account” must be used in [Connect Cloud](https://connect.posit.cloud).
+For example, with email address “<johndoe@psi.uned.es>”, create account
+“john-does-test” in [Connect Cloud](https://connect.posit.cloud).
 
-Consider the account “iad-psi-uned-es”, associated with email address
-“<iad.uned.psi@gmail.com>”, to be the “production” account”. Then,
-decide beforehand whether you will follow these instructions using the
+Consider the account associated with email address
+“<iad.uned.psi@gmail.com>” to be the “production” account”. Then, decide
+beforehand whether you will follow these instructions using the
 “production account” (when the app is not deployed and needs to be set
 up for usage within the “PEC”) or the alternative “test account” (when
 the app is already deployed and running, and the “PEC” is being
@@ -188,93 +187,121 @@ completed by the students during the course).
 
 </div>
 
-1.  Log in to [shinyapps.io](https://www.shinyapps.io/) using the email
-    associated with the account (production/test) that you will use. If
-    necessary, follow the steps to create a new account. (If using the
-    “production account”, log in with email address
+1.  Log in to [Connect Cloud](https://connect.posit.cloud) using the
+    email associated with the account (production/test) that you will
+    use. If necessary, follow the steps to create a new account. (If
+    using the “production account”, log in with email address
     “<iad.uned.psi@gmail.com>”, authenticating with Google.)
 
-2.  In the [shinyapps.io
-    dashboard](https://www.shinyapps.io/admin/#/dashboard), click on the
-    avatar (upper-right corner) and then on “Tokens” in the dropdown
-    menu to go to the “Tokens” tab.
+2.  In Rstudio, click on the menu “Tools” -\> “Global Options…”, and
+    section “Publishing”.
 
-3.  A token will be already created for this account, so you only need
-    to authorize it in your local Rstudio session. Click on the “Show”
-    button; a window will pop-up. Click on “Show secret”, and then on
-    “Copy to clipboard”. On the message window, type “CTRL + C” to copy
-    the R code with the authorization token, and then “Accept” to close
-    the message window, and “Ok” to close the pop-up window.
+3.  Click on “Connect…”, then on “Posit Connect Cloud” and “Connect
+    Account”. This will open an authorizatin page in the default web
+    browser.
 
-4.  Paste the copied R code into the Rstudio console and type “ENTER” to
-    run it and authorize the app on your local Rstudio session.
-    **IMPORTANT:** This will leave a trace of the authorization token in
-    your Rstudio history; at this point, make sure you go to the
-    “History” tab and delete the last entry, by selecting it and
-    clicking on the “Remove the selected history entries” button
-    (“document with a red X” icon), or by clicking on the “Clear all
-    history entries” (“broom” icon).
+4.  The page in the browser will show a pane titled “Authorize Access”,
+    with an 8-character alphanumeric code. After reading the
+    information, click on “Continue”, and then on “Authorize”. If the
+    authorization is successful, the page will show now an “Access
+    Authorized” message. Close the browser tab or window.
 
-5.  Open either the [“ui.R”](ui.R) or [“server.R”](server.R) file in the
-    Rstudio editor. Then click on the “Publish” button; select the
-    corresponding account on [shinyapps.io](https://www.shinyapps.io)
-    (i.e., “iad-psi-uned-es” if using the “production account”, the
-    “test account” you created if using it), and enter the app title
-    (“pid-pec-iad”) in the “Title” text box. Finally, **select
-    carefully** ALL OF and ONLY the following files and folders:
+5.  Return to Rstudio. The “Options” window will now show the [Connect
+    Cloud](https://connect.posit.cloud) account under “Publishing
+    Accounts”. Click on “Ok” to close the “Options” window.
 
-    - .Renviron
-    - .secrets/encrypted-oauth-token-rds
-    - doc/gsheets_config.yml
-    - R/constants.R
-    - R/data_storage.R
-    - R/hash_emails.R
-    - R/log.R
-    - R/simulated_data.R
-    - renv.lock
-    - server.R
-    - ui.R
+6.  Open the script
+    [“src/deploy_data_download.R”](src/deploy_data_download.R) in
+    Rstudio, and run it by clicking on the “Source” button (upper right
+    corner in the editor).
 
-<div class="callout-caution">
+7.  After the message “Preparing for deployment”, the console will
+    prompt to “Enter the publication account:”. Enter the account name
+    for [Connect Cloud](https://connect.posit.cloud), then press
+    `ENTER`.
 
-Make sure to select the previous files and only those. There must be
-exactly 11 files checkboxed.
+<div class="callout-tip">
+
+Prompting for the publication account every time is an intentional
+design decision, to avoid hardcoding the account in the code and
+preventing its exposure (it is not clear whether it can be a security
+issue, but just in case).
+
+When trying to deploy and redeploy the app several times, it may be
+tiresome and frustrating having to type in the account every time. To
+avoid this, the deployment script
+[“src/deploy_data_download.R”](src/deploy_data_download.R) can be edited
+to manually add the account name (between lines 27 and 28), therefore
+skipping the “prompt” step:
+
+``` r
+...
+
+deploy_app(
+  account = "iad-psi-uned",
+  main      = APP_MAIN,
+...
+```
+
+<div class="callout-warning">
+
+Important! If you do add this line, **do NOT commit** the change to git.
+Instead, revert the change when you have finished deploying the app.
 
 </div>
 
-6.  Click on “Publish”. The “Deploy” tab will open, printing out several
-    messages. If the deployment is successful, the tab will ultimately
-    output a message with the URL where the app is deployed. If using
-    the “production account”, it will be:
+8.  The console will output several messages informing of the progress
+    of the deployment process.
 
-    `Deployment completed: https://iad-psi-uned-es.shinyapps.io/pid-pec-iad/`
+<div class="callout-information">
 
-    If using the “test account”, it will match
+If the deployment has been tried before and the app already existed (and
+has been deleted) in [Connect Cloud](https://connect.posit.cloud), at a
+certain point the console may inform that it “Failed to find existing
+content on server”, and prompt to choose “What do you want to do?”.
 
-    `Deployment completed: https://<test-account>.shinyapps.io/pid-pec-iad/`
+If this happens, chose option “2: Delete existing deployment record &
+deploy this content as a new item”, by typing on the console `2` and
+then pressing `ENTER`.
 
-    The “Deploy” tab will automatically close while a tab will open in
-    the default browser, navigating to the URL of the app (the one in
-    the message above).
+</div>
 
-7.  Check that the app is running properly: The previous URL will not
+    If the deployment is successful, the console will output a message similar to
+
+    ```
+    ── Deployment complete ──────────────────────────────────────────────────────────────────────
+    ✔ Successfully deployed to <https://connect.posit.cloud/<account-name>/content/019f65b7-492a-8cfa-a453-340a6b9d5bd5>
+    ```
+
+with `<account-name>` being the publishing account introduced in step 7.
+A tab will open in the default browser, navigating to a preview of the
+app in [Connect Cloud](https://connect.posit.cloud).
+
+<div class="callout-information">
+
+The Operating System may pop up a Window requesting to grant access to R
+through the firewall. If this is the case, click on “Grant access”
+(“Permitir” or similar).
+
+</div>
+
+9.  In the app preview, click on the “Settings” button, click on “URL”,
+    and activate “Customize your URL”. In “Custom name” will be
+    automatically filled in with “data-download-app”; leave it as is (or
+    fill it in with that value, otherwise), and click on “Republish”.
+
+10. In the app preview, click on the “Copy Link” button. Open a new
+    browser tab and paste in the URL of the app. It will be similar to
+
+`https://<account-name>-data-download-app.share.connect.posit.cloud/`
+
+with `<account-name>` being the publishing account introduced in step 7.
+
+11. Check that the app is running properly: The previous URL will not
     work because the “email” GET parameter is missing from the URL, so
-    to test it, first go to the [Applications dashboard in
-    shinyapps.io](https://www.shinyapps.io/admin/#/applications/all) and
-    check that the app “pid-pec-iad” is listed with Status “Running”.
+    to test it, add an “email” GET parameter at the end, e.g.:
 
-8.  If the app is running, test the app by browsing to its URL
-    (<https://iad-psi-uned-es.shinyapps.io/pid-pec-iad> if using the
-    “production account”, something like
-    <https://><test-account>.shinyapps.io/pid-pec-iad if using the “test
-    account”), and then adding an “email” GET parameter at the end,
-    i.e., with the “production account”:
-
-    <https://iad-psi-uned-es.shinyapps.io/pid-pec-iad?email=johndoe@psi.uned.es>\`
-
-    with a “test account”, something like:
-
-    <https://><test-account>.shinyapps.io/<pid-pec-iad?email=johndoe@psi.uned.es>\`
+`https://<account-name>-data-download-app.share.connect.posit.cloud/?email=johndoe@psi.uned.es`
 
 <div class="callout-tip">
 
@@ -283,10 +310,30 @@ It is highly recommended that you use your own email at the
 
 </div>
 
-If the app works properly, a dataset should be downloaded automatically
-and/or by clicking on the link to download it manually. It should also
-be checked that the new entries (for “Access” and “Download”) are logged
-in the Google Spreadsheet file.
+If the app works properly, a dataset should be downloaded, either
+automatically and/or by clicking on the link to download it manually. It
+should also be checked that the new entries (for “Access” and
+“Download”) are logged in the Google Spreadsheet file.
+
+## Deploying the “Feedback” app to [Posit Connect Cloud](https://connect.posit.cloud)
+
+Deploying the “Feedback” app to [Connect
+Cloud](https://connect.posit.cloud) follows a similar procedure as
+described above for [deploying the “Data Download” app](#deploy-dd). The
+only changes that need to be made to that procedure for the “Feedback”
+app are:
+
+**Steps 6 and 7:** Use script
+[“src/deploy_feedback.R”](src/deploy_feedback.R) instead of
+[“src/deploy_data_download.R”](src/deploy_data_download.R).
+
+**Steps 9 through 11:** Use the value “feedback-app” instead of
+“data-download-app” in the textbox “Custom name”, to customize the URL
+of the app. This URL will then be similar to
+
+`https://<account-name>-feedback-app.share.connect.posit.cloud/`
+
+with `<account-name>` being the publishing account introduced in step 7.
 
 # Repository structure
 
@@ -314,3 +361,5 @@ The file structure of this repository is as follows:
 
 Use the folders as indicated to store the different files and generate
 the outputs of the processes.
+
+</div>
