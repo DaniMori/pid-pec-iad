@@ -27,7 +27,6 @@ APP_NAME <- "Data Download App"
 deploy_app(
   main      = APP_MAIN,
   app_files = c(
-    "app.R",
     ".Renviron",
     ".secrets/encrypted-oauth-token.rds",
     "doc/gsheets_config.yml",

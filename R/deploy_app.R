@@ -36,7 +36,7 @@ deploy_app <- function(main,
   file.copy(main, PCC_MAIN)
 
   rsconnect::deployApp(
-    appFiles      = app_files,
+    appFiles      = c(PCC_MAIN, app_files),
     appName       = app_name,
     appPrimaryDoc = PCC_MAIN,
     account       = account,

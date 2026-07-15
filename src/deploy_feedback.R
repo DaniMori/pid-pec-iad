@@ -26,7 +26,6 @@ APP_NAME <- "Feedback App"
 
 deploy_app(
   main      = APP_MAIN,
-    "app.R",
   app_files = c(
     ".Renviron",
     ".secrets/encrypted-oauth-token.rds",
