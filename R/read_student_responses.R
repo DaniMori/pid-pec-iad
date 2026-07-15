@@ -25,6 +25,10 @@ source("R/log.R",            encoding = 'UTF-8')
 
 # Constant objects for processing the student responses dataset:
 
+## Variable name objects:
+response_vars_labels <- response_vars_filepath |>
+  readr::read_csv(col_types = readr::cols(.default = readr::col_character()))
+
 ## Symbols for selecting and processing "numeric" items
 num_items_selection <- rlang::quo(
   tidyselect::all_of('item_' |> paste0(c(1:4, 6L, 8:9)))
