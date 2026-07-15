@@ -26,17 +26,18 @@ APP_NAME <- "Feedback App"
 
 deploy_app(
   main      = APP_MAIN,
-  app_files = c( # TODO: Update app files
     "app.R",
+  app_files = c(
     ".Renviron",
     ".secrets/encrypted-oauth-token.rds",
-    "doc/gsheets_config.yml",
     "feedback-res/student_response_variables.csv",
     "R/_disable_autoload.R",
+    "feedback-res/student_responses.csv",
     "R/constants.R",
-    "R/data_storage.R",
     "R/hash_emails.R",
     "R/log.R",
+    "R/read_student_responses.R",
+    "R/score_responses.R",
     "R/simulated_data.R"
   ),
   app_name  = APP_NAME
