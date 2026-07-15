@@ -1,4 +1,17 @@
 
+- [Repository `pid-pec-iad`](#repository-pid-pec-iad)
+- [License](#license)
+  - [Attributions](#attributions)
+- [Project installation](#project-installation)
+  - [Software components](#software-components)
+  - [Installing the project locally](#installing-the-project-locally)
+  - [Restoring the environment](#restoring-the-environment)
+- [Usage](#usage)
+  - [Configuration](#configuration)
+  - [Running the app](#running-the-app)
+  - [Deploying the “Data Download” app to Posit Connect
+    Cloud](#deploy-dd)
+
 # Repository `pid-pec-iad`
 
 Repository for “Teaching innovation project 2025” at UEND. It consists
