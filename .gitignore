@@ -36,6 +36,8 @@
 
 # Shiny publication files
 *.dcf
+## Temporary file for deploying the apps to Connect Cloud:
+app.R
 
 # App configuration
 /.secrets/
