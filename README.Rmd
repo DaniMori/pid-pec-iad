@@ -163,6 +163,11 @@ these instructions:
 2. Create a new Google Spreadsheets file (ideally inside the folder "PID-IAD"),
    and give it a meaningful name (e.g. "pid-iad-data").
    
+::: callout-important
+Before creating a new Google Spreadsheets file, make sure that it has not been
+already created for the project and it is configured already.
+:::
+
 3. Open this new Spreadsheets file in a browser.
 
 4. Copy its file ID from the URL in the browser's direction bar: This is the
