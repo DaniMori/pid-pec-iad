@@ -172,7 +172,10 @@ already created for the project and it is configured already.
 
 4. Copy its file ID from the URL in the browser's direction bar: This is the
    alphanumeric code between "https://docs.google.com/spreadsheets/d/" and the
-   last slash ("/"). DO NOT include any of the two slashes.
+   last slash ("/"). DO NOT include any of the two slashes. That is, if the URL
+   in the direction bar is
+   `https://docs.google.com/spreadsheets/d/19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw/edit?gid=0#gid=0`,
+   then the file ID is `19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw`.
 
 ::: callout-tip
 On Windows, press `CTRL` + `L` to go to the direction bar and select the URL.
@@ -182,10 +185,9 @@ On Windows, press `CTRL` + `L` to go to the direction bar and select the URL.
    "doc/gsheets_config.yml".
 
 6. Paste the copied file ID into line 3 of "doc/gsheets_config.yml", between the
-   double quotes, and omitting the "caret" (<>) characters; e.g.: if the URL in
-   the direction bar is
-   `https://docs.google.com/spreadsheets/d/19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw/edit?gid=0#gid=0`,
-   then line 3 of "doc/gsheets_config.yml" must be
+   double quotes, and omitting the "caret" (<>) characters; e.g.: if the file ID
+   is `19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw` (see step 4), then line 3
+   of "doc/gsheets_config.yml" must be
    
    `file_id: "19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw"`
 
