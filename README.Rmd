@@ -162,15 +162,21 @@ these instructions:
 
 2. Create a new Google Spreadsheets file (ideally inside the folder "PID-IAD"),
    and give it a meaningful name (e.g. "pid-iad-data").
+   
+3. Open this new Spreadsheets file in a browser.
 
-3. Copy its file ID from the direction bar: This is the alphanumeric code
-   between "https://docs.google.com/spreadsheets/d/" and the last slash ("/").
-   DO NOT include any of the two slashes.
+4. Copy its file ID from the URL in the browser's direction bar: This is the
+   alphanumeric code between "https://docs.google.com/spreadsheets/d/" and the
+   last slash ("/"). DO NOT include any of the two slashes.
+
+::: callout-tip
+On Windows, press `CTRL` + `L` to go to the direction bar and select the URL.
+:::
   
-4. Open file "doc/ghseets_config_template.yml", and save it as
+5. Open file "doc/ghseets_config_template.yml" in RStudio, and save it as
    "doc/gsheets_config.yml".
 
-5. Paste the copied file ID into line 3 of "doc/gsheets_config.yml", between the
+6. Paste the copied file ID into line 3 of "doc/gsheets_config.yml", between the
    double quotes, and omitting the "caret" (<>) characters; e.g.: if the URL in
    the direction bar is
    `https://docs.google.com/spreadsheets/d/19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw/edit?gid=0#gid=0`,
@@ -178,7 +184,7 @@ these instructions:
    
    `file_id: "19oPSRB2S2HIL2BW87VB5rAEHXJCSYqxCQZZKzhciRqw"`
 
-6. Save the changes to "doc/gsheets_config.yml".
+7. Save the changes to "doc/gsheets_config.yml".
 
 ## Running the app
 
