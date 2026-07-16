@@ -1,6 +1,9 @@
 ---
 title: "Google Spreadsheets connection instructions"
-format: gfm
+format:
+  html:
+    code-copy: true
+    toc: true
 editor: source
 execute: 
   eval: false
@@ -28,15 +31,15 @@ This procedure uses [the {gargle} package](https://gargle.r-lib.org/) (an R
 interface for the Google APIs) to authenticate. Its description is based on the
 following sources, both of them articles in the package website:
 
--   [Non-interactive
-    auth](https://gargle.r-lib.org/articles/non-interactive-auth.html#project-level-oauth-cache),
-    specially [section "Project-level OAuth
-    cache"](https://gargle.r-lib.org/articles/non-interactive-auth.html#project-level-oauth-cache)
+- [Non-interactive
+  auth](https://gargle.r-lib.org/articles/non-interactive-auth.html#project-level-oauth-cache),
+  specially [section "Project-level OAuth
+  cache"](https://gargle.r-lib.org/articles/non-interactive-auth.html#project-level-oauth-cache)
 
--   [Managing tokens
-    securely](https://gargle.r-lib.org/articles/managing-tokens-securely.html),
-    specially [section "Encrypt an R
-    object"](https://gargle.r-lib.org/articles/managing-tokens-securely.html#encrypt-an-r-object)
+- [Managing tokens
+  securely](https://gargle.r-lib.org/articles/managing-tokens-securely.html),
+  specially [section "Encrypt an R
+  object"](https://gargle.r-lib.org/articles/managing-tokens-securely.html#encrypt-an-r-object)
 
 ## Setup summary
 
@@ -178,8 +181,6 @@ rstudioapi::restartSession(clean = FALSE)
 4.  Verify that the key is created as an environment variable
 
 ```{r check-evvar-key}
-#| eval: true
-
 # NOTE: If the R session fails to restore, the following lines will restore the
 #       missing objects and set up the options manually:
 CACHE_PATH   <- ".secrets"
@@ -274,6 +275,8 @@ For this minimal example, we will create an empty spreadsheet.
     everything up until the last "slash" ("/") character. In this example:
 
 ```{r gs-url}
+#| eval: true
+
 # TODO: Change line 282 to use a different Google Spreadsheets file created
 #       following these instructions, e.g.:
 # GS_URL <-
@@ -363,7 +366,7 @@ test_data <- data.frame(   # The timestamp value will indicate when this code
 googlesheets4::sheet_append(gs_link, test_data)
 ```
 
-3.  Verify that the line has been written, navigating to `{r} GS_URL` and
+3.  Verify that the line has been written, navigating to "`{r} GS_URL`" and
     checking the last value (the only one, likely) of `timestamp`.
 
 4.  As the Google Spreadsheets file will not be used anymore (it was only for

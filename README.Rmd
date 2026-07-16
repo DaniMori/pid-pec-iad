@@ -150,7 +150,9 @@ locally to test its functionality, and finally deploy it to
 
 Before trying to run it, the Google Spreadsheets connection must be set up.
 Follow the instructions in document ["Google Spreadsheets connection
-instructions"](doc/gs_instructions.qmd) to do this.
+instructions"](doc/gs_instructions.qmd) first to do this. This is a Quarto
+markdown file; it is **recommended** that you **open it locally in RStudio** and
+**"Render"** it, to **follow the instructions from the HTML-rendered version**.
 
 Once the connection is set up, a new Google Spreadsheets file needs to be
 created as the storage backend for the Shiny App. In order to do this, follow
