@@ -124,6 +124,10 @@ in the console:
 renv::restore(prompt = FALSE)
 ```
 
+After the environment has been successfully restored, restart the R
+session in the menu “Session” -\> “Restart R” (or using the keyboard
+shortcut `CTRL + SHIFT + F10`).
+
 # Usage
 
 The main purpose of this repository is to create a Shiny app that
