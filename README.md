@@ -177,6 +177,19 @@ on the right-side down arrow and make sure the option “Run External”
 (instead of “Run in Window” or “Run in Viewer Pane”) is selected; then
 click on “Run App”.
 
+### Testing the data download
+
+To test the app functionality, go to the URL bar and add e.g.
+“?<email=johndoe@psi.uned.es>” after the app URL (which should look like
+“<https://localhost>:<XXXX>”, being `<XXXX>`), and type `ENTER`. For
+example, if the URL is
+
+    https://localhost:1111
+
+test the functionality (data downloading) by browsing to
+
+    https://localhost:1111?email=johndoe@psi.uned.es
+
 ## Deploying the “Data Download” app to [Posit Connect Cloud](https://connect.posit.cloud)
 
 <div class="callout-important">
