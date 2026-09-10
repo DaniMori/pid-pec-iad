@@ -116,12 +116,12 @@ about this), you will need to manually install the package first:
 install.packages("renv")
 ```
 
-Once it is successfully installed, use the “renv” -\> “Restore library…”
-button in Rstudio’s “Packages” tab to restore the environment.
-Alternatively, you can type in the console:
+Once it is successfully installed, use the “Restore” button in Rstudio’s
+“Packages” tab to restore the environment. Alternatively, you can type
+in the console:
 
 ``` r
-renv::restore()
+renv::restore(prompt = FALSE)
 ```
 
 # Usage
