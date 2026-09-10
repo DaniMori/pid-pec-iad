@@ -53,9 +53,9 @@ Start by installing the following software components:
 
 - [Rstudio Desktop](https://posit.co/download/rstudio-desktop/):
   Although not strictly necessary, it is recommended to install the
-  Rstudio IDE; for strict reproducibility, use build [2026.07.0+139 for
+  Rstudio IDE; for strict reproducibility, use build [2026.08.2+200 for
   Windows
-  10/11](https://download1.rstudio.org/electron/windows/RStudio-2026.07.0-139.exe).
+  10/11](https://download1.rstudio.org/electron/windows/RStudio-2026.08.2-200.exe).
 
 <!-- -->
 
@@ -70,7 +70,7 @@ Start by installing the following software components:
 - [Git client](https://git-scm.com/download): Install the Git client in
   order to be able to clone locally the project repository. On Windows,
   use [the 64-bit Windows
-  installer](https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.1/Git-2.55.0-64-bit.exe).
+  installer](https://github.com/git-for-windows/git/releases/download/v2.53.0.windows.1/Git-2.53.0-64-bit.exe).
 
 ## Installing the project locally
 
