@@ -16,7 +16,7 @@ source("R/deploy_app.R", encoding = 'UTF-8') # Defines `ACCOUNT_PROMPT`
 
 # Repository `pid-pec-iad`
 
-Repository for "Teaching innovation project 2025" at UEND. It consists of:
+Repository for "Teaching innovation project 2025" at UNED. It consists of:
 
 - A Shiny Application for generating personalized student datasets
 
@@ -192,7 +192,7 @@ these instructions:
 ## Running the app
 
 The Shiny app can be run locally in Rstudio from the file
-["app.R"](app.R). When it is active in the text editor, the
+["data-download.R"](data-download.R). When it is active in the text editor, the
 "Source" dropdown menu that appears in the upper toolbar for scripts and
 computable documents turns into a "Run App" menu. To make sure the complete
 functionality of the app is working, it is better to run it on a web browser.

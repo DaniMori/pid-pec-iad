@@ -14,7 +14,7 @@
 
 # Repository `pid-pec-iad`
 
-Repository for “Teaching innovation project 2025” at UEND. It consists
+Repository for “Teaching innovation project 2025” at UNED. It consists
 of:
 
 - A Shiny Application for generating personalized student datasets
@@ -168,14 +168,14 @@ this, follow these instructions:
 ## Running the app
 
 The Shiny app can be run locally in Rstudio from the file
-[“app.R”](app.R). When it is active in the text editor, the “Source”
-dropdown menu that appears in the upper toolbar for scripts and
-computable documents turns into a “Run App” menu. To make sure the
-complete functionality of the app is working, it is better to run it on
-a web browser. Instead of just clicking on this button, click on the
-right-side down arrow and make sure the option “Run External” (instead
-of “Run in Window” or “Run in Viewer Pane”) is selected; then click on
-“Run App”.
+[“data-download.R”](data-download.R). When it is active in the text
+editor, the “Source” dropdown menu that appears in the upper toolbar for
+scripts and computable documents turns into a “Run App” menu. To make
+sure the complete functionality of the app is working, it is better to
+run it on a web browser. Instead of just clicking on this button, click
+on the right-side down arrow and make sure the option “Run External”
+(instead of “Run in Window” or “Run in Viewer Pane”) is selected; then
+click on “Run App”.
 
 ## Deploying the “Data Download” app to [Posit Connect Cloud](https://connect.posit.cloud)
 
