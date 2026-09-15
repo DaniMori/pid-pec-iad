@@ -15,59 +15,53 @@
 
 # Simulated data objects:
 
-## Variable names:
-SIM_VARIABLES <- c("var_1",                "var_2")
-SIM_VAR_NAMES <- c("Horas sueno promedio", "Satisfaccion vital") |>
+## Dataset properties:
+SAMPLE_SIZE  <- 300:500  # Uniformly random sample size of 300-500
+
+
+## Variable properties:
+
+SIM_VARIABLES <- "var_" |> paste0(1:7) # Variable identifiers
+
+SIM_VAR_NAMES <- c( # Variable names
+  "ID",
+  "Inteligencia",
+  "Responsabilidad",
+  "Nota",
+  "Salario_deseado",
+  "SES",
+  "Curso"
+) |>
   setNames(SIM_VARIABLES)
 
-## Model parameters:
-INTERCEPT_VAR_NAME    <- "intercept"
-SLOPE_VAR_NAME        <- "slope"
-RELATIONSHIP_VAR_NAME <- "relationship"
 
-## Variable data:
-SAMPLE_SIZE  <- 300:500  # Uniformly random sample size of 300-500
-VAR_1_SCORES <-  40:100 / 10 # Possible scores in `var_1`
-VAR_2_SCORES <-   1:  5      # Possible scores in `var_2`
+## Variable values:
 
-## Modeling variables:
-REL_LEVS <- c(-1L, 1L) # Levels for the "relationship" item response
+# Categories in `var_4` ("Nota"):
+VAR_4_CATS <- C("Suspenso", "Aprobado", "Notable", "Sobresaliente")
+
+# Values in `var_5` ("Salario_deseado"):
+VAR_5_VALUES <- c(15:30, 35, 40, 45, 50, 60) * 1000
+
+# Categories in `var_6` ("SES"):
+VAR_6_CATS <- C("Bajo", "Medio", "Alto")
+
+# Categories in `var_7` ("Curso"):
+VAR_6_CATS <- C("No", "Sí")
+
+
+## Bivariate variable properties:
+
+# Correlation ranges (among generating variables):
+CORR_LIMS_VARS_2_3 <- c(-0.8, 0.8) # "Inteligencia"    - "Responsabilidad"
+CORR_LIMS_VARS_2_4 <- c( 0,   0.6) # "Inteligencia"    - "Nota"
+CORR_LIMS_VARS_2_5 <- c(-0.5, 0.5) # "Inteligencia"    - "Salario_deseado"
+CORR_LIMS_VARS_3_5 <- c(-0.5, 0.5) # "Responsabilidad" - "Salario_deseado"
 
 
 # Response generation objects:
 
-ITEM_1_LS_CAT <- 2L # Category "Insatisfecho" in "life satisfaction" variable
-                    #   (for item 1).
-
-## Item value labels:
-SIGN_LEVELS    <- c(-1, 0, 1) |> as.character()
-LOGICAL_LEVELS <- c(FALSE, TRUE) |> as.character()
-
-LOGICAL_LABELS <- c("No", "Sí")
-LOGICAL_VALUES <- LOGICAL_LEVELS |> setNames(LOGICAL_LABELS)
-
-ITEM_7_LABELS <- c(
-  "Las variables  tienen una relación indirecta",
-  "Las variables  tienen una relación nula (exactamente igual a cero)",
-  "Las variables  tienen una relación directa"
-)
-ITEM_7_VALUES <- SIGN_LEVELS |> setNames(ITEM_7_LABELS)
-
-ITEM_10_LABELS <- c(
-  paste(
-    'A menos "satisfacción vital",',
-    'mayor "promedio semanal de horas diarias de sueño"'
-  ),
-  paste(
-    'La relación entre la "satisfacción vital" y el "promedio semanal',
-    'de horas diarias de sueño" es nula (exactamente igual a cero)'
-  ),
-  paste(
-    'A más "satisfacción vital",',
-    'mayor "promedio semanal de horas diarias de sueño"'
-  )
-)
-ITEM_10_VALUES <- SIGN_LEVELS |> setNames(ITEM_10_LABELS)
+## TODO: Pending (to complete when the items are complete)
 
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
@@ -76,18 +70,56 @@ simulate_data <- function(seed) {
 
   set.seed(seed)
 
-  slope       <- sample(REL_LEVS, size = 1L) # Simulated regression coefficient
+  ## TODO: Decide whether to move the correlation construction to a function
+
+  # Correlations among generating variables:
+  gen_vars <- SIM_VARIABLES[2:5] # Variable names for the correlation matrix
+  corrs <- matrix(nrow = 4L, ncol = 4L, dimnames = list(gen_vars, gen_vars))
+  diag(corrs) <- 1L
+  corrs[upper.tri(corrs)] <- c(
+    runif(1L, CORR_LIMS_VARS_2_3[1], CORR_LIMS_VARS_2_3[2]),
+    runif(1L, CORR_LIMS_VARS_2_4[1], CORR_LIMS_VARS_2_4[2]),
+    NA,
+    runif(1L, CORR_LIMS_VARS_2_5[1], CORR_LIMS_VARS_2_5[2]),
+    runif(1L, CORR_LIMS_VARS_3_5[1], CORR_LIMS_VARS_3_5[2]),
+    NA
+  )
+
+  ## Determine missing correlations to make matrix positive definite:
+
+  ### Correlations among variables 3 and 4:
+
+  corr_matrix_2_4 <- corrs[SIM_VARIABLES[2:4], SIM_VARIABLES[2:4]]
+  corrs_2_4       <- corr_matrix_2_4[upper.tri(corr_matrix_2_4)]
+  corr_lims_3_4   <- faux::pos_def_limits(corrs_2_4)
+
+  corrs[SIM_VARIABLES[3], SIM_VARIABLES[4]] <- runif( # Assign correlation
+    1L,
+    corr_lims_3_4$min,
+    corr_lims_3_4$max
+  )
+
+
+  ### Correlations among variables 4 and 5:
+  corrs_4_5                                 <- corrs[upper.tri(corrs)]
+  corr_lims_4_5                             <- faux::pos_def_limits(corrs_4_5)
+  corrs[SIM_VARIABLES[4], SIM_VARIABLES[5]] <- runif( # Assign correlation
+    1L,
+    corr_lims_4_5$min,
+    corr_lims_4_5$max
+  )
+
+  ## Complete correlation matrix:
+  corr_vector             <- corrs[upper.tri(corrs)]
+  corrs                   <- t(corrs)
+  corrs[upper.tri(corrs)] <- corr_vector
+
+  # Generate data:
   sample_size <- sample(SAMPLE_SIZE, size = 1L) # Random sample size
-  n_crit_vals <- length(VAR_2_SCORES) # Nº of values in `var_2`
 
   output <- tibble::tibble(
-    var_1 = sample(
-      VAR_1_SCORES,
-      size    = sample_size,
-      replace = TRUE
-    ),
-    # Preliminary "continuous version" of `var_2`
-    var_2 = slope * var_1 + rnorm(sample_size)
+    var_1    = 1:sample_size,
+    std_vars = faux::rnorm_multi(sample_size, r = corrs)
   )
 
   # Random cut points for `var_2` (to avoid a "flat" barplot)
