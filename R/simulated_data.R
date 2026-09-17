@@ -11,6 +11,11 @@
 # ==============================================================================
 
 
+## ---- SOURCES: ---------------------------------------------------------------
+
+source("R/sim_functions.R", encoding = 'UTF-8')
+
+
 ## ---- CONSTANTS: -------------------------------------------------------------
 
 # Simulated data objects:
@@ -38,16 +43,16 @@ SIM_VAR_NAMES <- c( # Variable names
 ## Variable values:
 
 # Categories in `var_4` ("Nota"):
-VAR_4_CATS <- C("Suspenso", "Aprobado", "Notable", "Sobresaliente")
+VAR_4_CATS <- c("Suspenso", "Aprobado", "Notable", "Sobresaliente")
 
 # Values in `var_5` ("Salario_deseado"):
 VAR_5_VALUES <- c(15:30, 35, 40, 45, 50, 60) * 1000
 
 # Categories in `var_6` ("SES"):
-VAR_6_CATS <- C("Bajo", "Medio", "Alto")
+VAR_6_CATS <- c("Bajo", "Medio", "Alto")
 
 # Categories in `var_7` ("Curso"):
-VAR_6_CATS <- C("No", "Sí")
+VAR_6_CATS <- c("No", "Sí")
 
 
 ## Bivariate variable properties:
@@ -73,15 +78,38 @@ simulate_data <- function(seed) {
   ## TODO: Decide whether to move the correlation construction to a function
 
   # Correlations among generating variables:
-  gen_vars <- SIM_VARIABLES[2:5] # Variable names for the correlation matrix
-  corrs <- matrix(nrow = 4L, ncol = 4L, dimnames = list(gen_vars, gen_vars))
+  gen_varnames  <- SIM_VAR_NAMES[2:5] # Names for the correlation matrix
+  corr_dimnames <- list(gen_varnames, gen_varnames)
+  corr_inf_lims <- c(
+    NA,
+    CORR_LIMS_VARS_2_3[1],
+    CORR_LIMS_VARS_2_4[1],
+    CORR_LIMS_VARS_2_5[1],
+    NA |> rep(3),
+    CORR_LIMS_VARS_3_5[1],
+    NA |> rep(8)
+  ) |>
+    matrix(nrow = 4L, byrow = TRUE, dimnames = corr_dimnames)
+  corr_sup_lims <- c(
+    NA,
+    CORR_LIMS_VARS_2_3[2],
+    CORR_LIMS_VARS_2_4[2],
+    CORR_LIMS_VARS_2_5[2],
+    NA |> rep(3),
+    CORR_LIMS_VARS_3_5[2],
+    NA |> rep(8)
+  ) |>
+    matrix(nrow = 4L, byrow = TRUE, dimnames = corr_dimnames)
+
+
+  corrs <- matrix(nrow = 4L, ncol = 4L, dimnames = list(gen_varnames, gen_varnames))
   diag(corrs) <- 1L
   corrs[upper.tri(corrs)] <- c(
-    runif(1L, CORR_LIMS_VARS_2_3[1], CORR_LIMS_VARS_2_3[2]),
-    runif(1L, CORR_LIMS_VARS_2_4[1], CORR_LIMS_VARS_2_4[2]),
+    generate_correlation(CORR_LIMS_VARS_2_3[1], CORR_LIMS_VARS_2_3[2]),
+    generate_correlation(CORR_LIMS_VARS_2_4[1], CORR_LIMS_VARS_2_4[2]),
     NA,
-    runif(1L, CORR_LIMS_VARS_2_5[1], CORR_LIMS_VARS_2_5[2]),
-    runif(1L, CORR_LIMS_VARS_3_5[1], CORR_LIMS_VARS_3_5[2]),
+    generate_correlation(CORR_LIMS_VARS_2_5[1], CORR_LIMS_VARS_2_5[2]),
+    generate_correlation(CORR_LIMS_VARS_3_5[1], CORR_LIMS_VARS_3_5[2]),
     NA
   )
 
