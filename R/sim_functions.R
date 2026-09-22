@@ -21,6 +21,11 @@
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
+generate_sample_size <- function(min, max) {
+
+  sample(min:max, size = 1L)
+}
+
 generate_correlation <- function(min = -1, max = 1) {
 
   runif(n = 1L, min = min, max = max)

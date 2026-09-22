@@ -21,7 +21,8 @@ source("R/sim_functions.R", encoding = 'UTF-8')
 # Simulated data objects:
 
 ## Dataset properties:
-SAMPLE_SIZE  <- 300:500  # Uniformly random sample size of 300-500
+SAMPLE_SIZE_MIN <- 300L
+SAMPLE_SIZE_MAX <- 500L
 
 
 ## Variable properties:
@@ -76,6 +77,9 @@ simulate_data <- function(seed) {
   set.seed(seed)
 
   ## TODO: Decide whether to move the correlation construction to a function
+  # Random sample size:
+  sample_size <- generate_sample_size(SAMPLE_SIZE_MIN, SAMPLE_SIZE_MAX)
+
 
   # Correlations among generating variables:
   gen_varnames  <- SIM_VAR_NAMES[2:5] # Names for the correlation matrix
@@ -103,7 +107,10 @@ simulate_data <- function(seed) {
 
   corrs <- generate_corr_matrix(min = corr_inf_lims, max = corr_sup_lims)
 
+  # Generate data:
 
+  ## Random sample size:
+  sample_size <- generate_sample_size(SAMPLE_SIZE_MIN, SAMPLE_SIZE_MAX)
 
   ### Correlations among variables 4 and 5:
   corrs_4_5                                 <- corrs[upper.tri(corrs)]
