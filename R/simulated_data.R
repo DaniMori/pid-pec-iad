@@ -123,7 +123,7 @@ simulate_data <- function(seed) {
   ## Main: ----
 
   # Correlations among generating variables:
-  gen_varnames  <- SIM_VAR_NAMES[2:5] # Names for the correlation matrix
+  gen_varnames  <- SIM_VARIABLES[2:5] # Names for the correlation matrix
   corr_dimnames <- list(gen_varnames, gen_varnames)
   corr_inf_lims <- c(
     NA,
@@ -150,36 +150,23 @@ simulate_data <- function(seed) {
 
   # Generate data:
 
+  ## Generate standardized variableS:
   std_vars <- faux::rnorm_multi(sample_size, r = corrs) |> tibble::as_tibble()
 
+  ## Transform standardized variables to the target distribution:
   transformed_vars <- std_vars |> dplyr::mutate(
-    !!SIM_VAR_NAMES["var_2"] := !!rlang::sym(SIM_VAR_NAMES["var_2"]) *
-      var_2_sd + var_2_mean,
-    !!SIM_VAR_NAMES["var_3"] := !!rlang::sym(SIM_VAR_NAMES["var_3"]) *
-      var_3_sd + var_3_mean,
-    !!SIM_VAR_NAMES["var_4"] := (!!rlang::sym(SIM_VAR_NAMES["var_4"])) |>
-      quantitative_2_categorical(var_4_props),
-    !!SIM_VAR_NAMES["var_5"] := (
-      VAR_5_SHIFT + VAR_5_SCALE *
-      exp(!!rlang::sym(SIM_VAR_NAMES["var_5"]))
-    ) |>
+    var_2 = (var_2_mean + var_2 * var_2_sd) |> as.integer(),
+    var_3 = (var_3_mean + var_3 * var_3_sd) |> as.integer(),
+    var_4 = var_4 |> quantitative_2_categorical(var_4_props),
+    var_5 = (VAR_5_SHIFT + VAR_5_SCALE * exp(var_5)) |>
       round_quant_2_set(VAR_5_VALUES),
   )
-  ## TODO: Code additional transformations
 
-  output <- tibble::tibble(!!SIM_VAR_NAMES["var_1"] := 1:sample_size) |>
+  output <- tibble::tibble(var_1 = 1:sample_size) |>
     dplyr::bind_cols(transformed_vars)
 
-  # Recode `var_2` into discrete values using the cut points:
-  output |>
-    dplyr::mutate(
-      var_2 = var_2 |> cut(
-        breaks         = cut_quantiles,
-        labels         = VAR_2_SCORES,
-        include.lowest = TRUE
-      )
-    ) |>
-    setNames(SIM_VAR_NAMES)
+  # Assign variable names:
+  output |> setNames(SIM_VAR_NAMES)
 }
 
 compute_correct_responses <- function(data) {
