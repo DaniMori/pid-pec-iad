@@ -56,7 +56,7 @@ complete_corr <- function(corr_matrix, row, col) {
 
 generate_corr_matrix <- function(min = NA_real_, max = NA_real_) {
 
-  if (is.na(min) & is.na(max)) {
+  if (identical(min, NA_real_) & identical(max, NA_real_)) {
 
     stop("At least one of `min` or `max` must be defined.")
   }
@@ -91,6 +91,13 @@ generate_corr_matrix <- function(min = NA_real_, max = NA_real_) {
 
     result <- result |> complete_corr(index_1, index_2)
   }
+
+  ## Complete correlation matrix:
+  corr_vector               <- result[upper.tri(result)]
+  result                    <- t(result)
+  result[upper.tri(result)] <- corr_vector
+
+  result
 }
 
 ## ---- MAIN: ------------------------------------------------------------------

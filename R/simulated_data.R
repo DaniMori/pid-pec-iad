@@ -101,31 +101,8 @@ simulate_data <- function(seed) {
   ) |>
     matrix(nrow = 4L, byrow = TRUE, dimnames = corr_dimnames)
 
+  corrs <- generate_corr_matrix(min = corr_inf_lims, max = corr_sup_lims)
 
-  corrs <- matrix(nrow = 4L, ncol = 4L, dimnames = list(gen_varnames, gen_varnames))
-  diag(corrs) <- 1L
-  corrs[upper.tri(corrs)] <- c(
-    generate_correlation(CORR_LIMS_VARS_2_3[1], CORR_LIMS_VARS_2_3[2]),
-    generate_correlation(CORR_LIMS_VARS_2_4[1], CORR_LIMS_VARS_2_4[2]),
-    NA,
-    generate_correlation(CORR_LIMS_VARS_2_5[1], CORR_LIMS_VARS_2_5[2]),
-    generate_correlation(CORR_LIMS_VARS_3_5[1], CORR_LIMS_VARS_3_5[2]),
-    NA
-  )
-
-  ## Determine missing correlations to make matrix positive definite:
-
-  ### Correlations among variables 3 and 4:
-
-  corr_matrix_2_4 <- corrs[SIM_VARIABLES[2:4], SIM_VARIABLES[2:4]]
-  corrs_2_4       <- corr_matrix_2_4[upper.tri(corr_matrix_2_4)]
-  corr_lims_3_4   <- faux::pos_def_limits(corrs_2_4)
-
-  corrs[SIM_VARIABLES[3], SIM_VARIABLES[4]] <- runif( # Assign correlation
-    1L,
-    corr_lims_3_4$min,
-    corr_lims_3_4$max
-  )
 
 
   ### Correlations among variables 4 and 5:
