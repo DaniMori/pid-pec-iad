@@ -43,16 +43,25 @@ SIM_VAR_NAMES <- c( # Variable names
 
 ## Variable values:
 
-# Categories in `var_4` ("Nota"):
+### Objects for simulating IQ-metric variables:
+IQ_METRIC_MEAN_CENTER      <- 100L
+IQ_METRIC_MEAN_HALF_RANGE  <-  10L
+IQ_METRIC_SD_CENTER        <-  15L
+IQ_METRIC_SD_HALF_RANGE    <-   3L
+
+### Maximum nº of outliers in var_3:
+MAX_OUTLIERS <- 20L
+
+### Categories in `var_4` ("Nota"):
 VAR_4_CATS <- c("Suspenso", "Aprobado", "Notable", "Sobresaliente")
 
-# Values in `var_5` ("Salario_deseado"):
+### Values in `var_5` ("Salario_deseado"):
 VAR_5_VALUES <- c(15:30, 35, 40, 45, 50, 60) * 1000
 
-# Categories in `var_6` ("SES"):
+### Categories in `var_6` ("SES"):
 VAR_6_CATS <- c("Bajo", "Medio", "Alto")
 
-# Categories in `var_7` ("Curso"):
+### Categories in `var_7` ("Curso"):
 VAR_6_CATS <- c("No", "Sí")
 
 
@@ -74,12 +83,38 @@ CORR_LIMS_VARS_3_5 <- c(-0.5, 0.5) # "Responsabilidad" - "Salario_deseado"
 
 simulate_data <- function(seed) {
 
+  ## Constant objects: ----
+
   set.seed(seed)
 
-  ## TODO: Decide whether to move the correlation construction to a function
   # Random sample size:
   sample_size <- generate_sample_size(SAMPLE_SIZE_MIN, SAMPLE_SIZE_MAX)
 
+  ## TODO: Decide whether to move the variable parameter generation to function
+  # Random parameters for scaling variables:
+  var_2_mean <- runif(
+    1L,
+    IQ_METRIC_MEAN_CENTER - IQ_METRIC_MEAN_HALF_RANGE,
+    IQ_METRIC_MEAN_CENTER + IQ_METRIC_MEAN_HALF_RANGE
+  )
+  var_2_sd   <- runif(
+    1L,
+    IQ_METRIC_SD_CENTER - IQ_METRIC_SD_HALF_RANGE,
+    IQ_METRIC_SD_CENTER + IQ_METRIC_SD_HALF_RANGE
+  )
+  var_3_mean <- runif(
+    1L,
+    IQ_METRIC_MEAN_CENTER - IQ_METRIC_MEAN_HALF_RANGE,
+    IQ_METRIC_MEAN_CENTER + IQ_METRIC_MEAN_HALF_RANGE
+  )
+  var_3_sd   <- runif(
+    1L,
+    IQ_METRIC_SD_CENTER - IQ_METRIC_SD_HALF_RANGE,
+    IQ_METRIC_SD_CENTER + IQ_METRIC_SD_HALF_RANGE
+  )
+
+
+  ## Main: ----
 
   # Correlations among generating variables:
   gen_varnames  <- SIM_VAR_NAMES[2:5] # Names for the correlation matrix
@@ -109,30 +144,18 @@ simulate_data <- function(seed) {
 
   # Generate data:
 
-  ## Random sample size:
-  sample_size <- generate_sample_size(SAMPLE_SIZE_MIN, SAMPLE_SIZE_MAX)
+  std_vars <- faux::rnorm_multi(sample_size, r = corrs) |> tibble::as_tibble()
 
-  ### Correlations among variables 4 and 5:
-  corrs_4_5                                 <- corrs[upper.tri(corrs)]
-  corr_lims_4_5                             <- faux::pos_def_limits(corrs_4_5)
-  corrs[SIM_VARIABLES[4], SIM_VARIABLES[5]] <- runif( # Assign correlation
-    1L,
-    corr_lims_4_5$min,
-    corr_lims_4_5$max
+  transformed_vars <- std_vars |> dplyr::mutate(
+    !!SIM_VAR_NAMES["var_2"] := !!rlang::sym(SIM_VAR_NAMES["var_2"]) *
+      var_2_sd + var_2_mean,
+    !!SIM_VAR_NAMES["var_3"] := !!rlang::sym(SIM_VAR_NAMES["var_3"]) *
+      var_3_sd + var_3_mean
   )
+  ## TODO: Code additional transformations
 
-  ## Complete correlation matrix:
-  corr_vector             <- corrs[upper.tri(corrs)]
-  corrs                   <- t(corrs)
-  corrs[upper.tri(corrs)] <- corr_vector
-
-  # Generate data:
-  sample_size <- sample(SAMPLE_SIZE, size = 1L) # Random sample size
-
-  output <- tibble::tibble(
-    var_1    = 1:sample_size,
-    std_vars = faux::rnorm_multi(sample_size, r = corrs)
-  )
+  output <- tibble::tibble(!!SIM_VAR_NAMES["var_1"] := 1:sample_size) |>
+    dplyr::bind_cols(transformed_vars)
 
   # Random cut points for `var_2` (to avoid a "flat" barplot)
   rel_cut_props <- runif(n_crit_vals, min = .2, max = 1) |> cumsum()
