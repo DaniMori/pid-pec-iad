@@ -1,12 +1,12 @@
 # ==============================================================================
 #
-# FILE NAME:   server.R
-# DESCRIPTION: Server logic of the "Dataset generation" app for teaching
-#              innovation project in "Introduction to Data Analysis".
+# FILE NAME:   data-download.R
+# DESCRIPTION: "Dataset generation" app for teaching innovation project in the
+#              "Introduction to Data Analysis" course.
 #
 # AUTHOR:      Daniel Morillo
 #
-# DATE:        2024-09-26
+# DATE:        2026-07-08
 #
 # ==============================================================================
 
@@ -19,6 +19,8 @@ setwd(here::here())
 ## ---- PACKAGES: --------------------------------------------------------------
 
 library(shiny)
+library(shinyjs, warn.conflicts = FALSE)
+
 
 ## ---- SOURCES: ---------------------------------------------------------------
 
@@ -27,6 +29,7 @@ source("R/simulated_data.R", encoding = 'UTF-8')
 source("R/hash_emails.R",    encoding = 'UTF-8')
 source("R/data_storage.R",   encoding = 'UTF-8')
 source("R/log.R",            encoding = 'UTF-8')
+
 
 ## ---- CONSTANTS: -------------------------------------------------------------
 
@@ -46,10 +49,27 @@ auto_download_code <- glue::glue(
 )
 
 
-## ---- MAIN: ------------------------------------------------------------------
+## ---- FUNCTIONS: -------------------------------------------------------------
+
+## ----create-user-interface----------------------------------------------------
+ui <- fluidPage(
+
+  shinyjs::useShinyjs(), # Used to disable the download button
+
+  # Application title
+  # TODO: Decide title & add logos (if necessary)
+  titlePanel(GEN_DATA_APP_TITLE),
+
+  fillPage(
+
+    # Download link:
+    downloadLink(DOWNLOAD_LINK_ID, DOWNLOAD_LINK_LABEL),
+
+    tags$div(tags$p(CLOSE_WINDOW_MSG), style="margin-top:2em;")
+  )
+)
 
 ## ----create-server-logic------------------------------------------------------
-
 server <- function(input, output, session) {
 
   # Reactive values:
@@ -99,3 +119,9 @@ server <- function(input, output, session) {
     contentType = "text/csv"
   )
 }
+
+
+## ---- MAIN: ------------------------------------------------------------------
+
+# Run the application
+shinyApp(ui = ui, server = server)

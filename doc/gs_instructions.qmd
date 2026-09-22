@@ -55,8 +55,8 @@ The setup process consists of the following steps:
 ## Set up an OAuth token
 
 This step will create an OAuth token for the Shiny app to use non-interactively,
-which is necessary to deploy it on [shinyapps.io](https://www.shinyapps.io/)
-without human intervention.
+which is necessary to deploy it on [Posit Connect
+Cloud](https://connect.posit.cloud) without human intervention.
 
 We will make use of the interactive capabilities of {gargle} to generate a token
 through a browser and cache it in a secret directory (i.e. folder), local to
@@ -116,8 +116,8 @@ hexadecimal number with several digits, and `<user_name>` is the user name of
 the Google account used to "authorize *Tidyverse API Packages*".
 
 This file is the token that will be used to grant the Shiny app access to the
-spreadsheet file. However, as this file needs to be deployed to
-[shinyapps.io](https://www.shinyapps.io/) along with the app code and associated
+spreadsheet file. However, as this file needs to be deployed to [Posit Connect
+Cloud](https://connect.posit.cloud) along with the app code and associated
 files, it needs to be encrypted to prevent it from the risk of being exposed
 publicly. This could allow malicious agents accessing not only the spreadsheet
 for this project, but all other spreadsheets this account has access to.

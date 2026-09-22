@@ -29,9 +29,6 @@ response_vars_filepath <- here::here(FAR_DIR, RESPONSE_VARS_FILENAME)
 STUDENT_RESPONSES_FILENAME <- "student_responses.csv" # File name
 student_responses_filepath <- here::here(FAR_DIR, STUDENT_RESPONSES_FILENAME)
 
-## Variable name objects:
-response_vars_labels <- response_vars_filepath |>
-  readr::read_csv(col_types = readr::cols(.default = readr::col_character()))
 
 # Event related constants:
 
