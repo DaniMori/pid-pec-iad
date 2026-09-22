@@ -34,7 +34,7 @@ SIM_VAR_NAMES <- c( # Variable names
   "Inteligencia",
   "Responsabilidad",
   "Nota",
-  "Salario_deseado",
+  "Salario",
   "SES",
   "Curso"
 ) |>
@@ -56,7 +56,9 @@ MAX_OUTLIERS <- 20L
 VAR_4_CATS <- c("Suspenso", "Aprobado", "Notable", "Sobresaliente")
 
 ### Values in `var_5` ("Salario_deseado"):
-VAR_5_VALUES <- c(15:30, 35, 40, 45, 50, 60) * 1000
+VAR_5_VALUES <- c(15:30, 35L, 40L, 45L, 50L, 60L) * 1000L
+VAR_5_SCALE  <-  2500L # Values to give a proper range from 15K to 60K
+VAR_5_SHIFT  <- 15000L
 
 ### Categories in `var_6` ("SES"):
 VAR_6_CATS <- c("Bajo", "Medio", "Alto")
@@ -157,6 +159,11 @@ simulate_data <- function(seed) {
       var_3_sd + var_3_mean,
     !!SIM_VAR_NAMES["var_4"] := (!!rlang::sym(SIM_VAR_NAMES["var_4"])) |>
       quantitative_2_categorical(var_4_props),
+    !!SIM_VAR_NAMES["var_5"] := (
+      VAR_5_SHIFT + VAR_5_SCALE *
+      exp(!!rlang::sym(SIM_VAR_NAMES["var_5"]))
+    ) |>
+      round_quant_2_set(VAR_5_VALUES),
   )
   ## TODO: Code additional transformations
 

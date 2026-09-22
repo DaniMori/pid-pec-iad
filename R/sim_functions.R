@@ -54,6 +54,17 @@ quantitative_2_categorical <- function(variable, proportions, ordinal = TRUE) {
   )
 }
 
+round_quant_2_set <- function(variable, values) {
+
+  closest <- variable |>
+    purrr::map(~ values[which.min(abs(. - values))]) |>
+    unlist()
+
+  if (is.integer(values)) closest <- closest |> as.integer()
+
+  closest
+}
+
 generate_correlation <- function(min = -1, max = 1) {
 
   runif(n = 1L, min = min, max = max)
