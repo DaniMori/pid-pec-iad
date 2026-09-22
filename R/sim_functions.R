@@ -26,6 +26,34 @@ generate_sample_size <- function(min, max) {
   sample(min:max, size = 1L)
 }
 
+generate_category_proportions <- function(categories, min_prop = 0) {
+
+  ## TODO: Review; `min_prop` is not actually the "minimal proportion"
+  rel_props <- categories |> length() |> runif(min = min_prop)
+  props     <- rel_props / sum(rel_props) # Normalize
+
+  props |> setNames(categories) # Returned value
+}
+
+quantitative_2_categorical <- function(variable, proportions, ordinal = TRUE) {
+
+  if (proportions |> names() |> is.null()) {
+
+    stop("`proportions` must have the category labels as names.")
+  }
+
+  # Transform prooprtions into the "cumulative proportions" to compute quantiles
+  cut_props <- proportions |> cumsum() # TODO: Check that are normalized
+  cut_props <- c(0, cut_props) # Extra "cutpoint" needed by `quantile()`
+
+  variable |> cut(   # Quantiles for the cutoff points:
+    breaks         = variable |> quantile(cut_props, names = FALSE),
+    labels         = proportions |> names(),
+    include.lowest = TRUE,
+    ordered_result = ordinal
+  )
+}
+
 generate_correlation <- function(min = -1, max = 1) {
 
   runif(n = 1L, min = min, max = max)

@@ -91,6 +91,7 @@ simulate_data <- function(seed) {
   sample_size <- generate_sample_size(SAMPLE_SIZE_MIN, SAMPLE_SIZE_MAX)
 
   ## TODO: Decide whether to move the variable parameter generation to function
+
   # Random parameters for scaling variables:
   var_2_mean <- runif(
     1L,
@@ -112,6 +113,9 @@ simulate_data <- function(seed) {
     IQ_METRIC_SD_CENTER - IQ_METRIC_SD_HALF_RANGE,
     IQ_METRIC_SD_CENTER + IQ_METRIC_SD_HALF_RANGE
   )
+
+  # Random cut points for `var_4` (to avoid a "flat" barplot)
+  var_4_props <- VAR_4_CATS |> generate_category_proportions()
 
 
   ## Main: ----
@@ -150,17 +154,14 @@ simulate_data <- function(seed) {
     !!SIM_VAR_NAMES["var_2"] := !!rlang::sym(SIM_VAR_NAMES["var_2"]) *
       var_2_sd + var_2_mean,
     !!SIM_VAR_NAMES["var_3"] := !!rlang::sym(SIM_VAR_NAMES["var_3"]) *
-      var_3_sd + var_3_mean
+      var_3_sd + var_3_mean,
+    !!SIM_VAR_NAMES["var_4"] := (!!rlang::sym(SIM_VAR_NAMES["var_4"])) |>
+      quantitative_2_categorical(var_4_props),
   )
   ## TODO: Code additional transformations
 
   output <- tibble::tibble(!!SIM_VAR_NAMES["var_1"] := 1:sample_size) |>
     dplyr::bind_cols(transformed_vars)
-
-  # Random cut points for `var_2` (to avoid a "flat" barplot)
-  rel_cut_props <- runif(n_crit_vals, min = .2, max = 1) |> cumsum()
-  cut_props     <- c(0, rel_cut_props / max(rel_cut_props)) # Normalize
-  cut_quantiles <- output |> dplyr::pull(var_2) |> quantile(cut_props)
 
   # Recode `var_2` into discrete values using the cut points:
   output |>
