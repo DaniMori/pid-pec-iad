@@ -82,6 +82,12 @@ round_quant_2_set <- function(variable, values) {
 
 generate_correlation <- function(min = -1, max = 1) {
 
+  # Do not generate if both limits are `NA`:
+  if (is.na(min) && is.na(max)) return(NA_real_)
+
+  if (is.na(min)) min <- -1
+  if (is.na(max)) max <-  1
+
   runif(n = 1L, min = min, max = max)
 }
 
@@ -121,10 +127,6 @@ generate_corr_matrix <- function(min = NA_real_, max = NA_real_) {
   }
   ## TODO: Review and add additional defensive clauses
 
-  # Complete limits for "known correlations"
-  min[is.na(min) & !is.na(max)] <- -1
-  max[is.na(max) & !is.na(min)] <-  1
-
   # TODO: Make sure `min` and `max` have the same dimensions
   dim_corr <- dim(min)[1] # TODO: Make sure `min` and `max` are square matrices
   names    <- dimnames(min) # TODO: Check & corrrect name assignment
@@ -133,12 +135,10 @@ generate_corr_matrix <- function(min = NA_real_, max = NA_real_) {
   result       <- matrix(nrow = dim_corr, ncol = dim_corr, dimnames = names)
   diag(result) <- 1
 
-  suppressWarnings( # Avoid warning when both limits are `NA`
-    result[upper.tri(result)] <- purrr::map2_dbl(
-      min[upper.tri(min)],
-      max[upper.tri(max)],
-      generate_correlation
-    )
+  result[upper.tri(result)] <- purrr::map2_dbl(
+    min[upper.tri(min)],
+    max[upper.tri(max)],
+    generate_correlation
   )
 
   missing_corrs <- get_missing_corrs(result)
