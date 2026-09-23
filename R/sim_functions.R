@@ -28,8 +28,23 @@ generate_sample_size <- function(min, max) {
 
 generate_category_proportions <- function(categories, min_prop = 0) {
 
-  ## TODO: Review; `min_prop` is not actually the "minimal proportion"
-  rel_props <- categories |> length() |> runif(min = min_prop)
+  n_categories <- categories |> length()
+  n_props      <- min_prop   |> length()
+
+  if (!n_props %in% c(1L, n_categories)) {
+
+    stop("`min_prop` must have length 1 or equal to `categories`.")
+  }
+  if (any(min_prop > 1/n_categories)) {
+
+    stop("`min_prop` values must be at most 1 / 'nº of categories'.")
+  }
+
+  # Tranform "minimal proportions" into the minimal pre-normalized values:
+  # min_prop = min_non_norm / (min_non_norm + n_categories - 1)
+  min_non_norm <- (n_categories - 1) / (1 / min_prop - 1)
+
+  rel_props <- n_categories |> runif(min = min_non_norm)
   props     <- rel_props / sum(rel_props) # Normalize
 
   props |> setNames(categories) # Returned value

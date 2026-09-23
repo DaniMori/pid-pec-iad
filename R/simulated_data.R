@@ -117,7 +117,7 @@ simulate_data <- function(seed) {
   )
 
   # Random cut points for `var_4` (to avoid a "flat" barplot)
-  var_4_props <- VAR_4_CATS |> generate_category_proportions()
+  var_4_props <- VAR_4_CATS |> generate_category_proportions(min_prop = .2)
 
 
   ## Main: ----
