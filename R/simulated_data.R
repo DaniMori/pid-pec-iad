@@ -27,8 +27,6 @@ SAMPLE_SIZE_MAX <- 500L
 
 ## Variable properties:
 
-SIM_VARIABLES <- "var_" |> paste0(1:7) # Variable identifiers
-
 SIM_VAR_NAMES <- c( # Variable names
   "ID",
   "Inteligencia",
@@ -37,8 +35,11 @@ SIM_VAR_NAMES <- c( # Variable names
   "Salario",
   "SES",
   "Formacion"
-) |>
-  setNames(SIM_VARIABLES)
+)
+
+SIM_VARIABLES <- "var_" |> # Variable identifiers
+  paste0(1:7) |>
+  setNames(SIM_VAR_NAMES)
 
 
 ## Variable values:
@@ -117,7 +118,7 @@ simulate_data <- function(seed) {
 
   ## Main: ----
 
-  set.seed(seed)
+  set.seed(seed) # Ensure the reproducibility
 
 
   # Generate random parameters for the simulated variables:
@@ -179,7 +180,7 @@ simulate_data <- function(seed) {
     dplyr::bind_cols(transformed_vars)
 
   # Assign variable names:
-  output |> setNames(SIM_VAR_NAMES)
+  output |> dplyr::rename(!!!SIM_VARIABLES)
 }
 
 compute_correct_responses <- function(data) {
