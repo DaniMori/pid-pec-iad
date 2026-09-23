@@ -87,10 +87,30 @@ simulate_data <- function(seed) {
 
   ## Constant objects: ----
 
-  set.seed(seed)
+  # Correlations among generating variables:
+  gen_varnames  <- SIM_VARIABLES[2:5] # Names for the correlation matrix
+  corr_dimnames <- list(gen_varnames, gen_varnames)
+  corr_inf_lims <- c(
+    NA,
+    CORR_LIMS_VARS_2_3[1],
+    CORR_LIMS_VARS_2_4[1],
+    CORR_LIMS_VARS_2_5[1],
+    NA |> rep(3),
+    CORR_LIMS_VARS_3_5[1],
+    NA |> rep(8)
+  ) |>
+    matrix(nrow = 4L, byrow = TRUE, dimnames = corr_dimnames)
+  corr_sup_lims <- c(
+    NA,
+    CORR_LIMS_VARS_2_3[2],
+    CORR_LIMS_VARS_2_4[2],
+    CORR_LIMS_VARS_2_5[2],
+    NA |> rep(3),
+    CORR_LIMS_VARS_3_5[2],
+    NA |> rep(8)
+  ) |>
+    matrix(nrow = 4L, byrow = TRUE, dimnames = corr_dimnames)
 
-  # Random sample size:
-  sample_size <- generate_sample_size(SAMPLE_SIZE_MIN, SAMPLE_SIZE_MAX)
 
   ## TODO: Decide whether to move the variable parameter generation to function
 
@@ -122,30 +142,12 @@ simulate_data <- function(seed) {
 
   ## Main: ----
 
-  # Correlations among generating variables:
-  gen_varnames  <- SIM_VARIABLES[2:5] # Names for the correlation matrix
-  corr_dimnames <- list(gen_varnames, gen_varnames)
-  corr_inf_lims <- c(
-    NA,
-    CORR_LIMS_VARS_2_3[1],
-    CORR_LIMS_VARS_2_4[1],
-    CORR_LIMS_VARS_2_5[1],
-    NA |> rep(3),
-    CORR_LIMS_VARS_3_5[1],
-    NA |> rep(8)
-  ) |>
-    matrix(nrow = 4L, byrow = TRUE, dimnames = corr_dimnames)
-  corr_sup_lims <- c(
-    NA,
-    CORR_LIMS_VARS_2_3[2],
-    CORR_LIMS_VARS_2_4[2],
-    CORR_LIMS_VARS_2_5[2],
-    NA |> rep(3),
-    CORR_LIMS_VARS_3_5[2],
-    NA |> rep(8)
-  ) |>
-    matrix(nrow = 4L, byrow = TRUE, dimnames = corr_dimnames)
+  set.seed(seed)
 
+  # Random sample size:
+  sample_size <- generate_sample_size(SAMPLE_SIZE_MIN, SAMPLE_SIZE_MAX)
+
+  # Generation of correlation matrix for multivariate variables
   corrs <- generate_corr_matrix(min = corr_inf_lims, max = corr_sup_lims)
 
   # Generate data:
