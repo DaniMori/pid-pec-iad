@@ -119,6 +119,30 @@ complete_corr <- function(corr_matrix, row, col) {
   corr_matrix
 }
 
+complete_corrs <- function(corr_matrix) {
+
+  missing_corrs <- get_missing_corrs(corr_matrix)
+
+  for (index in 1:nrow(missing_corrs)) {
+
+    index_1 <- missing_corrs[index, 1]
+    index_2 <- missing_corrs[index, 2]
+
+    corr_matrix <- corr_matrix |> complete_corr(index_1, index_2)
+  }
+
+  corr_matrix
+}
+
+complete_lower_tri_corrs <- function(corr_matrix) {
+
+  corr_vector                         <- corr_matrix[upper.tri(corr_matrix)]
+  corr_matrix                         <- t(corr_matrix)
+  corr_matrix[upper.tri(corr_matrix)] <- corr_vector
+
+  corr_matrix
+}
+
 generate_corr_matrix <- function(min = NA_real_, max = NA_real_) {
 
   if (identical(min, NA_real_) & identical(max, NA_real_)) {
@@ -133,30 +157,19 @@ generate_corr_matrix <- function(min = NA_real_, max = NA_real_) {
 
   # Create result correlation matrix "template"
   result       <- matrix(nrow = dim_corr, ncol = dim_corr, dimnames = names)
-  diag(result) <- 1
+  diag(result) <- 1L
 
+  # Generate correlations with defined limits
   result[upper.tri(result)] <- purrr::map2_dbl(
     min[upper.tri(min)],
     max[upper.tri(max)],
     generate_correlation
   )
 
-  missing_corrs <- get_missing_corrs(result)
-
-  for (index in 1:nrow(missing_corrs)) {
-
-    index_1 <- missing_corrs[index, 1]
-    index_2 <- missing_corrs[index, 2]
-
-    result <- result |> complete_corr(index_1, index_2)
-  }
-
-  ## Complete correlation matrix:
-  corr_vector               <- result[upper.tri(result)]
-  result                    <- t(result)
-  result[upper.tri(result)] <- corr_vector
-
-  result
+  # Complete correlation matrix with non-restricted correlations
+  result |>
+    complete_corrs() |>
+    complete_lower_tri_corrs() # Complete lower triangle
 }
 
 ## ---- MAIN: ------------------------------------------------------------------
