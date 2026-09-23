@@ -91,59 +91,70 @@ generate_correlation <- function(min = -1, max = 1) {
   runif(n = 1L, min = min, max = max)
 }
 
-get_missing_corrs <- function(corr_matrix) {
+complete_correlation <- function(corr_matrix, row, col, min = -1, max = 1) {
 
-  missing_corrs <- which(is.na(corr_matrix), arr.ind = TRUE, useNames = FALSE)
-  dimnames(missing_corrs) <- list(character(0), c("row", "col")) # Name columns
+  if (is.na(min)) min <- -1
+  if (is.na(max)) max <-  1
 
-  # Return only the upper triangle:
-  missing_corrs[missing_corrs[, 1] < missing_corrs[, 2], ]
-}
+  corr_limits <- corr_matrix |> pos_def_limits(row, col)
 
-upper_left_corner <- function(matrix, max_row, max_col) {
+  min <- max(min, corr_limits$min)
+  max <- min(max, corr_limits$max)
 
-  matrix[1:max_row, 1:max_col]
-}
+  if (min > max) { # Limits incompatible with earlier correlations
 
-complete_corr <- function(corr_matrix, row, col) {
-
-  corrs_part  <- corr_matrix |> upper_left_corner(row, col)
-  corrs       <- corrs_part[upper.tri(corrs_part)]
-  corr_limits <- faux::pos_def_limits(corrs)
-
-  corr_matrix[row, col] <- generate_correlation(
-    corr_limits$min,
-    corr_limits$max
-  )
-
-  corr_matrix
-}
-
-complete_corrs <- function(corr_matrix) {
-
-  missing_corrs <- get_missing_corrs(corr_matrix)
-
-  for (index in 1:nrow(missing_corrs)) {
-
-    index_1 <- missing_corrs[index, 1]
-    index_2 <- missing_corrs[index, 2]
-
-    corr_matrix <- corr_matrix |> complete_corr(index_1, index_2)
+    stop(
+      glue::glue(
+        "Limits in [{row}, {col}] do not yield positive definite matrix."
+      )
+    )
   }
 
-  corr_matrix
-}
-
-complete_lower_tri_corrs <- function(corr_matrix) {
-
-  corr_vector                         <- corr_matrix[upper.tri(corr_matrix)]
-  corr_matrix                         <- t(corr_matrix)
-  corr_matrix[upper.tri(corr_matrix)] <- corr_vector
+  corr_matrix[row, col] <- generate_correlation(min, max)
+  corr_matrix[col, row] <- corr_matrix[row, col]
 
   corr_matrix
 }
 
-generate_corr_matrix <- function(min = NA_real_, max = NA_real_) {
+pos_def_limits <- function(corrs, row, col) {
+
+  if (row == 1L) return(list(min = -1, max = 1))
+
+  # Exact interval for [row, col] that keeps [1:row, col] positive-definite;
+  #   assumes [1:row, 1:row] is positive-definite and [1:(row-1), col] already
+  #   filled.
+  #   NOTE: I do not fully understand this algorithm; it is recommended by
+  #   and adapted from Claude:
+  #   https://claude.ai/share/920ba62d-3807-4ef6-b7dc-e19fe8c4f9fa
+
+  complete_corrs <- corrs[1:row, 1:row]
+  comp_inv_corrs <- complete_corrs |> solve()
+  variable_corrs <- corrs[seq_len(row - 1L), col]
+
+  beta  <- sum(comp_inv_corrs[row, -row, drop = FALSE] * variable_corrs)
+  gamma <- drop(
+    crossprod(
+      variable_corrs,
+      comp_inv_corrs[-row, -row, drop = FALSE] %*% variable_corrs
+    )
+  ) - 1
+  disc  <- beta^2 - comp_inv_corrs[row, row] * gamma
+
+  list(
+    min = (-beta - sqrt(disc)) / comp_inv_corrs[row, row],
+    max = (-beta + sqrt(disc)) / comp_inv_corrs[row, row]
+  )
+}
+
+is_pos_def <- function(corr_matrix, tol = 1e-8) {
+
+  eigendecomposition <- eigen(corr_matrix, symmetric = TRUE, only.values = TRUE)
+  all(eigendecomposition$values > tol)
+}
+
+generate_corr_matrix <- function(min       = NA_real_,
+                                 max       = NA_real_,
+                                 max_tries = 1000L) {
 
   if (identical(min, NA_real_) & identical(max, NA_real_)) {
 
@@ -155,25 +166,36 @@ generate_corr_matrix <- function(min = NA_real_, max = NA_real_) {
   dim_corr <- dim(min)[1] # TODO: Make sure `min` and `max` are square matrices
   names    <- dimnames(min) # TODO: Check & corrrect name assignment
 
-  # Create result correlation matrix "template"
-  result       <- matrix(nrow = dim_corr, ncol = dim_corr, dimnames = names)
-  diag(result) <- 1L
+  for (iteration in 1:max_tries) {
 
-  # Generate correlations with defined limits
-  result[upper.tri(result)] <- purrr::map2_dbl(
-    min[upper.tri(min)],
-    max[upper.tri(max)],
-    generate_correlation
+    # Create result correlation matrix "template"
+    result           <- diag(dim_corr)
+    dimnames(result) <- names
+
+    # Generate correlations with defined limits
+    tryCatch(
+      for (col in 2:dim_corr) {
+
+        for (row in 1:(col - 1L)) {
+
+          result <- result |>
+            complete_correlation(row, col, min[row, col], max[row, col])
+        }
+      },
+      error = \(e) message(geterrmessage())
+    )
+    if (is_pos_def(result)) return(result)
+
+    warning(
+      glue::glue(
+        "Matrix generated in iteration {iteration} was not positive-definite."
+      )
+    )
+  }
+
+  stop(
+    glue::glue(
+      "Could not generate a correlation matrix after {max_tries} tries."
+    )
   )
-
-  # Complete correlation matrix with non-restricted correlations
-  result |>
-    complete_corrs() |>
-    complete_lower_tri_corrs() # Complete lower triangle
 }
-
-## ---- MAIN: ------------------------------------------------------------------
-
-## ----<chunk-name>----------------------------------------
-
-
