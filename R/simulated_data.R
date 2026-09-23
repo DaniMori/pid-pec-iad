@@ -36,7 +36,7 @@ SIM_VAR_NAMES <- c( # Variable names
   "Nota",
   "Salario",
   "SES",
-  "Curso"
+  "Formacion"
 ) |>
   setNames(SIM_VARIABLES)
 
@@ -49,22 +49,25 @@ IQ_METRIC_MEAN_HALF_RANGE  <-  10L
 IQ_METRIC_SD_CENTER        <-  15L
 IQ_METRIC_SD_HALF_RANGE    <-   3L
 
-### Maximum nº of outliers in var_3:
-MAX_OUTLIERS <- 20L
-
 ### Categories in `var_4` ("Nota"):
 VAR_4_CATS <- c("Suspenso", "Aprobado", "Notable", "Sobresaliente")
 
 ### Values in `var_5` ("Salario_deseado"):
 VAR_5_VALUES <- c(15:30, 35L, 40L, 45L, 50L, 60L) * 1000L
-VAR_5_SCALE  <-  2500L # Values to give a proper range from 15K to 60K
+VAR_5_SCALE  <-  2500L # These values give a proper range from 15K to 60K
 VAR_5_SHIFT  <- 15000L
 
 ### Categories in `var_6` ("SES"):
 VAR_6_CATS <- c("Bajo", "Medio", "Alto")
 
-### Categories in `var_7` ("Curso"):
-VAR_6_CATS <- c("No", "Sí")
+### Categories in `var_7` ("Formacion"):
+VAR_7_CATS <- c("No", "Sí")
+
+
+## Variable minimum proportions:
+VAR_4_MIN_PROP  <-   .12          # `var_4` ("Nota")
+VAR_6_MIN_PROPS <- c(.2, .33, .2) # `var_6` ("SES") in each `var_7` value
+VAR_7_MIN_PROP  <-   .4           # `var_7` ("Formacion")
 
 
 ## Bivariate variable properties:
@@ -112,8 +115,20 @@ simulate_data <- function(seed) {
     matrix(nrow = 4L, byrow = TRUE, dimnames = corr_dimnames)
 
 
-  ## TODO: Decide whether to move the variable parameter generation to function
+  ## Main: ----
 
+  set.seed(seed)
+
+
+  # Generate random parameters for the simulated variables:
+
+  # Random sample size:
+  sample_size <- generate_sample_size(SAMPLE_SIZE_MIN, SAMPLE_SIZE_MAX)
+
+  # Correlation matrix for multivariate variables (`var_2` to `var_5`)
+  corrs <- generate_corr_matrix(min = corr_inf_lims, max = corr_sup_lims)
+
+  ## TODO: Decide whether to move the variable parameter generation to function
   # Random parameters for scaling variables:
   var_2_mean <- runif(
     1L,
@@ -136,19 +151,14 @@ simulate_data <- function(seed) {
     IQ_METRIC_SD_CENTER + IQ_METRIC_SD_HALF_RANGE
   )
 
-  # Random cut points for `var_4` (to avoid a "flat" barplot)
-  var_4_props <- VAR_4_CATS |> generate_category_proportions(min_prop = .2)
+  # Random cut points for categorical variables (to avoid "flat" barplots)
+  var_4_props <- VAR_4_CATS |>
+    generate_category_proportions(min_prop = VAR_4_MIN_PROP)
+  var_7_props <- VAR_7_CATS |>
+    generate_category_proportions(min_prop = VAR_7_MIN_PROP)
+  var_6_props <- VAR_6_CATS |>
+    generate_category_proportions(min_prop = VAR_6_MIN_PROPS)
 
-
-  ## Main: ----
-
-  set.seed(seed)
-
-  # Random sample size:
-  sample_size <- generate_sample_size(SAMPLE_SIZE_MIN, SAMPLE_SIZE_MAX)
-
-  # Generation of correlation matrix for multivariate variables
-  corrs <- generate_corr_matrix(min = corr_inf_lims, max = corr_sup_lims)
 
   # Generate data:
 
@@ -162,6 +172,7 @@ simulate_data <- function(seed) {
     var_4 = var_4 |> quantitative_2_categorical(var_4_props),
     var_5 = (VAR_5_SHIFT + VAR_5_SCALE * exp(var_5)) |>
       round_quant_2_set(VAR_5_VALUES),
+    var_7 = var_7_props |> names() |> sample(size = sample_size, replace = TRUE, prob = var_7_props)
   )
 
   output <- tibble::tibble(var_1 = 1:sample_size) |>
