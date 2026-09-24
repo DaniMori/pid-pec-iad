@@ -43,6 +43,8 @@ generate_category_proportions <- function(categories, min_prop = 0) {
   # Tranform "minimal proportions" into the minimal pre-normalized values:
   # min_prop = min_non_norm / (min_non_norm + n_categories - 1)
   min_non_norm <- (n_categories - 1) / (1 / min_prop - 1)
+  # TODO: This can be improved (a lot). Using max & min limits, and finding a
+  # better way of simulating the categories.
 
   rel_props <- n_categories |> runif(min = min_non_norm)
   props     <- rel_props / sum(rel_props) # Normalize

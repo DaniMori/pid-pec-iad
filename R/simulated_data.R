@@ -57,13 +57,13 @@ VAR_5_VALUES <- c(15:30, 35L, 40L, 45L, 50L, 60L) * 1000L
 VAR_5_SCALE  <-  2500L # These values give a proper range from 15K to 60K
 VAR_5_SHIFT  <- 15000L
 
-### Categories in `var_7` ("Formacion"):
-VAR_7_CATS <- c("No", "Sí")
+### Categories in `var_6` ("Formacion"):
+VAR_6_CATS <- c("No", "Sí")
 
 
 ## Variable minimum proportions:
-VAR_4_MIN_PROP  <-   .12          # `var_4` ("Nota")
-VAR_7_MIN_PROP  <-   .4           # `var_7` ("Formacion")
+VAR_4_MIN_PROP  <-    .12           # `var_4` ("Nota")
+VAR_6_MIN_PROPS <- c(0, .2, .5, .5) # `var_6` == "Sí" in each `var_4` value
 
 
 ## Bivariate variable properties:
@@ -87,8 +87,8 @@ simulate_data <- function(seed) {
   ## Constant objects: ----
 
   # Correlations among generating variables:
-  gen_varnames  <- SIM_VARIABLES[2:5] # Names for the correlation matrix
-  corr_dimnames <- list(gen_varnames, gen_varnames)
+  gen_vars      <- SIM_VARIABLES[2:5] # Names for the correlation matrix
+  corr_dimnames <- list(gen_vars, gen_vars)
   corr_inf_lims <- c(
     NA,
     CORR_LIMS_VARS_2_3[1],
@@ -150,14 +150,18 @@ simulate_data <- function(seed) {
   # Random cut points for categorical variables (to avoid "flat" barplots)
   var_4_props <- VAR_4_CATS |>
     generate_category_proportions(min_prop = VAR_4_MIN_PROP)
-  var_7_props <- VAR_7_CATS |>
-    generate_category_proportions(min_prop = VAR_7_MIN_PROP)
+  ## TODO: Function for simulating "conditional probabilities"?
+  var_6_props <- VAR_6_MIN_PROPS |> # Probability of "Sí" for each `var_4` value
+    purrr::map_dbl(runif, n = 1L) |>
+    setNames(VAR_4_CATS)
 
 
   # Generate data:
 
-  ## Generate standardized variableS:
-  std_vars <- mvtnorm::rmvnorm(sample_size, sigma = corrs) |> tibble::as_tibble()
+  ## Generate standardized variables:
+  std_vars <- mvtnorm::rmvnorm(sample_size, sigma = corrs) |>
+    tibble::as_tibble(.name_repair = "minimal") |>
+    setNames(gen_vars)
 
   ## Transform standardized variables to the target distribution:
   transformed_vars <- std_vars |> dplyr::mutate(
@@ -166,7 +170,8 @@ simulate_data <- function(seed) {
     var_4 = var_4 |> quantitative_2_categorical(var_4_props),
     var_5 = (VAR_5_SHIFT + VAR_5_SCALE * exp(var_5)) |>
       round_quant_2_set(VAR_5_VALUES),
-    var_7 = var_7_props |> names() |> sample(size = sample_size, replace = TRUE, prob = var_7_props)
+    var_6 = (var_6_props[as.character(var_4)] > runif(sample_size)) |>
+      dplyr::if_else(true = VAR_6_CATS[2], false = VAR_6_CATS[1])
   )
 
   output <- tibble::tibble(var_1 = 1:sample_size) |>
