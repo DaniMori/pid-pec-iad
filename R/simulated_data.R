@@ -33,12 +33,11 @@ SIM_VAR_NAMES <- c( # Variable names
   "Responsabilidad",
   "Nota",
   "Salario",
-  "SES",
   "Formacion"
 )
 
 SIM_VARIABLES <- "var_" |> # Variable identifiers
-  paste0(1:7) |>
+  paste0(seq_along(SIM_VAR_NAMES)) |>
   setNames(SIM_VAR_NAMES)
 
 
@@ -58,16 +57,12 @@ VAR_5_VALUES <- c(15:30, 35L, 40L, 45L, 50L, 60L) * 1000L
 VAR_5_SCALE  <-  2500L # These values give a proper range from 15K to 60K
 VAR_5_SHIFT  <- 15000L
 
-### Categories in `var_6` ("SES"):
-VAR_6_CATS <- c("Bajo", "Medio", "Alto")
-
 ### Categories in `var_7` ("Formacion"):
 VAR_7_CATS <- c("No", "Sí")
 
 
 ## Variable minimum proportions:
 VAR_4_MIN_PROP  <-   .12          # `var_4` ("Nota")
-VAR_6_MIN_PROPS <- c(.2, .33, .2) # `var_6` ("SES") in each `var_7` value
 VAR_7_MIN_PROP  <-   .4           # `var_7` ("Formacion")
 
 
@@ -157,8 +152,6 @@ simulate_data <- function(seed) {
     generate_category_proportions(min_prop = VAR_4_MIN_PROP)
   var_7_props <- VAR_7_CATS |>
     generate_category_proportions(min_prop = VAR_7_MIN_PROP)
-  var_6_props <- VAR_6_CATS |>
-    generate_category_proportions(min_prop = VAR_6_MIN_PROPS)
 
 
   # Generate data:
