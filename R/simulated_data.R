@@ -164,6 +164,7 @@ simulate_data <- function(seed) {
   # Generate data:
 
   ## Generate standardized variableS:
+  std_vars <- mvtnorm::rmvnorm(sample_size, sigma = corrs) |> tibble::as_tibble()
 
   ## Transform standardized variables to the target distribution:
   transformed_vars <- std_vars |> dplyr::mutate(
