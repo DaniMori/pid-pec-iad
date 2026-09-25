@@ -32,7 +32,7 @@ SIM_VAR_NAMES <- c( # Variable names
   "Inteligencia",
   "Responsabilidad",
   "Nota",
-  "Salario",
+  "Salario_deseado",
   "Formacion"
 )
 
