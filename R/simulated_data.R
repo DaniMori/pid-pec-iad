@@ -21,7 +21,7 @@ source("R/sim_functions.R", encoding = 'UTF-8')
 # Simulated data objects:
 
 ## Dataset properties:
-SAMPLE_SIZE_MIN <- 300L
+SAMPLE_SIZE_MIN <- 100L
 SAMPLE_SIZE_MAX <- 500L
 
 
