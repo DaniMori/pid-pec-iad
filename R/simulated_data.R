@@ -75,11 +75,6 @@ CORR_LIMS_VARS_2_5 <- c(-0.5, 0.5) # "Inteligencia"    - "Salario_deseado"
 CORR_LIMS_VARS_3_5 <- c(-0.5, 0.5) # "Responsabilidad" - "Salario_deseado"
 
 
-# Response generation objects:
-
-## TODO: Pending (to complete when the items are complete)
-
-
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
 simulate_data <- function(seed) {
@@ -179,68 +174,4 @@ simulate_data <- function(seed) {
 
   # Assign variable names:
   output |> dplyr::rename(!!!SIM_VARIABLES)
-}
-
-compute_correct_responses <- function(data) {
-  ## Constant objects: ----
-
-  # Linear regression model objects:
-  INTERCEPT_TERM <- "(Intercept)"
-  criterion_name <- SIM_VAR_NAMES['var_1'] |> glue::backtick()
-  predictor_name <- SIM_VAR_NAMES['var_2'] |> glue::backtick()
-
-
-  ## Main: ----
-
-  # Transform `var_2` to integer to use it as a "linear term" in the regression
-  data <- data |> dplyr::mutate(`Satisfaccion vital` = `Satisfaccion vital` |>
-                                  as.character() |>
-                                  as.integer())
-
-  # Fit model and extract coefficients:
-  model       <- glue::glue("{criterion_name} ~ {predictor_name}") # Formula
-  fitted_model <- data         |> lm(formula = model)
-  coefficients <- fitted_model |> broom::tidy()
-
-  # Compute responses:
-
-  # Correct numeric responses are computed with machine precision, to take into
-  #   account the possibility of accepting (incorrectly) truncated (instead of
-  #   rounded) values as correct.
-  computed_responses <- data |> dplyr::summarize(
-    item_1 = table(`Satisfaccion vital`)[ITEM_1_LS_CAT],
-    item_2 = median(`Horas sueno promedio`),
-    item_3 = sd(`Horas sueno promedio`),
-    item_4 = quantile(`Horas sueno promedio`, .34),
-    item_5 = boxplot.stats(`Horas sueno promedio`)$out |>
-      length() |>
-      as.logical() |>
-      as.character(),
-    item_6 = cor(`Satisfaccion vital`, `Horas sueno promedio`),
-    item_7 = item_6 |> sign() |> as.character(),
-    item_8 = coefficients |>
-      dplyr::filter(term == INTERCEPT_TERM) |>
-      dplyr::pull(estimate),
-    item_9 = coefficients |>
-      dplyr::filter(term == predictor_name) |>
-      dplyr::pull(estimate),
-    item_10 = item_9 |> sign() |> as.character(),
-  )
-
-  # Capture warning when factor levels are missing in the data (they will!)
-  suppressWarnings(
-    computed_responses <- computed_responses |> dplyr::mutate(
-      item_5  = item_5 |>
-        readr::parse_factor(levels = LOGICAL_VALUES) |>
-        forcats::fct_recode(!!!LOGICAL_VALUES),
-      item_7  = item_7 |>
-        readr::parse_factor(levels = ITEM_7_VALUES) |>
-        forcats::fct_recode(!!!ITEM_7_VALUES),
-      item_10 = item_10 |>
-        readr::parse_factor(levels = ITEM_10_VALUES) |>
-        forcats::fct_recode(!!!ITEM_10_VALUES)
-    )
-  )
-
-  computed_responses
 }
