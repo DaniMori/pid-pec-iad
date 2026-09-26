@@ -11,162 +11,167 @@
 # ==============================================================================
 
 
+## ---- SOURCES: ---------------------------------------------------------------
+
+source("R/sim_functions.R", encoding = 'UTF-8')
+
+
 ## ---- CONSTANTS: -------------------------------------------------------------
 
 # Simulated data objects:
 
-## Variable names:
-SIM_VARIABLES <- c("var_1",                "var_2")
-SIM_VAR_NAMES <- c("Horas sueno promedio", "Satisfaccion vital") |>
-  setNames(SIM_VARIABLES)
-
-## Model parameters:
-INTERCEPT_VAR_NAME    <- "intercept"
-SLOPE_VAR_NAME        <- "slope"
-RELATIONSHIP_VAR_NAME <- "relationship"
-
-## Variable data:
-SAMPLE_SIZE  <- 300:500  # Uniformly random sample size of 300-500
-VAR_1_SCORES <-  40:100 / 10 # Possible scores in `var_1`
-VAR_2_SCORES <-   1:  5      # Possible scores in `var_2`
-
-## Modeling variables:
-REL_LEVS <- c(-1L, 1L) # Levels for the "relationship" item response
+## Dataset properties:
+SAMPLE_SIZE_MIN <- 100L
+SAMPLE_SIZE_MAX <- 500L
 
 
-# Response generation objects:
+## Variable properties:
 
-ITEM_1_LS_CAT <- 2L # Category "Insatisfecho" in "life satisfaction" variable
-                    #   (for item 1).
-
-## Item value labels:
-SIGN_LEVELS    <- c(-1, 0, 1) |> as.character()
-LOGICAL_LEVELS <- c(FALSE, TRUE) |> as.character()
-
-LOGICAL_LABELS <- c("No", "Sí")
-LOGICAL_VALUES <- LOGICAL_LEVELS |> setNames(LOGICAL_LABELS)
-
-ITEM_7_LABELS <- c(
-  "Las variables  tienen una relación indirecta",
-  "Las variables  tienen una relación nula (exactamente igual a cero)",
-  "Las variables  tienen una relación directa"
+SIM_VAR_NAMES <- c( # Variable names
+  "ID",
+  "Inteligencia",
+  "Responsabilidad",
+  "Nota",
+  "Salario_deseado",
+  "Formacion"
 )
-ITEM_7_VALUES <- SIGN_LEVELS |> setNames(ITEM_7_LABELS)
 
-ITEM_10_LABELS <- c(
-  paste(
-    'A menos "satisfacción vital",',
-    'mayor "promedio semanal de horas diarias de sueño"'
-  ),
-  paste(
-    'La relación entre la "satisfacción vital" y el "promedio semanal',
-    'de horas diarias de sueño" es nula (exactamente igual a cero)'
-  ),
-  paste(
-    'A más "satisfacción vital",',
-    'mayor "promedio semanal de horas diarias de sueño"'
-  )
-)
-ITEM_10_VALUES <- SIGN_LEVELS |> setNames(ITEM_10_LABELS)
+SIM_VARIABLES <- "var_" |> # Variable identifiers
+  paste0(seq_along(SIM_VAR_NAMES)) |>
+  setNames(SIM_VAR_NAMES)
+
+
+## Variable values:
+
+### Objects for simulating IQ-metric variables:
+IQ_METRIC_MEAN_CENTER      <- 100L
+IQ_METRIC_MEAN_HALF_RANGE  <-  10L
+IQ_METRIC_SD_CENTER        <-  15L
+IQ_METRIC_SD_HALF_RANGE    <-   3L
+
+### Categories in `var_4` ("Nota"):
+VAR_4_CATS <- c("Suspenso", "Aprobado", "Notable", "Sobresaliente")
+
+### Values in `var_5` ("Salario_deseado"):
+VAR_5_VALUES <- c(15:30, 35L, 40L, 45L, 50L, 60L) * 1000L
+VAR_5_SCALE  <-  2500L # These values give a proper range from 15K to 60K
+VAR_5_SHIFT  <- 15000L
+
+### Categories in `var_6` ("Formacion"):
+VAR_6_CATS <- c("No", "Sí")
+
+
+## Variable minimum proportions:
+VAR_4_MIN_PROP  <-    .12           # `var_4` ("Nota")
+VAR_6_MIN_PROPS <- c(0, .2, .5, .5) # `var_6` == "Sí" in each `var_4` value
+
+
+## Bivariate variable properties:
+
+# Correlation ranges (among generating variables):
+CORR_LIMS_VARS_2_3 <- c(-0.8, 0.8) # "Inteligencia"    - "Responsabilidad"
+CORR_LIMS_VARS_2_4 <- c( 0,   0.6) # "Inteligencia"    - "Nota"
+CORR_LIMS_VARS_2_5 <- c(-0.5, 0.5) # "Inteligencia"    - "Salario_deseado"
+CORR_LIMS_VARS_3_5 <- c(-0.5, 0.5) # "Responsabilidad" - "Salario_deseado"
 
 
 ## ---- FUNCTIONS: -------------------------------------------------------------
 
 simulate_data <- function(seed) {
 
-  set.seed(seed)
-
-  slope       <- sample(REL_LEVS, size = 1L) # Simulated regression coefficient
-  sample_size <- sample(SAMPLE_SIZE, size = 1L) # Random sample size
-  n_crit_vals <- length(VAR_2_SCORES) # Nº of values in `var_2`
-
-  output <- tibble::tibble(
-    var_1 = sample(
-      VAR_1_SCORES,
-      size    = sample_size,
-      replace = TRUE
-    ),
-    # Preliminary "continuous version" of `var_2`
-    var_2 = slope * var_1 + rnorm(sample_size)
-  )
-
-  # Random cut points for `var_2` (to avoid a "flat" barplot)
-  rel_cut_props <- runif(n_crit_vals, min = .2, max = 1) |> cumsum()
-  cut_props     <- c(0, rel_cut_props / max(rel_cut_props)) # Normalize
-  cut_quantiles <- output |> dplyr::pull(var_2) |> quantile(cut_props)
-
-  # Recode `var_2` into discrete values using the cut points:
-  output |>
-    dplyr::mutate(
-      var_2 = var_2 |> cut(
-        breaks         = cut_quantiles,
-        labels         = VAR_2_SCORES,
-        include.lowest = TRUE
-      )
-    ) |>
-    setNames(SIM_VAR_NAMES)
-}
-
-compute_correct_responses <- function(data) {
   ## Constant objects: ----
 
-  # Linear regression model objects:
-  INTERCEPT_TERM <- "(Intercept)"
-  criterion_name <- SIM_VAR_NAMES['var_1'] |> glue::backtick()
-  predictor_name <- SIM_VAR_NAMES['var_2'] |> glue::backtick()
+  # Correlations among generating variables:
+  gen_vars      <- SIM_VARIABLES[2:5] # Names for the correlation matrix
+  corr_dimnames <- list(gen_vars, gen_vars)
+  corr_inf_lims <- c(
+    NA,
+    CORR_LIMS_VARS_2_3[1],
+    CORR_LIMS_VARS_2_4[1],
+    CORR_LIMS_VARS_2_5[1],
+    NA |> rep(3),
+    CORR_LIMS_VARS_3_5[1],
+    NA |> rep(8)
+  ) |>
+    matrix(nrow = 4L, byrow = TRUE, dimnames = corr_dimnames)
+  corr_sup_lims <- c(
+    NA,
+    CORR_LIMS_VARS_2_3[2],
+    CORR_LIMS_VARS_2_4[2],
+    CORR_LIMS_VARS_2_5[2],
+    NA |> rep(3),
+    CORR_LIMS_VARS_3_5[2],
+    NA |> rep(8)
+  ) |>
+    matrix(nrow = 4L, byrow = TRUE, dimnames = corr_dimnames)
 
 
   ## Main: ----
 
-  # Transform `var_2` to integer to use it as a "linear term" in the regression
-  data <- data |> dplyr::mutate(`Satisfaccion vital` = `Satisfaccion vital` |>
-                                  as.character() |>
-                                  as.integer())
+  set.seed(seed) # Ensure the reproducibility
 
-  # Fit model and extract coefficients:
-  model       <- glue::glue("{criterion_name} ~ {predictor_name}") # Formula
-  fitted_model <- data         |> lm(formula = model)
-  coefficients <- fitted_model |> broom::tidy()
 
-  # Compute responses:
+  # Generate random parameters for the simulated variables:
 
-  # Correct numeric responses are computed with machine precision, to take into
-  #   account the possibility of accepting (incorrectly) truncated (instead of
-  #   rounded) values as correct.
-  computed_responses <- data |> dplyr::summarize(
-    item_1 = table(`Satisfaccion vital`)[ITEM_1_LS_CAT],
-    item_2 = median(`Horas sueno promedio`),
-    item_3 = sd(`Horas sueno promedio`),
-    item_4 = quantile(`Horas sueno promedio`, .34),
-    item_5 = boxplot.stats(`Horas sueno promedio`)$out |>
-      length() |>
-      as.logical() |>
-      as.character(),
-    item_6 = cor(`Satisfaccion vital`, `Horas sueno promedio`),
-    item_7 = item_6 |> sign() |> as.character(),
-    item_8 = coefficients |>
-      dplyr::filter(term == INTERCEPT_TERM) |>
-      dplyr::pull(estimate),
-    item_9 = coefficients |>
-      dplyr::filter(term == predictor_name) |>
-      dplyr::pull(estimate),
-    item_10 = item_9 |> sign() |> as.character(),
+  # Random sample size:
+  sample_size <- generate_sample_size(SAMPLE_SIZE_MIN, SAMPLE_SIZE_MAX)
+
+  # Correlation matrix for multivariate variables (`var_2` to `var_5`)
+  corrs <- generate_corr_matrix(min = corr_inf_lims, max = corr_sup_lims)
+
+  ## TODO: Decide whether to move the variable parameter generation to function
+  # Random parameters for scaling variables:
+  var_2_mean <- runif(
+    1L,
+    IQ_METRIC_MEAN_CENTER - IQ_METRIC_MEAN_HALF_RANGE,
+    IQ_METRIC_MEAN_CENTER + IQ_METRIC_MEAN_HALF_RANGE
+  )
+  var_2_sd   <- runif(
+    1L,
+    IQ_METRIC_SD_CENTER - IQ_METRIC_SD_HALF_RANGE,
+    IQ_METRIC_SD_CENTER + IQ_METRIC_SD_HALF_RANGE
+  )
+  var_3_mean <- runif(
+    1L,
+    IQ_METRIC_MEAN_CENTER - IQ_METRIC_MEAN_HALF_RANGE,
+    IQ_METRIC_MEAN_CENTER + IQ_METRIC_MEAN_HALF_RANGE
+  )
+  var_3_sd   <- runif(
+    1L,
+    IQ_METRIC_SD_CENTER - IQ_METRIC_SD_HALF_RANGE,
+    IQ_METRIC_SD_CENTER + IQ_METRIC_SD_HALF_RANGE
   )
 
-  # Capture warning when factor levels are missing in the data (they will!)
-  suppressWarnings(
-    computed_responses <- computed_responses |> dplyr::mutate(
-      item_5  = item_5 |>
-        readr::parse_factor(levels = LOGICAL_VALUES) |>
-        forcats::fct_recode(!!!LOGICAL_VALUES),
-      item_7  = item_7 |>
-        readr::parse_factor(levels = ITEM_7_VALUES) |>
-        forcats::fct_recode(!!!ITEM_7_VALUES),
-      item_10 = item_10 |>
-        readr::parse_factor(levels = ITEM_10_VALUES) |>
-        forcats::fct_recode(!!!ITEM_10_VALUES)
-    )
+  # Random cut points for categorical variables (to avoid "flat" barplots)
+  var_4_props <- VAR_4_CATS |>
+    generate_category_proportions(min_prop = VAR_4_MIN_PROP)
+  ## TODO: Function for simulating "conditional probabilities"?
+  var_6_props <- VAR_6_MIN_PROPS |> # Probability of "Sí" for each `var_4` value
+    purrr::map_dbl(runif, n = 1L) |>
+    setNames(VAR_4_CATS)
+
+
+  # Generate data:
+
+  ## Generate standardized variables:
+  std_vars <- mvtnorm::rmvnorm(sample_size, sigma = corrs) |>
+    tibble::as_tibble(.name_repair = "minimal") |>
+    setNames(gen_vars)
+
+  ## Transform standardized variables to the target distribution:
+  transformed_vars <- std_vars |> dplyr::mutate(
+    var_2 = (var_2_mean + var_2 * var_2_sd) |> as.integer(),
+    var_3 = (var_3_mean + var_3 * var_3_sd) |> as.integer(),
+    var_4 = var_4 |> quantitative_2_categorical(var_4_props),
+    var_5 = (VAR_5_SHIFT + VAR_5_SCALE * exp(var_5)) |>
+      round_quant_2_set(VAR_5_VALUES),
+    var_6 = (var_6_props[as.character(var_4)] > runif(sample_size)) |>
+      dplyr::if_else(true = VAR_6_CATS[2], false = VAR_6_CATS[1])
   )
 
-  computed_responses
+  output <- tibble::tibble(var_1 = 1:sample_size) |>
+    dplyr::bind_cols(transformed_vars)
+
+  # Assign variable names:
+  output |> dplyr::rename(!!!SIM_VARIABLES)
 }
